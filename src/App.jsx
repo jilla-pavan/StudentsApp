@@ -62,10 +62,36 @@ function App() {
     { id: 4, name: 'Final Term', maxScore: 100, date: '2024-05-01' }
   ])
 
-  // Add batch management
+  // Update the batches state with more detailed dummy data
   const [batches, setBatches] = useState([
-    { id: 1, name: 'Morning Batch', timing: '9:00 AM - 12:00 PM' },
-    { id: 2, name: 'Afternoon Batch', timing: '2:00 PM - 5:00 PM' },
+    {
+      id: 1,
+      name: 'Morning Batch',
+      startTime: '09:00',
+      endTime: '11:00',
+      daysOfWeek: ['Monday', 'Wednesday', 'Friday']
+    },
+    {
+      id: 2,
+      name: 'Afternoon Batch',
+      startTime: '14:00',
+      endTime: '16:00',
+      daysOfWeek: ['Tuesday', 'Thursday', 'Saturday']
+    },
+    {
+      id: 3,
+      name: 'Evening Batch',
+      startTime: '18:00',
+      endTime: '20:00',
+      daysOfWeek: ['Monday', 'Tuesday', 'Thursday']
+    },
+    {
+      id: 4,
+      name: 'Weekend Batch',
+      startTime: '10:00',
+      endTime: '13:00',
+      daysOfWeek: ['Saturday', 'Sunday']
+    }
   ])
 
   // Update student structure to include batch
@@ -290,18 +316,18 @@ function App() {
   const getClassPerformance = (testId) => {
     const test = mockTests.find(t => t.id === testId)
     if (!test) return 0
-
-    const studentsWithScores = students.filter(s =>
+    
+    const studentsWithScores = students.filter(s => 
       s.mockScores.some(score => score.mockId === testId)
     )
-
+    
     if (studentsWithScores.length === 0) return 0
-
+    
     const totalScore = studentsWithScores.reduce((acc, student) => {
       const score = student.mockScores.find(s => s.mockId === testId)
       return acc + (score.absent ? 0 : score.score)
     }, 0)
-
+    
     return (totalScore / studentsWithScores.length).toFixed(1)
   }
 
@@ -310,7 +336,7 @@ function App() {
     const totalTests = student.mockScores.length
     const absentCount = student.mockScores.filter(score => score.absent).length
     const averageScore = calculateAverageScore(student.mockScores)
-
+    
     return {
       totalTests,
       absentCount,
@@ -475,8 +501,8 @@ function App() {
 
   // Add this function to get attendance records for the date range
   const getAttendanceRecords = (student) => {
-    return student.attendanceHistory?.filter(record =>
-      record.date >= dateRange.start &&
+    return student.attendanceHistory?.filter(record => 
+      record.date >= dateRange.start && 
       record.date <= dateRange.end
     ).sort((a, b) => new Date(b.date) - new Date(a.date)) || []
   }
@@ -522,11 +548,11 @@ function App() {
 
   // Add state for feedback messages
   const [feedback, setFeedback] = useState({ message: '', type: '' }) // type can be 'success' or 'error'
-
+  
   // Handle mock test form submission
   const handleSubmitMockTest = (e) => {
     e.preventDefault()
-
+    
     const newMockTest = {
       id: editingMock ? editingMock.id : Date.now(),
       name: newMock.name,
@@ -606,11 +632,11 @@ function App() {
 
     const updatedMockScores = [
       ...(student.mockScores || []).filter(s => s.mockId !== testId),
-      {
-        mockId: testId,
+      { 
+        mockId: testId, 
         score: score,
         date: test.date,
-        absent: isAbsent
+        absent: isAbsent 
       }
     ]
 
@@ -660,437 +686,373 @@ function App() {
   const [editingBatch, setEditingBatch] = useState(null)
   const [showBatchForm, setShowBatchForm] = useState(false)
 
-  // Add this section in your JSX where you want to show batches
-  {
-    currentView === 'batches' && (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">Manage Batches</h2>
-            <p className="text-gray-600">Create and manage student batches</p>
-          </div>
-          <button
-            onClick={() => {
-              setShowBatchForm(true)
-              setEditingBatch(null)
-              setCurrentBatch({
-                name: '',
-                startTime: '',
-                endTime: '',
-                description: '',
-              })
-            }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700
-            transition-all duration-300 flex items-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Create New Batch
-          </button>
-        </div>
-
-        {/* Batches Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {batches.length === 0 ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-12">
-              <div className="bg-gray-50 rounded-full p-4 mb-4">
-                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900">No batches created yet</h3>
-              <p className="text-gray-500 text-center mt-1">Create your first batch to get started</p>
-            </div>
-          ) : (
-            batches.map(batch => (
-              <div
-                key={batch.id}
-                className={`${gridCardStyle}`}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">{batch.name}</h3>
-                    <div className="text-sm text-gray-500 mt-1">
-                      {batch.startTime} - {batch.endTime}
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
-                    {students.filter(s => s.batch === batch.id).length} Students
-                  </span>
-                </div>
-
-                {batch.description && (
-                  <p className="text-gray-600 text-sm mb-4">{batch.description}</p>
-                )}
-
-                <div className="flex gap-3 pt-4 border-t border-gray-100">
-                  <button
-                    onClick={() => {
-                      setEditingBatch(batch)
-                      setCurrentBatch(batch)
-                      setShowBatchForm(true)
-                    }}
-                    className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-1.5
-                    bg-green-50 px-3 py-1.5 rounded-lg hover:bg-green-100 transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteBatch(batch.id)}
-                    className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-1.5
-                    bg-red-50 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  // Add these functions with your other functions
-  const handleBatchSubmit = (e) => {
-    e.preventDefault()
-
-    if (editingBatch) {
-      // Update existing batch
-      setBatches(batches.map(batch =>
-        batch.id === editingBatch.id ? { ...currentBatch, id: batch.id } : batch
-      ))
-    } else {
-      // Add new batch
-      setBatches([
-        ...batches,
-        {
-          id: Date.now(),
-          ...currentBatch
-        }
-      ])
-    }
-
-    setShowBatchForm(false)
-    setEditingBatch(null)
-    setCurrentBatch({
-      name: '',
-      startTime: '',
-      endTime: '',
-      description: '',
+  // Add helper function to format time
+  const formatTime = (time) => {
+    return new Date(`2024-01-01T${time}`).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
     })
   }
 
-  const handleDeleteBatch = (batchId) => {
-    if (window.confirm('Are you sure you want to delete this batch?')) {
-      // Check if batch has students
-      const batchHasStudents = students.some(student => student.batch === batchId)
+  // Add helper function to calculate batch progress
+  const calculateBatchProgress = (startDate, endDate) => {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const today = new Date()
+    
+    const total = end - start
+    const elapsed = today - start
+    
+    return Math.max(0, Math.min(100, Math.round((elapsed / total) * 100)))
+  }
 
-      if (batchHasStudents) {
-        alert('Cannot delete batch that has students. Please reassign or remove students first.')
-        return
-      }
-
-      setBatches(batches.filter(batch => batch.id !== batchId))
+  // Add helper function to get batch status color
+  const getBatchStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return 'bg-green-100 text-green-800'
+      case 'upcoming':
+        return 'bg-blue-100 text-blue-800'
+      case 'completed':
+        return 'bg-gray-100 text-gray-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
     }
   }
 
-  return (
-    <div className="min-h-screen w-screen overflow-x-hidden bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="flex relative">
-        {/* Sidebar - make it responsive */}
-        <div className="hidden md:block w-64 fixed left-0 top-0 h-screen bg-white shadow-lg p-4 space-y-2">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">
-              Career Sure Academy
-            </h1>
-          </div>
+  // Simplified newBatch state
+  const [newBatch, setNewBatch] = useState({
+    name: '',
+    startTime: '',
+    endTime: '',
+    daysOfWeek: []
+  })
 
-          {/* Students Section */}
-          <div className="space-y-1">
+  // Simplified batch form
+  const handleBatchSubmit = (e) => {
+    e.preventDefault()
+    
+    const batchToAdd = {
+      id: editingBatch ? editingBatch.id : Date.now(),
+      ...newBatch
+    }
+
+    if (editingBatch) {
+      setBatches(batches.map(batch => 
+        batch.id === editingBatch.id ? batchToAdd : batch
+      ))
+    } else {
+      setBatches([...batches, batchToAdd])
+    }
+
+    // Reset form and redirect to view
+    setNewBatch({
+      name: '',
+      startTime: '',
+      endTime: '',
+      daysOfWeek: []
+    })
+    setEditingBatch(null)
+    setCurrentView('batches-view')
+  }
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Sidebar */}
+      <div className="w-64 min-h-screen bg-white shadow-lg p-4 space-y-2">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+            Career Sure Academy
+          </h1>
+        </div>
+
+        {/* Students Section */}
+        <div className="space-y-1">
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'students' ? '' : 'students')}
+            className={`${sidebarButtonStyle} flex items-center justify-between w-full ${
+              currentView.startsWith('students') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" 
+                />
+              </svg>
+              <span>Students</span>
+            </div>
+            <svg 
+              className={`w-4 h-4 transform transition-transform ${expandedMenu === 'students' ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {/* Students Submenu */}
+          <div className={`pl-4 space-y-1 ${expandedMenu === 'students' ? 'block' : 'hidden'}`}>
             <button
-              onClick={() => setExpandedMenu(expandedMenu === 'students' ? '' : 'students')}
-              className={`${sidebarButtonStyle} flex items-center justify-between w-full ${currentView.startsWith('students') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+              onClick={() => {
+                setCurrentView('students-view')
+                setShowForm(false)
+              }}
+              className={`${sidebarButtonStyle} text-sm ${currentView === 'students-view' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
                 }`}
             >
-              <span>Students</span>
-              <svg
-                className={`w-4 h-4 transform transition-transform ${expandedMenu === 'students' ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              View Students
             </button>
 
-            {/* Students Submenu */}
-            <div className={`pl-4 space-y-1 ${expandedMenu === 'students' ? 'block' : 'hidden'}`}>
-              <button
-                onClick={() => {
-                  setCurrentView('students-view')
-                  setShowForm(false)
-                }}
-                className={`${sidebarButtonStyle} text-sm ${currentView === 'students-view' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
-                  }`}
-              >
-                View Students
-              </button>
-
-              <button
-                onClick={() => {
-                  setCurrentView('students-add')
-                  setShowForm(true)
-                }}
-                className={`${sidebarButtonStyle} text-sm ${currentView === 'students-add' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
-                  }`}
-              >
-                Add Student
-              </button>
-            </div>
-          </div>
-
-          {/* Batches Section */}
-          <div className="space-y-1">
             <button
-              onClick={() => setExpandedMenu(expandedMenu === 'batches' ? '' : 'batches')}
-              className={`${sidebarButtonStyle} flex items-center justify-between w-full ${
-                currentView.startsWith('batches') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+              onClick={() => {
+                setCurrentView('students-add')
+                setShowForm(true)
+              }}
+              className={`${sidebarButtonStyle} text-sm ${currentView === 'students-add' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+                }`}
+            >
+              Add Student
+            </button>
+          </div>
+        </div>
+
+        {/* Batches Section */}
+        <div className="space-y-1">
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'batches' ? '' : 'batches')}
+            className={`${sidebarButtonStyle} flex items-center justify-between w-full ${
+              currentView.startsWith('batches') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" 
+                />
+              </svg>
+              Batches
+            </div>
+            <svg 
+              className={`w-4 h-4 transform transition-transform ${expandedMenu === 'batches' ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {/* Batches Submenu */}
+          <div className={`pl-4 space-y-1 ${expandedMenu === 'batches' ? 'block' : 'hidden'}`}>
+            <button
+              onClick={() => setCurrentView('batches-view')}
+              className={`${sidebarButtonStyle} text-sm ${
+                currentView === 'batches-view' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" 
-                  />
-                </svg>
-                Batches
-              </div>
-              <svg 
-                className={`w-4 h-4 transform transition-transform ${expandedMenu === 'batches' ? 'rotate-180' : ''}`} 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              View Batches
             </button>
+            
+            <button
+              onClick={() => {
+                setCurrentView('batches-add')
+                setShowBatchForm(true)
+              }}
+              className={`${sidebarButtonStyle} text-sm ${
+                currentView === 'batches-add' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+              }`}
+            >
+              Add Batch
+            </button>
+          </div>
+        </div>
 
-            {/* Batches Submenu */}
-            <div className={`pl-4 space-y-1 ${expandedMenu === 'batches' ? 'block' : 'hidden'}`}>
-              <button
-                onClick={() => setCurrentView('batches-view')}
-                className={`${sidebarButtonStyle} text-sm ${
-                  currentView === 'batches-view' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
-                }`}
-              >
-                View Batches
-              </button>
-              
+        {/* Other menu items */}
+        <button
+          onClick={() => setCurrentView('attendance')}
+          className={`${sidebarButtonStyle} ${currentView === 'attendance' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+            }`}
+        >
+          Attendance
+        </button>
+
+        <button
+          onClick={() => setCurrentView('mock')}
+          className={`${sidebarButtonStyle} ${currentView === 'mock' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+            }`}
+        >
+          Mock Tests
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="h-full p-6">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                {currentView === 'students-view' && 'View Students'}
+                {currentView === 'students-add' && 'Add New Student'}
+                {currentView === 'attendance' && 'Attendance Management'}
+                {currentView === 'mock' && 'Mock Tests'}
+                {currentView === 'batches-view' && 'View Batches'}
+                {currentView === 'batches-add' && 'Create New Batch'}
+              </h2>
+              <p className="text-gray-600">
+                {currentView === 'students-view' && 'View and manage existing students'}
+                {currentView === 'attendance' && 'Track and manage student attendance'}
+                {currentView === 'mock' && 'Manage mock tests and scores'}
+                {currentView === 'batches-view' && 'View and manage all batches'}
+                {currentView === 'batches-add' && 'Create and configure new batch'}
+              </p>
+            </div>
+            {currentView === 'batches-view' && (
               <button
                 onClick={() => {
                   setCurrentView('batches-add')
                   setShowBatchForm(true)
                 }}
-                className={`${sidebarButtonStyle} text-sm ${
-                  currentView === 'batches-add' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
-                }`}
+                className={`${buttonStyle} bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 
+                  shadow-md hover:shadow-xl flex items-center gap-2`}
               >
-                Add Batch
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add New Batch
               </button>
-            </div>
+            )}
           </div>
 
-          {/* Other menu items */}
-          <button
-            onClick={() => setCurrentView('attendance')}
-            className={`${sidebarButtonStyle} ${currentView === 'attendance' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
-              }`}
-          >
-            Attendance
-          </button>
-
-          <button
-            onClick={() => setCurrentView('mock')}
-            className={`${sidebarButtonStyle} ${currentView === 'mock' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
-              }`}
-          >
-            Mock Tests
-          </button>
-        </div>
-
-        {/* Main Content - adjust margin for sidebar and make it responsive */}
-        <div className="w-full md:ml-64 min-h-screen">
-          <div className="p-4 md:p-8">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 w-full gap-4">
-              <div>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
-                  {currentView === 'students-view' && 'View Students'}
-                  {currentView === 'students-add' && 'Add New Student'}
-                  {currentView === 'attendance' && 'Attendance Management'}
-                  {currentView === 'mock' && 'Mock Tests'}
-                  {currentView === 'batches' && 'Manage Batches'}
-                </h2>
-                <p className="text-sm md:text-base text-gray-600">
-                  {currentView === 'students-view' && 'View and manage existing students'}
-                  {currentView === 'attendance' && 'Track and manage student attendance'}
-                  {currentView === 'mock' && 'Manage mock tests and scores'}
-                  {currentView === 'batches' && 'Create and manage batches'}
-                </p>
-              </div>
-              {currentView === 'students-view' && (
-                <button
-                  onClick={() => {
-                    setCurrentView('students-add')
-                    setShowForm(true)
-                  }}
-                  className={`${buttonStyle} bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg hover:bg-blue-700 
-                    shadow-md hover:shadow-xl flex items-center gap-2 w-full md:w-auto justify-center`}
-                >
-                  Add Student
-                </button>
-              )}
-            </div>
-
-            {/* Content Area */}
-            <div className="w-full">
-              {currentView === 'students-view' && (
-                <div className={`${cardStyle} bg-white rounded-xl shadow-md p-4 md:p-6 border border-gray-100 w-full`}>
-                  {/* Search and Filter Section - make it responsive */}
-                  <div className="mb-6 bg-white/80 backdrop-blur-sm backdrop-filter rounded-xl shadow-sm p-4 md:p-5 border border-gray-200/80">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-                      <div className="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
-                        <input
-                          type="text"
-                          placeholder="Search by name or roll number..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className={`${searchInputStyle} w-full md:w-64`}
-                        />
-                        <select
-                          value={selectedBatch}
-                          onChange={(e) => setSelectedBatch(e.target.value)}
-                          className={`${selectStyle} w-full md:w-auto`}
-                        >
-                          <option value="">All Batches</option>
-                          {[...new Set(students.map(s => s.batch))]
-                            .filter(Boolean)
-                            .sort((a, b) => a - b)
-                            .map(batchNum => (
-                              <option key={batchNum} value={batchNum}>
-                                Batch {batchNum} ({students.filter(s => s.batch?.toString() === batchNum?.toString()).length} students)
-                              </option>
-                            ))}
-                        </select>
+          {/* Content Area */}
+          <div className="w-full">
+            {currentView === 'students-view' && (
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                {/* Search and Filter Section */}
+                <div className="mb-6 bg-white/80 backdrop-blur-sm backdrop-filter rounded-xl shadow-sm p-5 border border-gray-200/80">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="text"
+                        placeholder="Search by name or roll number..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className={searchInputStyle}
+                      />
+                      <select
+                        value={selectedBatch}
+                        onChange={(e) => setSelectedBatch(e.target.value)}
+                        className={selectStyle}
+                      >
+                        <option value="">All Batches</option>
+                        {[...new Set(students.map(s => s.batch))]
+                          .filter(Boolean)
+                          .sort((a, b) => a - b)
+                          .map(batchNum => (
+                            <option key={batchNum} value={batchNum}>
+                              Batch {batchNum} ({students.filter(s => s.batch?.toString() === batchNum?.toString()).length} students)
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                    {selectedBatch ? (
+                      <div className="px-4 py-2 bg-blue-50 rounded-lg text-blue-700 font-medium">
+                        Showing {students.filter(s => s.batch?.toString() === selectedBatch).length} students from Batch {selectedBatch}
                       </div>
-                      <div className="px-4 py-2 bg-blue-50 rounded-lg text-blue-700 font-medium w-full md:w-auto text-center md:text-left">
-                        {students.filter(student => {
+                    ) : (
+                      <div className="px-4 py-2 bg-blue-50 rounded-lg text-blue-700 font-medium">
+                        Showing all {students.length} students
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filtered Students Grid */}
+                <div className="mb-6">
+                  <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-6 rounded-xl border border-blue-100/50 backdrop-blur-sm backdrop-filter">
+                    <h3 className="text-lg font-medium text-blue-800 mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      {selectedBatch ? `Batch ${selectedBatch} Students` : 'All Students'}
+                    </h3>
+                    <div className="space-y-4">
+                      {students
+                        .filter(student => {
                           const searchLower = searchTerm.toLowerCase();
                           const matchesSearch = !searchTerm ||
                             student.name?.toLowerCase().includes(searchLower) ||
                             student.rollNumber?.toLowerCase().includes(searchLower);
                           const matchesBatch = !selectedBatch || student.batch?.toString() === selectedBatch;
                           return matchesSearch && matchesBatch;
-                        }).length} students
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Filtered Students Grid - make it responsive */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                    {students
-                      .filter(student => {
-                        const searchLower = searchTerm.toLowerCase();
-                        const matchesSearch = !searchTerm ||
-                          student.name?.toLowerCase().includes(searchLower) ||
-                          student.rollNumber?.toLowerCase().includes(searchLower);
-                        const matchesBatch = !selectedBatch || student.batch?.toString() === selectedBatch;
-                        return matchesSearch && matchesBatch;
-                      })
-                      .map(student => (
-                        <div
-                          key={student.id}
-                          onClick={() => handleCardClick(student)}
-                          className={`${gridCardStyle} group`}
-                        >
-                          {/* Card Header */}
-                          <div className="flex flex-col mb-4">
-                            <div className="flex items-start gap-4">
-                              {/* Image with hover effect */}
-                              <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 ring-2 ring-offset-2 ring-transparent group-hover:ring-blue-500 transition-all duration-300">
-                                {student.imageUrl ? (
-                                  <img
-                                    src={student.imageUrl}
-                                    alt={student.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                      />
-                                    </svg>
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Student Info with improved typography */}
-                              <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-lg text-gray-800 truncate group-hover:text-blue-600 transition-colors duration-300">
-                                  {student.name}
+                        })
+                        .map(student => (
+                          <div
+                            key={student.id}
+                            onClick={() => handleCardClick(student)}
+                            className={`${cardHoverStyle} bg-white p-4 rounded-xl border border-gray-200/80 flex items-center gap-4 cursor-pointer`}
+                          >
+                            {/* Student Image */}
+                            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 ring-2 ring-offset-2 ring-transparent group-hover:ring-blue-500 transition-all duration-300">
+                              {student.imageUrl ? (
+                                <img
+                                  src={student.imageUrl}
+                                  alt={student.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                    />
+                                  </svg>
                                 </div>
-                                <div className="text-sm text-gray-500 truncate mt-0.5">
-                                  Roll No: {student.rollNumber}
-                                </div>
-                              </div>
+                              )}
+                            </div>
 
-                              {/* Enhanced Batch Badge */}
-                              <div className="flex-shrink-0">
-                                <span className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 
-                                  rounded-lg text-sm font-medium border border-blue-100/50 shadow-sm group-hover:shadow-md
-                                  transition-all duration-300">
+                            {/* Student Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <h4 className="text-lg font-semibold text-gray-900 truncate">{student.name}</h4>
+                                <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
                                   Batch {student.batch}
                                 </span>
                               </div>
+                              <div className="flex items-center gap-4 text-sm text-gray-600">
+                                <span className="flex items-center gap-1">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                  </svg>
+                                  Roll No: {student.rollNumber}
+                                </span>
+                                {student.email && (
+                                  <span className="flex items-center gap-1">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                    {student.email}
+                                  </span>
+                                )}
+                                {student.contactNumber && (
+                                  <span className="flex items-center gap-1">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                    </svg>
+                                    {student.contactNumber}
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                          </div>
 
-                          {/* Contact Info with improved spacing */}
-                          <div className="space-y-2.5 mb-4">
-                            {student.contactNumber && (
-                              <div className="flex items-center gap-2.5 text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                </svg>
-                                {student.contactNumber}
-                              </div>
-                            )}
-                            {student.email && (
-                              <div className="flex items-center gap-2.5 text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                {student.email}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Action Buttons with enhanced hover effects */}
-                          <div className="pt-4 border-t border-gray-100">
-                            <div className="flex flex-wrap gap-2">
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -1099,57 +1061,38 @@ function App() {
                                   setCurrentView('students-add');
                                   setShowForm(true);
                                 }}
-                                className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-2
-                                  bg-green-50 hover:bg-green-100 px-4 py-2 rounded-lg transition-all duration-300
-                                  border border-green-100 hover:border-green-200 shadow-sm hover:shadow-md"
+                                className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors duration-300"
                               >
-                                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
-                                Edit
                               </button>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDeleteStudent(student.id);
                                 }}
-                                className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-2
-                                  bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-all duration-300
-                                  border border-red-100 hover:border-red-200 shadow-sm hover:shadow-md"
+                                className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300"
                               >
-                                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                                Delete
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  viewStudentReport(student);
-                                }}
-                                className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-2
-                                  bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition-all duration-300
-                                  border border-blue-100 hover:border-blue-200 shadow-sm hover:shadow-md"
-                              >
-                                <span>View Details</span>
-                                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
 
-                    {/* No Results Message */}
-                    {students.filter(student => {
-                      const searchLower = searchTerm.toLowerCase();
-                      const matchesSearch = !searchTerm ||
-                        student.name?.toLowerCase().includes(searchLower) ||
-                        student.rollNumber?.toLowerCase().includes(searchLower);
-                      const matchesBatch = !selectedBatch || student.batch?.toString() === selectedBatch;
-                      return matchesSearch && matchesBatch;
-                    }).length === 0 && (
+                      {/* No Results Message */}
+                      {students.filter(student => {
+                        const searchLower = searchTerm.toLowerCase();
+                        const matchesSearch = !searchTerm ||
+                          student.name?.toLowerCase().includes(searchLower) ||
+                          student.rollNumber?.toLowerCase().includes(searchLower);
+                        const matchesBatch = !selectedBatch || student.batch?.toString() === selectedBatch;
+                        return matchesSearch && matchesBatch;
+                      }).length === 0 && (
                         <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
                           <div className="bg-gray-50 rounded-full p-4 mb-4">
                             <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1169,288 +1112,431 @@ function App() {
                           </p>
                         </div>
                       )}
+                    </div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Add/Edit Student Form */}
-              {currentView === 'students-add' && (
-                <div className="bg-gradient-to-br from-white to-gray-50/80 rounded-xl shadow-lg p-8 border border-gray-200/80 backdrop-blur-sm">
-                  <div className="mb-6 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      {editingStudent ? 'Edit Student' : 'Add New Student'}
-                    </h2>
-                    <span className="px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium border border-blue-100">
-                      {editingStudent ? `Editing Roll No: ${editingStudent.rollNumber}` : 'New Student'}
-                    </span>
-                  </div>
+            {/* Add/Edit Student Form */}
+            {currentView === 'students-add' && (
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    {editingStudent ? 'Edit Student' : 'Add New Student'}
+                  </h2>
+                  <span className="px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium border border-blue-100">
+                    {editingStudent ? `Editing Roll No: ${editingStudent.rollNumber}` : 'New Student'}
+                  </span>
+                </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-8">
-                    {/* Image Upload Section */}
-                    <div className="flex justify-center mb-8">
-                      <div className="w-40 h-40 relative group">
-                        <div className={`
-                          w-full h-full rounded-full border-3 border-dashed
-                          flex items-center justify-center overflow-hidden
-                          transition-all duration-300
-                          ${newStudent.imageUrl
-                            ? 'border-transparent'
-                            : 'border-gray-300 group-hover:border-blue-300 bg-gray-50/80'}
-                        `}>
-                          {newStudent.imageUrl ? (
-                            <img
-                              src={newStudent.imageUrl}
-                              alt="Student"
-                              className="w-full h-full object-cover rounded-full"
-                            />
-                          ) : (
-                            <div className="text-center">
-                              <svg className="w-12 h-12 text-gray-400 mx-auto mb-2 group-hover:text-blue-400 transition-colors duration-300"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
-                              <p className="text-sm text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
-                                Click to upload photo
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          title="Upload student image"
-                        />
-                        {newStudent.imageUrl && (
-                          <button
-                            type="button"
-                            onClick={() => setNewStudent({ ...newStudent, image: null, imageUrl: '' })}
-                            className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-2
-                              hover:bg-red-200 transition-colors duration-300 shadow-sm hover:shadow-md"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  {/* Image Upload Section */}
+                  <div className="flex justify-center mb-8">
+                    <div className="w-40 h-40 relative group">
+                      <div className={`
+                        w-full h-full rounded-full border-3 border-dashed
+                        flex items-center justify-center overflow-hidden
+                        transition-all duration-300
+                        ${newStudent.imageUrl
+                          ? 'border-transparent'
+                          : 'border-gray-300 group-hover:border-blue-300 bg-gray-50/80'}
+                      `}>
+                        {newStudent.imageUrl ? (
+                          <img
+                            src={newStudent.imageUrl}
+                            alt="Student"
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        ) : (
+                          <div className="text-center">
+                            <svg className="w-12 h-12 text-gray-400 mx-auto mb-2 group-hover:text-blue-400 transition-colors duration-300"
+                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
                             </svg>
-                          </button>
+                            <p className="text-sm text-gray-500 group-hover:text-blue-500 transition-colors duration-300">
+                              Click to upload photo
+                            </p>
+                          </div>
                         )}
                       </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        title="Upload student image"
+                      />
+                      {newStudent.imageUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setNewStudent({ ...newStudent, image: null, imageUrl: '' })}
+                          className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-2
+                            hover:bg-red-200 transition-colors duration-300 shadow-sm hover:shadow-md"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
-
-                    {/* Form Fields Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-6">
-                        <div>
-                          <label className={formLabelStyle}>
-                            Student Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={newStudent.name}
-                            onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
-                            className={formInputStyle}
-                            placeholder="Enter student's full name"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className={formLabelStyle}>
-                            Roll Number <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={newStudent.rollNumber}
-                            onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
-                            className={formInputStyle}
-                            placeholder="Enter roll number"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className={formLabelStyle}>
-                            Batch Number <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            value={newStudent.batch}
-                            onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
-                            className={formInputStyle}
-                            min="1"
-                            max="12"
-                            placeholder="Enter batch number"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-6">
-                        <div>
-                          <label className={formLabelStyle}>Contact Number</label>
-                          <input
-                            type="tel"
-                            value={newStudent.contactNumber || ''}
-                            onChange={(e) => setNewStudent({ ...newStudent, contactNumber: e.target.value })}
-                            className={formInputStyle}
-                            placeholder="Enter contact number"
-                          />
-                        </div>
-                        <div>
-                          <label className={formLabelStyle}>Email Address</label>
-                          <input
-                            type="email"
-                            value={newStudent.email || ''}
-                            onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
-                            className={formInputStyle}
-                            placeholder="Enter email address"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-4 pt-6 border-t border-gray-200">
-                      <button
-                        type="submit"
-                        className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg
-                          font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
-                      >
-                        {editingStudent ? 'Update Student' : 'Add Student'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCurrentView('students-view')
-                          setShowForm(false)
-                          setEditingStudent(null)
-                          setNewStudent({
-                            name: '',
-                            rollNumber: '',
-                            batch: '',
-                            image: null,
-                            imageUrl: '',
-                            attendance: { scrum: [], class: [] },
-                            mockScores: []
-                          })
-                        }}
-                        className="px-6 py-3 rounded-lg border border-gray-200 font-medium
-                          hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              {/* Add/Edit Batch Form */}
-              {currentView === 'batches-add' && (
-                <div className="bg-gradient-to-br from-white to-gray-50/80 rounded-xl shadow-lg p-8 border border-gray-200/80 backdrop-blur-sm">
-                  <div className="mb-6 flex items-center justify-between">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                      {editingBatch ? 'Edit Batch' : 'Create New Batch'}
-                    </h2>
                   </div>
 
-                  <form onSubmit={handleBatchSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Form Fields Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-6">
                       <div>
                         <label className={formLabelStyle}>
-                          Batch Name <span className="text-red-500">*</span>
+                          Student Name <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
-                          value={currentBatch.name}
-                          onChange={(e) => setCurrentBatch({ ...currentBatch, name: e.target.value })}
+                          value={newStudent.name}
+                          onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
                           className={formInputStyle}
-                          placeholder="Enter batch name"
+                          placeholder="Enter student's full name"
                           required
                         />
                       </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className={formLabelStyle}>
-                            Start Time <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="time"
-                            value={currentBatch.startTime}
-                            onChange={(e) => setCurrentBatch({ ...currentBatch, startTime: e.target.value })}
-                            className={formInputStyle}
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className={formLabelStyle}>
-                            End Time <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="time"
-                            value={currentBatch.endTime}
-                            onChange={(e) => setCurrentBatch({ ...currentBatch, endTime: e.target.value })}
-                            className={formInputStyle}
-                            required
-                          />
-                        </div>
+                      <div>
+                        <label className={formLabelStyle}>
+                          Roll Number <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={newStudent.rollNumber}
+                          onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
+                          className={formInputStyle}
+                          placeholder="Enter roll number"
+                          required
+                        />
                       </div>
-
-                      <div className="col-span-2">
-                        <label className={formLabelStyle}>Description</label>
-                        <textarea
-                          value={currentBatch.description}
-                          onChange={(e) => setCurrentBatch({ ...currentBatch, description: e.target.value })}
-                          className={`${formInputStyle} h-24 resize-none`}
-                          placeholder="Enter batch description"
+                      <div>
+                        <label className={formLabelStyle}>
+                          Batch Number <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={newStudent.batch}
+                          onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                          className={formInputStyle}
+                          min="1"
+                          placeholder="Enter batch number"
+                          required
                         />
                       </div>
                     </div>
 
-                    <div className="flex gap-4 pt-6 border-t border-gray-200">
-                      <button
-                        type="submit"
-                        className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg
-                          font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
-                      >
-                        {editingBatch ? 'Update Batch' : 'Create Batch'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCurrentView('batches-view')
-                          setShowBatchForm(false)
-                          setEditingBatch(null)
-                          setCurrentBatch({
-                            name: '',
-                            startTime: '',
-                            endTime: '',
-                            description: '',
-                          })
-                        }}
-                        className="px-6 py-3 rounded-lg border border-gray-200 font-medium
-                          hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
-                      >
-                        Cancel
-                      </button>
+                    <div className="space-y-6">
+                      <div>
+                        <label className={formLabelStyle}>Contact Number</label>
+                        <input
+                          type="tel"
+                          value={newStudent.contactNumber || ''}
+                          onChange={(e) => setNewStudent({ ...newStudent, contactNumber: e.target.value })}
+                          className={formInputStyle}
+                          placeholder="Enter contact number"
+                        />
+                      </div>
+                      <div>
+                        <label className={formLabelStyle}>Email Address</label>
+                        <input
+                          type="email"
+                          value={newStudent.email || ''}
+                          onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                          className={formInputStyle}
+                          placeholder="Enter email address"
+                        />
+                      </div>
                     </div>
-                  </form>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 pt-6 border-t border-gray-200">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg
+                        font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      {editingStudent ? 'Update Student' : 'Add Student'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentView('students-view')
+                        setShowForm(false)
+                        setEditingStudent(null)
+                        setNewStudent({
+                          name: '',
+                          rollNumber: '',
+                          batch: '',
+                          image: null,
+                          imageUrl: '',
+                          attendance: { scrum: [], class: [] },
+                          mockScores: []
+                        })
+                      }}
+                      className="px-6 py-3 rounded-lg border border-gray-200 font-medium
+                        hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Add/Edit Batch Form */}
+            {currentView === 'batches-add' && (
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    {editingBatch ? 'Edit Batch' : 'Create New Batch'}
+                  </h2>
                 </div>
-              )}
-            </div>
+
+                <form onSubmit={handleBatchSubmit} className="space-y-6">
+                  {/* Basic Information */}
+                  <div>
+                    <label className={formLabelStyle}>
+                      Batch Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newBatch.name}
+                      onChange={(e) => setNewBatch({ ...newBatch, name: e.target.value })}
+                      className={formInputStyle}
+                      placeholder="Enter batch name"
+                      required
+                    />
+                  </div>
+
+                  {/* Time Selection */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className={formLabelStyle}>
+                        Start Time <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="time"
+                        value={newBatch.startTime}
+                        onChange={(e) => setNewBatch({ ...newBatch, startTime: e.target.value })}
+                        className={formInputStyle}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className={formLabelStyle}>
+                        End Time <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="time"
+                        value={newBatch.endTime}
+                        onChange={(e) => setNewBatch({ ...newBatch, endTime: e.target.value })}
+                        className={formInputStyle}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Days Selection */}
+                  <div>
+                    <label className={formLabelStyle}>
+                      Days of Week <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                        <button
+                          key={day}
+                          type="button"
+                          onClick={() => {
+                            const days = newBatch.daysOfWeek.includes(day)
+                              ? newBatch.daysOfWeek.filter(d => d !== day)
+                              : [...newBatch.daysOfWeek, day]
+                            setNewBatch({ ...newBatch, daysOfWeek: days })
+                          }}
+                          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200
+                            ${newBatch.daysOfWeek.includes(day)
+                              ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                          {day.slice(0, 3)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex gap-4 pt-6 border-t border-gray-200">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg
+                        font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      {editingBatch ? 'Update Batch' : 'Create Batch'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentView('batches-view')
+                        setEditingBatch(null)
+                        setNewBatch({
+                          name: '',
+                          startTime: '',
+                          endTime: '',
+                          daysOfWeek: []
+                        })
+                      }}
+                      className="px-6 py-3 rounded-lg border border-gray-200 font-medium
+                        hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* Batches View */}
+            {currentView === 'batches-view' && (
+              <div className="space-y-6">
+                {/* Batches Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {batches.map(batch => {
+                    // Filter students who belong to this batch
+                    const batchStudents = students.filter(
+                      student => student.batch?.toString() === batch.name?.toString()
+                    );
+
+                    return (
+                      <div 
+                        key={batch.id}
+                        className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+                      >
+                        {/* Batch Header */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900">Batch {batch.name}</h3>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {batchStudents.length} Students Enrolled
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingBatch(batch)
+                                setNewBatch(batch)
+                                setCurrentView('batches-add')
+                              }}
+                              className="p-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors duration-300"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm('Are you sure you want to delete this batch?')) {
+                                  setBatches(batches.filter(b => b.id !== batch.id))
+                                }
+                              }}
+                              className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-300"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Batch Time */}
+                        <div className="flex items-center gap-2 text-gray-600 mb-4">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>{formatTime(batch.startTime)} - {formatTime(batch.endTime)}</span>
+                        </div>
+
+                        {/* Batch Days */}
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {batch.daysOfWeek.map(day => (
+                            <span 
+                              key={day}
+                              className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-sm font-medium"
+                            >
+                              {day.slice(0, 3)}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Students List */}
+                        <div className="mt-6">
+                          <h4 className="text-sm font-medium text-gray-700 mb-3">Enrolled Students</h4>
+                          {batchStudents.length > 0 ? (
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                              {batchStudents.map(student => (
+                                <div 
+                                  key={student.id}
+                                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                      <span className="text-sm font-medium text-blue-700">
+                                        {student.name?.charAt(0)}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <h5 className="text-sm font-medium text-gray-900">{student.name}</h5>
+                                      <p className="text-xs text-gray-500">Roll No: {student.rollNumber}</p>
+                                    </div>
+                                  </div>
+                                  {student.contactNumber && (
+                                    <span className="text-xs text-gray-500">{student.contactNumber}</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg">
+                              No students enrolled in this batch
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Add Batch Button */}
+                <button
+                  onClick={() => {
+                    setCurrentView('batches-add')
+                    setEditingBatch(null)
+                    setNewBatch({
+                      name: '',
+                      startTime: '',
+                      endTime: '',
+                      daysOfWeek: []
+                    })
+                  }}
+                  className="fixed bottom-8 right-8 bg-blue-600 text-white p-4 rounded-full shadow-lg 
+                    hover:bg-blue-700 hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Mobile Sidebar Toggle Button */}
-      <button 
-        className="md:hidden fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg"
-        onClick={() => {/* Add mobile menu toggle logic */}}
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
 
       {/* Student Details Modal */}
       {showStudentDetails && selectedStudent && (
@@ -1492,9 +1578,6 @@ function App() {
                 <div>
                   <h3 className="text-xl font-semibold text-gray-800">{selectedStudent.name}</h3>
                   <p className="text-gray-600">Roll No: {selectedStudent.rollNumber}</p>
-                  <span className="inline-block mt-1 px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium">
-                    Batch {selectedStudent.batch}
-                  </span>
                 </div>
               </div>
 
