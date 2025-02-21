@@ -334,7 +334,7 @@ function App() {
   // Update handleBatchSubmit
   const handleBatchSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingBatch) {
         // Update existing batch
@@ -378,7 +378,7 @@ function App() {
       setEditingBatch(null);
       setShowBatchForm(false);
       setCurrentView('batches-view');
-      
+
       // Refresh data
       fetchBatches();
       fetchStudents();
@@ -872,12 +872,34 @@ function App() {
   // First, add this new state near your other state declarations
   const [selectedBatchDetails, setSelectedBatchDetails] = useState(null)
 
+  // Add state for selected date and selected batch for attendance
+  const [attendanceDate, setAttendanceDate] = useState(getTodayDate());
+  const [selectedAttendanceBatch, setSelectedAttendanceBatch] = useState('');
+
+  // Add state for managing attendance submission
+  const [attendanceStudents, setAttendanceStudents] = useState([]);
+  const [showAttendanceList, setShowAttendanceList] = useState(false);
+
+  // Function to handle attendance submission
+  const handleAttendanceSubmit = () => {
+    // Filter students based on selected batch and date
+    const studentsInBatch = students.filter(student => student.batch === selectedAttendanceBatch);
+    setAttendanceStudents(studentsInBatch);
+    setShowAttendanceList(true); // Show the attendance list
+  };
+
+  // Function to mark attendance
+  const markAttendance = (studentId, status) => {
+    console.log(`Student ID: ${studentId}, Attendance: ${status}`);
+    // Implement logic to save attendance status (e.g., update state, send to server, etc.)
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
       <div className="w-64 min-h-screen bg-white shadow-lg p-4 space-y-2">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-xl font-bold text-gray-800 mb-2">
             Career Sure Academy
           </h1>
         </div>
@@ -981,14 +1003,41 @@ function App() {
           </div>
         </div>
 
-        {/* Other menu items */}
-        <button
-          onClick={() => setCurrentView('attendance')}
-          className={`${sidebarButtonStyle} ${currentView === 'attendance' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
-            }`}
-        >
-          Attendance
-        </button>
+        <div className="space-y-1">
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'attendance' ? '' : 'attendance')}
+            className={`${sidebarButtonStyle} flex items-center justify-between w-full ${currentView.startsWith('attendance') ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+              }`}
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+              Attendance
+            </div>
+            <svg
+              className={`w-4 h-4 transform transition-transform ${expandedMenu === 'attendance' ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {/* Attendance Submenu */}
+          <div className={`pl-4 space-y-1 ${expandedMenu === 'attendance' ? 'block' : 'hidden'}`}>
+            <button
+              onClick={() => setCurrentView('students-attendance')}
+              className={`${sidebarButtonStyle} text-sm ${currentView === 'students-attendance' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-600'
+                }`}
+            >
+              Students Attendance
+            </button>
+          </div>
+        </div>
 
         <button
           onClick={() => setCurrentView('mock')}
@@ -1005,7 +1054,7 @@ function App() {
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-xl font-bold text-gray-800 mb-2">
                 {currentView === 'students-view' && 'View Students'}
                 {currentView === 'students-add' && 'Add New Student'}
                 {currentView === 'attendance' && 'Attendance Management'}
@@ -1013,7 +1062,7 @@ function App() {
                 {currentView === 'batches-view' && 'View Batches'}
                 {currentView === 'batches-add' && 'Create New Batch'}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-sm">
                 {currentView === 'students-view' && 'View and manage existing students'}
                 {currentView === 'attendance' && 'Track and manage student attendance'}
                 {currentView === 'mock' && 'Manage mock tests and scores'}
@@ -1234,10 +1283,10 @@ function App() {
               <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
                 {/* Form Header */}
                 <div className="mb-8 border-b border-gray-100 pb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  <h2 className="text-xl font-bold text-gray-800 mb-2">
                     {editingStudent ? 'Edit Student Details' : 'Add New Student'}
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-sm">
                     {editingStudent
                       ? 'Update the information for existing student'
                       : 'Fill in the information to register a new student'}
@@ -1453,10 +1502,10 @@ function App() {
               <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
                 {/* Form Header */}
                 <div className="mb-8 border-b border-gray-100 pb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  <h2 className="text-xl font-bold text-gray-800 mb-2">
                     {editingBatch ? 'Edit Batch Details' : 'Create New Batch'}
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-sm">
                     {editingBatch
                       ? 'Update the information for existing batch'
                       : 'Fill in the details to create a new batch'}
@@ -1609,7 +1658,7 @@ function App() {
                     );
 
                     return (
-                      <div 
+                      <div
                         key={batch.id}
                         className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 
                           border border-gray-100 overflow-hidden"
@@ -1636,7 +1685,7 @@ function App() {
                           <div className="flex items-center gap-3 mb-4">
                             <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
                               <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                               </svg>
                             </div>
@@ -1649,7 +1698,7 @@ function App() {
                           {/* Schedule Days */}
                           <div className="flex flex-wrap gap-2">
                             {batch.daysOfWeek.map(day => (
-                              <span 
+                              <span
                                 key={day}
                                 className="px-2.5 py-1 bg-gray-50 text-gray-600 rounded-lg text-sm 
                                   border border-gray-100 hover:border-blue-100 hover:bg-blue-50 
@@ -1670,10 +1719,10 @@ function App() {
                               justify-center gap-2 group/btn"
                           >
                             <span>View Students</span>
-                            <svg 
-                              className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300" 
-                              fill="none" 
-                              stroke="currentColor" 
+                            <svg
+                              className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300"
+                              fill="none"
+                              stroke="currentColor"
                               viewBox="0 0 24 24"
                             >
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
@@ -1713,224 +1762,317 @@ function App() {
                 </div>
               </div>
             )}
+
+
+
+
+
+            {currentView === 'students-attendance' && (< div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Attendance Management</h2>
+
+              {/* Date Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                <input
+                  type="date"
+                  value={attendanceDate}
+                  onChange={(e) => setAttendanceDate(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
+                    focus:border-blue-400 transition-colors duration-200"
+                />
+              </div>
+
+              {/* Batch Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Batch</label>
+                <select
+                  value={selectedAttendanceBatch}
+                  onChange={(e) => setSelectedAttendanceBatch(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
+                    focus:border-blue-400 transition-colors duration-200 bg-white"
+                >
+                  <option value="">Select a batch</option>
+                  {batches.map(batch => (
+                    <option key={batch.id} value={batch.name}>
+                      Batch {batch.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                onClick={handleAttendanceSubmit}
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300"
+              >
+                Submit
+              </button>
+            </div>)}
+
+            {/* Show attendance list if available */}
+            {showAttendanceList && (
+              <div className="mt-6 bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {attendanceStudents.map(student => (
+                      <tr key={student.id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <div className="flex space-x-4">
+                            <button
+                              onClick={() => {
+                                // Handle marking as present
+                                console.log(`Student: ${student.name}, Attendance: Present`);
+                              }}
+                              className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 transition-colors duration-300"
+                            >
+                              Present
+                            </button>
+                            <button
+                              onClick={() => {
+                                // Handle marking as absent
+                                console.log(`Student: ${student.name}, Attendance: Absent`);
+                              }}
+                              className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition-colors duration-300"
+                            >
+                              Absent
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Student Details Modal */}
-      {showStudentDetails && selectedStudent && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white/95 backdrop-blur-sm backdrop-filter rounded-xl max-w-2xl w-full max-h-[90vh] 
+      {
+        showStudentDetails && selectedStudent && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white/95 backdrop-blur-sm backdrop-filter rounded-xl max-w-2xl w-full max-h-[90vh] 
             overflow-y-auto p-6 m-4 shadow-xl border border-gray-200/50">
-            <div className="flex justify-between items-start mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Student Details</h2>
-              <button
-                onClick={() => setShowStudentDetails(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="space-y-6">
-              {/* Student Header */}
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100">
-                  {selectedStudent.imageUrl ? (
-                    <img
-                      src={selectedStudent.imageUrl}
-                      alt={selectedStudent.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">{selectedStudent.name}</h3>
-                  <p className="text-gray-600">Roll No: {selectedStudent.rollNumber}</p>
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-700 mb-3">Contact Information</h4>
-                <div className="space-y-2">
-                  {selectedStudent.contactNumber && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                      </svg>
-                      {selectedStudent.contactNumber}
-                    </div>
-                  )}
-                  {selectedStudent.email && (
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                      {selectedStudent.email}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-gray-200">
+              <div className="flex justify-between items-start mb-6">
+                <h2 className="text-xl font-bold text-gray-800">Student Details</h2>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setEditingStudent(selectedStudent);
-                    setNewStudent(selectedStudent);
-                    setCurrentView('students-add');
-                    setShowForm(true);
-                    setShowStudentDetails(false);
-                  }}
-                  className="flex-1 text-green-600 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-lg font-medium"
-                >
-                  Edit Student
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteStudent(selectedStudent.id);
-                    setShowStudentDetails(false);
-                  }}
-                  className="flex-1 text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg font-medium"
-                >
-                  Delete Student
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Simplified Batch Students Modal */}
-      {selectedBatchDetails && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <h2 className="text-xl font-bold text-gray-800">
-                    Batch {selectedBatchDetails.name} Students
-                  </h2>
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
-                    {students.filter(s => s.batch?.toString() === selectedBatchDetails.name?.toString()).length} Students
-                  </span>
-                </div>
-                <button
-                  onClick={() => setSelectedBatchDetails(null)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  onClick={() => setShowStudentDetails(false)}
+                  className="text-gray-500 hover:text-gray-700"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-            </div>
 
-            {/* Students List */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-              <div className="space-y-4">
-                {students
-                  .filter(student => student.batch?.toString() === selectedBatchDetails.name?.toString())
-                  .map(student => (
-                    <div
-                      key={student.id}
-                      className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          {/* Student Image */}
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                            {student.imageUrl ? (
-                              <img
-                                src={student.imageUrl}
-                                alt={student.name}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                  />
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Student Info */}
-                          <div>
-                            <h4 className="font-medium text-gray-900">{student.name}</h4>
-                            <p className="text-sm text-gray-600">Roll No: {student.rollNumber}</p>
-                          </div>
-                        </div>
-
-                        {/* Contact Info */}
-                        <div className="flex items-center gap-6">
-                          {student.email && (
-                            <a
-                              href={`mailto:${student.email}`}
-                              className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                />
-                              </svg>
-                              {student.email}
-                            </a>
-                          )}
-                          {student.contactNumber && (
-                            <a
-                              href={`tel:${student.contactNumber}`}
-                              className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                />
-                              </svg>
-                              {student.contactNumber}
-                            </a>
-                          )}
-                        </div>
+              <div className="space-y-6">
+                {/* Student Header */}
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100">
+                    {selectedStudent.imageUrl ? (
+                      <img
+                        src={selectedStudent.imageUrl}
+                        alt={selectedStudent.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
                       </div>
-                    </div>
-                  ))}
-
-                {/* Empty State */}
-                {students.filter(s => s.batch?.toString() === selectedBatchDetails.name?.toString()).length === 0 && (
-                  <div className="text-center py-8">
-                    <div className="bg-gray-50 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-gray-500 font-medium">No students enrolled</h3>
-                    <p className="text-gray-400 text-sm mt-1">This batch doesn't have any students yet.</p>
+                    )}
                   </div>
-                )}
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-800">{selectedStudent.name}</h3>
+                    <p className="text-gray-600">Roll No: {selectedStudent.rollNumber}</p>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-700 mb-3">Contact Information</h4>
+                  <div className="space-y-2">
+                    {selectedStudent.contactNumber && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        {selectedStudent.contactNumber}
+                      </div>
+                    )}
+                    {selectedStudent.email && (
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        {selectedStudent.email}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingStudent(selectedStudent);
+                      setNewStudent(selectedStudent);
+                      setCurrentView('students-add');
+                      setShowForm(true);
+                      setShowStudentDetails(false);
+                    }}
+                    className="flex-1 text-green-600 bg-green-50 hover:bg-green-100 px-4 py-2 rounded-lg font-medium"
+                  >
+                    Edit Student
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteStudent(selectedStudent.id);
+                      setShowStudentDetails(false);
+                    }}
+                    className="flex-1 text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg font-medium"
+                  >
+                    Delete Student
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+
+      {/* Simplified Batch Students Modal */}
+      {
+        selectedBatchDetails && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-hidden">
+              {/* Modal Header */}
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-bold text-gray-800">
+                      Batch {selectedBatchDetails.name} Students
+                    </h2>
+                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
+                      {students.filter(s => s.batch?.toString() === selectedBatchDetails.name?.toString()).length} Students
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setSelectedBatchDetails(null)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Students List */}
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+                <div className="space-y-4">
+                  {students
+                    .filter(student => student.batch?.toString() === selectedBatchDetails.name?.toString())
+                    .map(student => (
+                      <div
+                        key={student.id}
+                        className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                            {/* Student Image */}
+                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                              {student.imageUrl ? (
+                                <img
+                                  src={student.imageUrl}
+                                  alt={student.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                    />
+                                  </svg>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Student Info */}
+                            <div>
+                              <h4 className="font-medium text-gray-900">{student.name}</h4>
+                              <p className="text-sm text-gray-600">Roll No: {student.rollNumber}</p>
+                            </div>
+                          </div>
+
+                          {/* Contact Info */}
+                          <div className="flex items-center gap-6">
+                            {student.email && (
+                              <a
+                                href={`mailto:${student.email}`}
+                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                {student.email}
+                              </a>
+                            )}
+                            {student.contactNumber && (
+                              <a
+                                href={`tel:${student.contactNumber}`}
+                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                                  />
+                                </svg>
+                                {student.contactNumber}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+
+                  {/* Empty State */}
+                  {students.filter(s => s.batch?.toString() === selectedBatchDetails.name?.toString()).length === 0 && (
+                    <div className="text-center py-8">
+                      <div className="bg-gray-50 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-gray-500 font-medium">No students enrolled</h3>
+                      <p className="text-gray-400 text-sm mt-1">This batch doesn't have any students yet.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div >
   )
 }
 
