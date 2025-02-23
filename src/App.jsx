@@ -219,6 +219,7 @@ function App() {
       const student = students.find(s => s.id === studentId);
       const newAttendance = !getAttendanceForDate(student, selectedDate, attendanceType);
 
+      // Update attendance in Firestore
       await updateDoc(studentRef, {
         attendance: {
           ...student.attendance,
@@ -229,6 +230,24 @@ function App() {
             { date: selectedDate, present: newAttendance }
           ].sort((a, b) => new Date(b.date) - new Date(a.date))
         }
+      });
+
+      // Remove scrum attendance data if it exists
+      if (attendanceType === 'scrum') {
+        delete student.attendance.scrum; // Remove scrum attendance
+        await updateDoc(studentRef, {
+          attendance: {
+            ...student.attendance
+          }
+        });
+      }
+
+      // Store attendance data in a separate collection if needed
+      await addDoc(collection(db, 'attendance'), {
+        studentId: studentId,
+        date: selectedDate,
+        type: attendanceType,
+        present: newAttendance
       });
 
       await fetchStudents();
@@ -879,19 +898,57 @@ function App() {
   // Add state for managing attendance submission
   const [attendanceStudents, setAttendanceStudents] = useState([]);
   const [showAttendanceList, setShowAttendanceList] = useState(false);
+  const [showAttendanceTable, setShowAttendanceTable] = useState(false);
 
   // Function to handle attendance submission
-  const handleAttendanceSubmit = () => {
-    // Filter students based on selected batch and date
-    const studentsInBatch = students.filter(student => student.batch === selectedAttendanceBatch);
-    setAttendanceStudents(studentsInBatch);
-    setShowAttendanceList(true); // Show the attendance list
+  const handleAttendanceSubmit = async (e) => {
+    e.preventDefault();
+    await fetchStudentsForAttendance();
+    setShowAttendanceTable(true); // Show the attendance table
+  };
+
+  // Function to fetch students for the selected batch
+  const fetchStudentsForAttendance = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'students'));
+      const studentsData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Filter students by selected batch
+      const filteredStudents = studentsData.filter(student => student.batchId === selectedBatch);
+      setAttendanceStudents(filteredStudents);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    }
   };
 
   // Function to mark attendance
-  const markAttendance = (studentId, status) => {
+  const markAttendance = async (studentId, status) => {
     console.log(`Student ID: ${studentId}, Attendance: ${status}`);
-    // Implement logic to save attendance status (e.g., update state, send to server, etc.)
+    try {
+      const studentRef = doc(db, 'students', studentId);
+      const today = getTodayDate();
+
+      // Update attendance in Firestore
+      await updateDoc(studentRef, {
+        attendance: {
+          ...attendanceStudents.find(s => s.id === studentId).attendance,
+          class: [
+            ...(attendanceStudents.find(s => s.id === studentId).attendance.class || []).filter(
+              record => record.date !== today
+            ),
+            { date: today, present: status === 'Present' }
+          ]
+        }
+      });
+
+      // Optionally, refresh the students list or update the state
+      await fetchStudentsForAttendance();
+    } catch (error) {
+      console.error('Error marking attendance:', error);
+    }
   };
 
   return (
@@ -1775,8 +1832,8 @@ function App() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
                 <input
                   type="date"
-                  value={attendanceDate}
-                  onChange={(e) => setAttendanceDate(e.target.value)}
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
                     focus:border-blue-400 transition-colors duration-200"
                 />
@@ -1786,8 +1843,8 @@ function App() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Batch</label>
                 <select
-                  value={selectedAttendanceBatch}
-                  onChange={(e) => setSelectedAttendanceBatch(e.target.value)}
+                  value={selectedBatch}
+                  onChange={(e) => setSelectedBatch(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
                     focus:border-blue-400 transition-colors duration-200 bg-white"
                 >
@@ -1817,34 +1874,33 @@ function App() {
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th> {/* New Column */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {attendanceStudents.map(student => (
                       <tr key={student.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{student.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-left">{student.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <div className="flex space-x-4">
                             <button
-                              onClick={() => {
-                                // Handle marking as present
-                                console.log(`Student: ${student.name}, Attendance: Present`);
-                              }}
+                              onClick={() => markAttendance(student.id, 'Present')}
                               className="bg-green-500 text-white px-4 py-1 rounded hover:bg-green-600 transition-colors duration-300"
                             >
                               Present
                             </button>
                             <button
-                              onClick={() => {
-                                // Handle marking as absent
-                                console.log(`Student: ${student.name}, Attendance: Absent`);
-                              }}
+                              onClick={() => markAttendance(student.id, 'Absent')}
                               className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 transition-colors duration-300"
                             >
                               Absent
                             </button>
                           </div>
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {/* Display the attendance status */}
+                          {student.attendance[attendanceType]?.find(record => record.date === selectedDate)?.present ? 'Present' : 'Absent'}
+                        </td> {/* New Column for Status */}
                       </tr>
                     ))}
                   </tbody>
