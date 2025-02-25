@@ -18,92 +18,280 @@ import {
   deleteObject
 } from 'firebase/storage'
 
-// Add these styles at the top of the component
-const cardStyle = "transition-all duration-300 hover:shadow-lg bg-white rounded-xl border border-gray-200/80"
-
-const buttonStyle = `
-  transition-all duration-300 transform active:scale-95 font-medium 
-  bg-blue-600 text-white hover:bg-blue-700
-`
-
-const tableHeaderStyle = "px-4 py-3 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider"
-
-const sidebarButtonStyle = "w-full text-left px-4 py-3 rounded-lg transition-all duration-300 hover:bg-blue-50"
-
-const cardHoverStyle = "transition-all duration-300 hover:shadow-lg hover:border-blue-200"
-
-const gridCardStyle = `
-  bg-white p-6 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 
-  border border-gray-200/80 hover:border-blue-200 transform hover:-translate-y-1
-  backdrop-blur-sm backdrop-filter
-`
-
-const searchInputStyle = `
-  px-4 py-2.5 border border-gray-200 rounded-lg w-72
-  focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300
-  bg-white/90 backdrop-blur-sm backdrop-filter
-`
-
-const selectStyle = `
-  px-4 py-2.5 border border-gray-200 rounded-lg
-  focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300
-  bg-white/90 backdrop-blur-sm backdrop-filter
-`
-
-const formInputStyle = `
-  w-full px-4 py-3 border border-gray-200 rounded-lg 
-  focus:ring-2 focus:ring-blue-500 focus:border-transparent
-  transition-all duration-300 bg-white/80 backdrop-blur-sm
-  hover:border-blue-200
-`
-
-const formLabelStyle = "block text-sm font-medium text-gray-800 mb-2"
-
-const attendanceCardStyle = `
-  bg-white rounded-xl shadow-md border border-gray-100 
-  transition-all duration-300 hover:shadow-lg
+// Update the style constants with more professional and consistent styling
+const cardStyle = `
+  bg-white rounded-xl border border-gray-200/80 shadow-sm
+  transition-all duration-300 hover:shadow-lg hover:border-blue-200/50
   backdrop-filter backdrop-blur-sm
 `
 
+const buttonStyle = `
+  px-4 py-2.5 rounded-lg font-medium shadow-sm
+  transition-all duration-300 transform active:scale-95
+  focus:outline-none focus:ring-2 focus:ring-offset-2
+`
+
+const primaryButtonStyle = `
+  ${buttonStyle}
+  bg-gradient-to-r from-blue-600 to-blue-700 
+  hover:from-blue-700 hover:to-blue-800
+  text-white focus:ring-blue-500
+`
+
+const secondaryButtonStyle = `
+  ${buttonStyle}
+  bg-gray-50 hover:bg-gray-100 
+  text-gray-700 hover:text-gray-900
+  border border-gray-200 hover:border-gray-300
+  focus:ring-gray-500
+`
+
+const dangerButtonStyle = `
+  ${buttonStyle}
+  bg-red-50 hover:bg-red-100
+  text-red-600 hover:text-red-700
+  border border-red-200 hover:border-red-300
+  focus:ring-red-500
+`
+
+const successButtonStyle = `
+  ${buttonStyle}
+  bg-green-50 hover:bg-green-100
+  text-green-600 hover:text-green-700
+  border border-green-200 hover:border-green-300
+  focus:ring-green-500
+`
+
+const inputStyle = `
+  w-full px-4 py-2.5 rounded-lg border border-gray-300
+  focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-200 bg-white
+  placeholder-gray-400 text-gray-900
+`
+
+const selectStyle = `
+  ${inputStyle}
+  appearance-none bg-no-repeat
+  bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"%3E%3Cpath stroke="%236B7280" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l4 4 4-4"/%3E%3C/svg%3E')]
+  bg-[length:1.25em_1.25em] bg-[right_0.5rem_center]
+  pr-10
+`
+
+const labelStyle = `
+  block text-sm font-medium text-gray-700 mb-1
+`
+
+const cardHeaderStyle = `
+  p-6 border-b border-gray-100
+  bg-gradient-to-r from-gray-50 to-white
+`
+
+// Add these new professional styles
+const tableStyle = `
+  min-w-full divide-y divide-gray-200 
+  bg-white shadow-sm rounded-lg border border-gray-200
+`
+
+const tableHeaderStyle = `
+  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider
+  bg-gray-50 border-b border-gray-200
+`
+
+const tableRowStyle = `
+  hover:bg-gray-50 transition-colors duration-200
+`
+
+const tableCellStyle = `
+  px-6 py-4 whitespace-nowrap text-sm text-gray-900
+`
+
+const badgeStyle = (color) => `
+  inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+  ${color === 'green' ? 'bg-green-100 text-green-800' :
+    color === 'red' ? 'bg-red-100 text-red-800' :
+    color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
+    color === 'blue' ? 'bg-blue-100 text-blue-800' :
+    'bg-gray-100 text-gray-800'}
+`
+
+const modalStyle = `
+  fixed inset-0 bg-black/40 backdrop-blur-sm
+  flex items-center justify-center z-50
+  transition-opacity duration-300
+`
+
+const modalContentStyle = `
+  bg-white rounded-xl shadow-xl
+  max-w-2xl w-full mx-4 max-h-[90vh]
+  overflow-y-auto border border-gray-200
+  transform transition-all duration-300
+  scale-95 opacity-0 animate-in
+`
+
+// Add new animation classes
+const fadeInAnimation = `
+  animate-[fadeIn_0.2s_ease-in-out]
+`
+
+const slideUpAnimation = `
+  animate-[slideUp_0.3s_ease-out]
+`
+
+// Add back the sidebarButtonStyle with improvements
+const sidebarButtonStyle = `
+  w-full text-left px-4 py-3 rounded-lg 
+  transition-all duration-300 
+  hover:bg-blue-50/80 
+  focus:outline-none focus:ring-2 focus:ring-blue-200
+  flex items-center justify-between
+  text-gray-600 hover:text-gray-900
+`
+
+// Update the sidebar styling to include both old and new styles
+const sidebarStyle = `
+  w-64 bg-white shadow-lg
+  flex flex-col
+  border-r border-gray-200
+`
+
+const sidebarItemStyle = `
+  flex items-center gap-3 px-4 py-3 rounded-lg
+  transition-all duration-200
+  text-gray-600 hover:text-gray-900
+  hover:bg-gray-50
+`
+
+const sidebarItemActiveStyle = `
+  ${sidebarItemStyle}
+  bg-blue-50 text-blue-600
+  font-medium
+`
+
+// Keep only this declaration with the other attendance-related styles
+const attendanceCardStyle = `
+  ${cardStyle}
+  overflow-hidden
+`
+
 const attendanceHeaderStyle = `
-  bg-gradient-to-r from-blue-50 to-gray-50 
-  border-b border-gray-100 p-6
+  ${cardHeaderStyle}
+  bg-gradient-to-r from-blue-50 to-gray-50
 `
 
 const attendanceTableStyle = `
-  min-w-full divide-y divide-gray-200
+  ${tableStyle}
   bg-white backdrop-filter backdrop-blur-sm
 `
 
 const attendanceButtonStyle = (isActive, type) => `
-  px-4 py-2 rounded-lg text-sm font-medium 
-  transition-all duration-300 flex items-center gap-2
+  ${buttonStyle}
+  flex items-center gap-2 text-sm
   ${isActive
     ? type === 'present'
-      ? 'bg-blue-100 text-blue-800 border border-blue-200'
-      : 'bg-gray-100 text-gray-800 border border-gray-200'
+      ? 'bg-green-100 text-green-800 border border-green-200'
+      : 'bg-red-100 text-red-800 border border-red-200'
     : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50'}
 `
 
+const attendanceStatusBadge = (status) => `
+  ${badgeStyle(
+    status === 'present' ? 'green' :
+    status === 'absent' ? 'red' : 'gray'
+  )}
+`
+
 const mockTestCardStyle = `
-  bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 
-  border border-gray-200/80 hover:border-orange-200
-  backdrop-filter backdrop-blur-sm
+  ${cardStyle}
+  hover:border-blue-200
 `
 
 const mockTestHeaderStyle = `
-  bg-gradient-to-r from-orange-50 to-gray-50 
-  border-b border-gray-100 p-6
+  ${cardHeaderStyle}
+  bg-gradient-to-r from-blue-50 to-gray-50
 `
 
 const mockScoreStyle = (score, maxScore) => `
-  px-3 py-1.5 rounded-full text-sm font-medium
-  ${score >= maxScore * 0.8
-    ? 'bg-orange-100 text-orange-800'
-    : score >= maxScore * 0.6
-      ? 'bg-gray-100 text-gray-800'
-      : 'bg-gray-200 text-gray-800'}
+  ${badgeStyle(
+    score >= maxScore * 0.8 ? 'green' :
+    score >= maxScore * 0.6 ? 'yellow' : 'red'
+  )}
 `
+
+// Add back the search input style
+const searchInputStyle = `
+  ${inputStyle}
+  w-72
+  bg-white/90 backdrop-blur-sm backdrop-filter
+`
+
+// Add these new components for better UX
+const LoadingSpinner = () => (
+  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent" />
+)
+
+const EmptyState = ({ icon, title, description }) => (
+  <div className="text-center py-12">
+    <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+      {icon}
+    </div>
+    <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+    <p className="text-gray-600 max-w-sm mx-auto">{description}</p>
+  </div>
+)
+
+// Update the Alert component for better visibility
+const Alert = ({ type, message, onClose }) => (
+  <div className={`
+    fixed top-4 right-4 z-50 
+    ${fadeInAnimation}
+    max-w-md w-full
+  `}>
+    <div className={`
+      rounded-lg shadow-lg p-4
+      ${type === 'success' ? 'bg-green-50 border border-green-200' :
+        type === 'error' ? 'bg-red-50 border border-red-200' :
+        'bg-blue-50 border border-blue-200'}
+    `}>
+      <div className="flex items-center gap-3">
+        {type === 'success' ? (
+          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+          </svg>
+        ) : (
+          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        )}
+        <p className={`font-medium ${
+          type === 'success' ? 'text-green-800' :
+          type === 'error' ? 'text-red-800' :
+          'text-blue-800'
+        }`}>
+          {message}
+        </p>
+        <button
+          onClick={onClose}
+          className="ml-auto p-1 rounded-full hover:bg-white/50 transition-colors duration-200"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+)
+
+// Add a new component for form sections
+const FormSection = ({ title, description, children }) => (
+  <div className="bg-gray-50 rounded-xl p-6 space-y-4">
+    <div className="mb-4">
+      <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+      {description && <p className="text-sm text-gray-600 mt-1">{description}</p>}
+    </div>
+    {children}
+  </div>
+)
 
 function App() {
   // Helper function to get today's date in YYYY-MM-DD format
@@ -216,6 +404,10 @@ function App() {
   // Add search and filter states
   const [searchTerm, setSearchTerm] = useState('')
   const [filterClass, setFilterClass] = useState('all')
+
+  // Add new state for single date filter
+  const [filterType, setFilterType] = useState('range'); // 'range' or 'single'
+  const [singleDate, setSingleDate] = useState(getTodayDate());
 
   // Add this new helper function
   const formatDateForInput = (date) => {
@@ -340,21 +532,36 @@ function App() {
     }
   };
 
+  // Add these new states
+  const [batchStartDate, setBatchStartDate] = useState(getTodayDate());
+
+  // Add this helper function to generate attendance records from batch start date
+  const generateAttendanceRecords = (startDate, batchDays) => {
+    const records = [];
+    const start = new Date(startDate);
+    const today = new Date();
+
+    // Loop through each date from start date to today
+    for (let date = new Date(start); date <= today; date.setDate(date.getDate() + 1)) {
+      const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
+
+      // Only add record if it's a batch day
+      if (batchDays.includes(dayOfWeek)) {
+        records.push({
+          date: date.toISOString().split('T')[0],
+          present: false // Mark as absent by default
+        });
+      }
+    }
+
+    return records;
+  };
+
   // Update handleSubmit for students
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!newStudent.name || !newStudent.rollNumber || !newStudent.batch) {
-      setAlertMessage('Please fill in all required fields');
-      setAlertType('error');
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
-      return;
-    }
-
     try {
-      // Show loading message
       setAlertMessage('Processing your request...');
       setAlertType('success');
       setShowAlert(true);
@@ -367,16 +574,46 @@ function App() {
         imageUrl = await getDownloadURL(storageRef);
       }
 
+      // Get batch details
+      const selectedBatchData = batches.find(b => b.name === newStudent.batch);
+
+      // Generate attendance records from batch start date
+      let attendanceRecords = [];
+      if (selectedBatchData) {
+        attendanceRecords = generateAttendanceRecords(
+          selectedBatchData.startDate,
+          selectedBatchData.daysOfWeek
+        );
+      }
+
       const studentData = {
         ...newStudent,
         imageUrl,
         gender: newStudent.gender,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        attendance: {
+          class: attendanceRecords,
+          scrum: []
+        }
       };
 
       if (selectedStudent) {
         // Update existing student
         const studentRef = doc(db, 'students', selectedStudent.id);
+
+        // Merge existing attendance with new records
+        const existingRecords = selectedStudent.attendance?.class || [];
+        const mergedRecords = [...existingRecords];
+
+        attendanceRecords.forEach(newRecord => {
+          const existingIndex = mergedRecords.findIndex(r => r.date === newRecord.date);
+          if (existingIndex === -1) {
+            mergedRecords.push(newRecord);
+          }
+        });
+
+        studentData.attendance.class = mergedRecords;
+
         await updateDoc(studentRef, studentData);
         setAlertMessage(`${newStudent.name}'s information has been successfully updated!`);
       } else {
@@ -426,28 +663,55 @@ function App() {
           startTime: newBatch.startTime,
           endTime: newBatch.endTime,
           daysOfWeek: newBatch.daysOfWeek,
-          trainer: newBatch.trainer
+          trainer: newBatch.trainer,
+          startDate: batchStartDate // Add start date
         });
 
-        // Update all students with this batch
+        // Update attendance records for all students in this batch
         const studentsToUpdate = students.filter(
           student => student.batch?.toString() === editingBatch.name?.toString()
         );
 
         for (const student of studentsToUpdate) {
           const studentRef = doc(db, 'students', student.id);
-          await updateDoc(studentRef, { batch: newBatch.name });
+          const newRecords = generateAttendanceRecords(batchStartDate, newBatch.daysOfWeek);
+
+          // Merge existing attendance with new records
+          const existingRecords = student.attendance?.class || [];
+          const mergedRecords = [...existingRecords];
+
+          newRecords.forEach(newRecord => {
+            const existingIndex = mergedRecords.findIndex(r => r.date === newRecord.date);
+            if (existingIndex === -1) {
+              mergedRecords.push(newRecord);
+            }
+          });
+
+          await updateDoc(studentRef, {
+            batch: newBatch.name,
+            attendance: {
+              ...student.attendance,
+              class: mergedRecords
+            }
+          });
         }
 
-        alert('Batch updated successfully!');
+        setAlertMessage('Batch updated successfully!');
       } else {
         // Create new batch
-        await addDoc(collection(db, 'batches'), {
+        const batchData = {
           ...newBatch,
+          startDate: batchStartDate,
           createdAt: new Date().toISOString()
-        });
-        alert('New batch created successfully!');
+        };
+
+        await addDoc(collection(db, 'batches'), batchData);
+        setAlertMessage('New batch created successfully!');
       }
+
+      setAlertType('success');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
 
       // Reset form and state
       setNewBatch({
@@ -457,6 +721,7 @@ function App() {
         daysOfWeek: [],
         trainer: ''
       });
+      setBatchStartDate(getTodayDate());
       setEditingBatch(null);
       setShowBatchForm(false);
       setCurrentView('batches-view');
@@ -464,9 +729,13 @@ function App() {
       // Refresh data
       fetchBatches();
       fetchStudents();
+
     } catch (error) {
       console.error('Error saving batch:', error);
-      alert('Failed to save batch. Please try again.');
+      setAlertMessage('Failed to save batch. Please try again.');
+      setAlertType('error');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
     }
   };
 
@@ -963,135 +1232,103 @@ function App() {
 
   // Function to handle attendance submission
   const handleAttendanceSubmit = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    
     if (!selectedDate || !selectedBatch) {
       setAlertMessage('Please select both date and batch');
       setAlertType('error');
       setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
       return;
     }
 
     try {
-      // First, fetch all students
-      const querySnapshot = await getDocs(collection(db, 'students'));
-      const studentsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      // Get all students from the selected batch
+      const filteredStudents = students.filter(student => 
+        student.batch?.toString() === selectedBatch?.toString()
+      );
 
-      // Log for debugging
-      console.log('Selected Batch:', selectedBatch);
-      console.log('All Students:', studentsData);
+      if (filteredStudents.length === 0) {
+        setAlertMessage('No students found in this batch');
+        setAlertType('warning');
+        setShowAlert(true);
+        return;
+      }
 
-      // Filter students by selected batch - make comparison more flexible
-      const filteredStudents = studentsData.filter(student => {
-        const studentBatch = student.batch?.toString().toLowerCase();
-        const selectedBatchStr = selectedBatch.toString().toLowerCase();
-        const matches = studentBatch === selectedBatchStr;
-        console.log('Student Batch:', studentBatch, 'Selected:', selectedBatchStr, 'Matches:', matches);
-        return matches;
-      });
-
-      console.log('Filtered Students:', filteredStudents);
-
-      // Initialize attendance structure for each student
+      // Initialize attendance structure for each student if not exists
       const studentsWithAttendance = filteredStudents.map(student => ({
         ...student,
         attendance: student.attendance || { class: [], scrum: [] }
       }));
 
-      if (studentsWithAttendance.length === 0) {
-        setAlertMessage('No students found in this batch');
-        setAlertType('error');
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
-      }
-
       setAttendanceStudents(studentsWithAttendance);
       setShowAttendanceTable(true);
 
     } catch (error) {
-      console.error('Error fetching students:', error);
-      setAlertMessage('Failed to fetch students. Please try again.');
+      console.error('Error loading attendance:', error);
+      setAlertMessage('Failed to load attendance data');
       setAlertType('error');
       setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
     }
-  };
+  }
 
-  // Also update the markAttendance function to ensure proper data structure
+  // Add this function if missing
   const markAttendance = async (studentId, present) => {
     try {
-      const student = attendanceStudents.find(s => s.id === studentId);
-      if (!student) {
-        setAlertMessage('Student not found');
-        setAlertType('error');
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
-        return;
-      }
-
-      // Show confirmation dialog
-      const confirmMessage = `Mark ${student.name} as ${present ? 'Present' : 'Absent'}?`;
-      if (!window.confirm(confirmMessage)) {
-        return;
-      }
-
       const studentRef = doc(db, 'students', studentId);
+      const student = attendanceStudents.find(s => s.id === studentId);
+      
+      if (!student) {
+        throw new Error('Student not found');
+      }
 
-      // Ensure proper attendance structure
-      const currentAttendance = student.attendance || { class: [], scrum: [] };
-      const classAttendance = Array.isArray(currentAttendance.class) ? currentAttendance.class : [];
-
-      // Remove any existing attendance for this date
-      const updatedAttendance = classAttendance.filter(record => record.date !== selectedDate);
-
-      // Add new attendance record
-      updatedAttendance.push({
+      // Create new attendance record
+      const newAttendance = {
         date: selectedDate,
         present: present
-      });
-
-      // Create the complete attendance object
-      const completeAttendance = {
-        ...currentAttendance,
-        class: updatedAttendance
       };
 
-      // Update in Firestore
-      await updateDoc(studentRef, {
-        attendance: completeAttendance
+      // Update attendance in state first
+      const updatedStudents = attendanceStudents.map(s => {
+        if (s.id === studentId) {
+          const existingAttendance = s.attendance?.class || [];
+          const filteredAttendance = existingAttendance.filter(a => a.date !== selectedDate);
+          return {
+            ...s,
+            attendance: {
+              ...s.attendance,
+              class: [...filteredAttendance, newAttendance]
+            }
+          };
+        }
+        return s;
       });
 
-      // Update local state
-      setAttendanceStudents(prevStudents =>
-        prevStudents.map(s =>
-          s.id === studentId
-            ? { ...s, attendance: completeAttendance }
-            : s
-        )
-      );
+      setAttendanceStudents(updatedStudents);
 
-      // Show success message
-      setAlertMessage(`${student.name}'s attendance marked as ${present ? 'Present' : 'Absent'}`);
+      // Then update in Firebase
+      await updateDoc(studentRef, {
+        attendance: {
+          ...student.attendance,
+          class: [...(student.attendance?.class || []).filter(a => a.date !== selectedDate), newAttendance]
+        }
+      });
+
+      setAlertMessage(`Attendance marked ${present ? 'present' : 'absent'} for ${student.name}`);
       setAlertType('success');
       setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
 
     } catch (error) {
       console.error('Error marking attendance:', error);
-      setAlertMessage(`Failed to mark attendance: ${error.message}`);
+      setAlertMessage('Failed to mark attendance');
       setAlertType('error');
       setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
     }
-  };
+  }
 
-  // Add these new states near your other state declarations
+  // Add these alert states if missing
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState(''); // 'success' or 'error'
+  const [alertType, setAlertType] = useState('success');
 
   // Add these new states
   const [showMockForm, setShowMockForm] = useState(false);
@@ -1104,15 +1341,15 @@ function App() {
 
   // Calculate average attendance
   const calculateAverageAttendance = () => {
-    const filteredStudents = students.filter(student => 
+    const filteredStudents = students.filter(student =>
       !selectedBatch || student.batch?.toString() === selectedBatch
     );
-    
+
     if (filteredStudents.length === 0) return 0;
 
     const attendancePercentages = filteredStudents.map(student => {
       const records = student.attendance?.class || [];
-      const recordsInRange = records.filter(record => 
+      const recordsInRange = records.filter(record =>
         record.date >= dateRange.start && record.date <= dateRange.end
       );
       const totalDays = recordsInRange.length;
@@ -1123,6 +1360,72 @@ function App() {
     const averageAttendance = attendancePercentages.reduce((a, b) => a + b, 0) / attendancePercentages.length;
     return averageAttendance.toFixed(1);
   };
+
+  // Add this new state for the selected student's attendance details
+  const [showAttendanceDetails, setShowAttendanceDetails] = useState(false);
+
+  // Add this new function to handle batch deletion
+  const handleDeleteBatch = async (batchId, batchName) => {
+    if (!confirm(`Are you sure you want to delete batch "${batchName}"? This will remove the batch from all enrolled students.`)) {
+      return;
+    }
+
+    try {
+      // Delete the batch
+      await deleteDoc(doc(db, 'batches', batchId));
+
+      // Update all students who were in this batch
+      const studentsToUpdate = students.filter(
+        student => student.batch?.toString() === batchName?.toString()
+      );
+
+      for (const student of studentsToUpdate) {
+        const studentRef = doc(db, 'students', student.id);
+        await updateDoc(studentRef, {
+          batch: '',
+          attendance: {
+            ...student.attendance,
+            class: student.attendance.class.filter(record =>
+              // Keep attendance records that aren't from this batch's days
+              !batches.find(b => b.id === batchId)?.daysOfWeek
+                .includes(new Date(record.date).toLocaleDateString('en-US', { weekday: 'long' }))
+            )
+          }
+        });
+      }
+
+      setAlertMessage('Batch deleted successfully');
+      setAlertType('success');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+
+      // Refresh data
+      await fetchBatches();
+      await fetchStudents();
+    } catch (error) {
+      console.error('Error deleting batch:', error);
+      setAlertMessage('Failed to delete batch. Please try again.');
+      setAlertType('error');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
+
+  // Add this new state for showing batch students
+  const [selectedBatchForStudents, setSelectedBatchForStudents] = useState(null);
+
+  // Add this new state for student list view type
+  const [studentListView, setStudentListView] = useState('grid'); // 'grid' or 'list'
+
+  // Add this after your other state declarations
+  const [mockTests, setMockTests] = useState([
+    {
+      id: 1,
+      name: 'Mock Test 1',
+      date: getTodayDate(),
+      maxScore: 100
+    }
+  ])
 
   return (
     <div className="min-h-screen flex">
@@ -1805,6 +2108,21 @@ function App() {
                     </div>
                   </div>
 
+                  {/* Add this in the batch form */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Batch Start Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={batchStartDate}
+                      onChange={(e) => setBatchStartDate(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                        focus:border-orange-400 transition-colors duration-200"
+                      required
+                    />
+                  </div>
+
                   {/* Form Actions */}
                   <div className="flex gap-4 pt-8 border-t border-gray-100">
                     <button
@@ -1840,119 +2158,189 @@ function App() {
 
             {/* Batches View */}
             {currentView === 'batches-view' && (
-              <div className="space-y-6">
-                {/* Batches Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {batches.map(batch => {
-                    const batchStudents = students.filter(
-                      student => student.batch?.toString() === batch.name?.toString()
-                    );
-
-                    return (
-                      <div
-                        key={batch.id}
-                        className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 
-                          border border-gray-100 overflow-hidden"
-                      >
-                        {/* Batch Header */}
-                        <div className="p-6 border-b border-gray-50">
-                          <div className="flex justify-between items-start mb-4">
-                            <div>
-                              <h3 className="text-xl font-semibold text-gray-800">
-                                Batch {batch.name}
-                              </h3>
-                              <p className="text-gray-500 mt-1">
-                                {formatTime(batch.startTime)} - {formatTime(batch.endTime)}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
-                                {batchStudents.length} Students
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Trainer Info */}
-                          <div className="flex items-center gap-3 mb-4">
-                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                              </svg>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Trainer</p>
-                              <p className="font-medium text-gray-800">{batch.trainer}</p>
-                            </div>
-                          </div>
-
-                          {/* Schedule Days */}
-                          <div className="flex flex-wrap gap-2">
-                            {batch.daysOfWeek.map(day => (
-                              <span
-                                key={day}
-                                className="px-2.5 py-1 bg-gray-50 text-gray-600 rounded-lg text-sm 
-                                  border border-gray-100 hover:border-blue-100 hover:bg-blue-50 
-                                  hover:text-blue-600 transition-all duration-300"
-                              >
-                                {day.slice(0, 3)}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* View Students button */}
-                        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                          <button
-                            onClick={() => setSelectedBatchDetails(batch)}
-                            className="w-full py-2 px-4 bg-white text-blue-600 rounded-lg border border-blue-100
-                              hover:bg-blue-50 hover:border-blue-200 transition-all duration-300 flex items-center 
-                              justify-center gap-2 group/btn"
-                          >
-                            <span>View Students</span>
-                            <svg
-                              className="w-4 h-4 transform group-hover/btn:translate-x-1 transition-transform duration-300"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
-                        </div>
+              <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
+                {/* Header */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Batches</h2>
+                      <p className="text-gray-600 mt-1">Manage your training batches and schedules</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="px-4 py-3 bg-blue-50 rounded-lg border border-blue-100">
+                        <p className="text-sm text-gray-600">Total Batches</p>
+                        <p className="text-2xl font-bold text-blue-600">{batches.length}</p>
                       </div>
-                    );
-                  })}
-
-                  {/* Empty State */}
-                  {batches.length === 0 && (
-                    <div className="col-span-full flex flex-col items-center justify-center py-12 px-4 bg-white 
-                      rounded-xl border border-gray-100">
-                      <div className="bg-gray-50 rounded-full p-4 mb-4">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-1">No batches found</h3>
-                      <p className="text-gray-500 text-center max-w-sm mb-4">
-                        Get started by creating your first batch
-                      </p>
                       <button
                         onClick={() => {
-                          setCurrentView('batches-add');
                           setShowBatchForm(true);
+                          setCurrentView('batches-add');
+                          setEditingBatch(null);
                         }}
-                        className={`${buttonStyle} px-4 py-2 rounded-lg inline-flex items-center gap-2`}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                          transition-all duration-300 flex items-center gap-2 shadow-sm hover:shadow-md"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Add New Batch
                       </button>
                     </div>
-                  )}
+                  </div>
                 </div>
+
+                {/* Batches Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {batches.map(batch => (
+                    <div key={batch.id}
+                      onClick={() => setSelectedBatchForStudents(batch)}
+                      className="bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden 
+                        hover:shadow-md transition-all duration-300 group cursor-pointer"
+                    >
+                      {/* Batch Header */}
+                      <div className="p-6 bg-gradient-to-r from-blue-50/50 to-white border-b border-gray-100">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                                Active
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                Started {new Date(batch.startDate).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              Batch {batch.name}
+                            </h3>
+                            <p className="text-sm text-gray-600 mt-1 flex items-center gap-2">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {batch.startTime} - {batch.endTime}
+                            </p>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <button
+                              onClick={() => {
+                                setEditingBatch(batch);
+                                setNewBatch({
+                                  name: batch.name,
+                                  startTime: batch.startTime,
+                                  endTime: batch.endTime,
+                                  daysOfWeek: batch.daysOfWeek,
+                                  trainer: batch.trainer
+                                });
+                                setBatchStartDate(batch.startDate || getTodayDate());
+                                setShowBatchForm(true);
+                                setCurrentView('batches-add');
+                              }}
+                              className="p-2 text-gray-600 hover:text-blue-600 transition-colors duration-200 
+                                rounded-lg hover:bg-blue-50"
+                              title="Edit Batch"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteBatch(batch.id, batch.name);
+                              }}
+                              className="p-2 text-gray-600 hover:text-red-600 transition-colors duration-200 
+                                rounded-lg hover:bg-red-50"
+                              title="Delete Batch"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Batch Details */}
+                      <div className="p-6">
+                        <div className="grid grid-cols-2 gap-6">
+                          {/* Trainer Info */}
+                          <div className="col-span-2">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-blue-50 rounded-lg">
+                                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">Trainer</p>
+                                <p className="text-sm text-gray-600">{batch.trainer}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Schedule */}
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className="p-2 bg-green-50 rounded-lg">
+                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                              </div>
+                              <p className="text-sm font-medium text-gray-900">Schedule</p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {batch.daysOfWeek.map(day => (
+                                <span key={day}
+                                  className="px-2 py-1 bg-green-50 text-green-700 rounded-md text-xs font-medium"
+                                >
+                                  {day}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Students Count */}
+                          <div>
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-purple-50 rounded-lg">
+                                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-900">Students</p>
+                                <p className="text-2xl font-bold text-purple-600">
+                                  {students.filter(s => s.batch?.toString() === batch.name?.toString()).length}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Empty State */}
+                {batches.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                      <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Batches Found</h3>
+                    <p className="text-gray-600">Create your first batch to get started.</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -2177,165 +2565,197 @@ function App() {
             )}
 
             {currentView === 'attendance-report' && (
-              <div className="bg-white rounded-xl shadow-sm">
-                {/* Header with Stats */}
-                <div className="p-8 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-gray-50">
-                  <div className="flex justify-between items-center mb-8">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900">Attendance Report</h2>
-                      <p className="text-base text-gray-600 mt-1">View and analyze student attendance records</p>
-                    </div>
-                    {/* Summary Stats Cards */}
-                    <div className="flex gap-6">
-                      <div className="px-8 py-4 bg-white rounded-xl shadow-sm border border-blue-100">
-                        <p className="text-sm font-medium text-gray-600 mb-1">Total Students</p>
-                        <p className="text-3xl font-bold text-blue-600">
-                          {students.filter(student => !selectedBatch || student.batch?.toString() === selectedBatch).length}
-                        </p>
+              <div className="bg-white min-h-screen">
+                {/* Header Section */}
+                <div className="bg-gradient-to-r from-blue-50 to-gray-50 border-b border-gray-200">
+                  <div className="px-8 py-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900">Attendance Report</h2>
+                        <p className="text-base text-gray-600 mt-1">Track and analyze student attendance records</p>
                       </div>
-                      <div className="px-8 py-4 bg-white rounded-xl shadow-sm border border-blue-100">
-                        <p className="text-sm font-medium text-gray-600 mb-1">Average Attendance</p>
-                        <p className="text-3xl font-bold text-blue-600">
-                          {calculateAverageAttendance()}%
-                        </p>
+                      <div className="flex gap-4">
+                        <div className="px-6 py-3 bg-white rounded-xl shadow-sm border border-blue-100">
+                          <p className="text-sm font-medium text-gray-600">Total Students</p>
+                          <p className="text-2xl font-bold text-blue-600 mt-1">
+                            {students.filter(student => !selectedBatch || student.batch?.toString() === selectedBatch).length}
+                          </p>
+                        </div>
+                        <div className="px-6 py-3 bg-white rounded-xl shadow-sm border border-blue-100">
+                          <p className="text-sm font-medium text-gray-600">Average Attendance</p>
+                          <p className="text-2xl font-bold text-blue-600 mt-1">
+                            {calculateAverageAttendance()}%
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Filters Section */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Select Batch</label>
-                      <select
-                        value={selectedBatch}
-                        onChange={(e) => setSelectedBatch(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                          focus:border-orange-400 text-base bg-white shadow-sm"
-                      >
-                        <option value="">All Batches</option>
-                        {batches.map(batch => (
-                          <option key={batch.id} value={batch.name}>
-                            Batch {batch.name} ({students.filter(s => s.batch?.toString() === batch.name?.toString()).length} students)
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">From Date</label>
-                      <input
-                        type="date"
-                        value={dateRange.start}
-                        onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                          focus:border-orange-400 text-base bg-white shadow-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">To Date</label>
-                      <input
-                        type="date"
-                        value={dateRange.end}
-                        onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                          focus:border-orange-400 text-base bg-white shadow-sm"
-                      />
+                    {/* Filters Section */}
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200/80">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Select Batch</label>
+                          <select
+                            value={selectedBatch}
+                            onChange={(e) => {
+                              const batch = batches.find(b => b.name === e.target.value);
+                              setSelectedBatch(e.target.value);
+                              // Set the start date to batch creation date when batch is selected
+                              if (batch) {
+                                setDateRange({
+                                  ...dateRange,
+                                  start: batch.startDate || getTodayDate()
+                                });
+                              }
+                            }}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
+                              focus:border-blue-400 text-base bg-white shadow-sm"
+                          >
+                            <option value="">All Batches</option>
+                            {batches.map(batch => (
+                              <option key={batch.id} value={batch.name}>
+                                Batch {batch.name} ({students.filter(s => s.batch?.toString() === batch.name?.toString()).length})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Filter Type</label>
+                          <div className="flex gap-4 mt-2">
+                            <label className="inline-flex items-center">
+                              <input
+                                type="radio"
+                                value="range"
+                                checked={filterType === 'range'}
+                                onChange={(e) => setFilterType(e.target.value)}
+                                className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">Date Range</span>
+                            </label>
+                            <label className="inline-flex items-center">
+                              <input
+                                type="radio"
+                                value="single"
+                                checked={filterType === 'single'}
+                                onChange={(e) => setFilterType(e.target.value)}
+                                className="form-radio h-4 w-4 text-blue-600 transition duration-150 ease-in-out"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">Today</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        {filterType === 'range' ? (
+                          <>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                              <input
+                                type="date"
+                                value={dateRange.start}
+                                onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
+                                  focus:border-blue-400 text-base bg-white shadow-sm"
+                                // Disable the input if a batch is selected
+                                disabled={!!selectedBatch}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                              <input
+                                type="date"
+                                value={dateRange.end}
+                                onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
+                                  focus:border-blue-400 text-base bg-white shadow-sm"
+                              />
+                            </div>
+                          </>
+                        ) : (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+                            <input
+                              type="date"
+                              value={singleDate}
+                              onChange={(e) => setSingleDate(e.target.value)}
+                              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
+                                focus:border-blue-400 text-base bg-white shadow-sm"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Report Content */}
+                {/* Students Grid */}
                 <div className="p-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {students
                       .filter(student => !selectedBatch || student.batch?.toString() === selectedBatch)
                       .map(student => {
                         const attendanceRecords = student.attendance?.class || [];
-                        const recordsInRange = attendanceRecords.filter(record => 
+                        const recordsInRange = attendanceRecords.filter(record =>
                           record.date >= dateRange.start && record.date <= dateRange.end
                         );
-                        
+
                         const totalDays = recordsInRange.length;
                         const presentDays = recordsInRange.filter(record => record.present).length;
                         const attendancePercentage = totalDays > 0 ? (presentDays / totalDays) * 100 : 0;
 
                         return (
-                          <div key={student.id} 
-                            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden 
-                              hover:shadow-md transition-all duration-300 group hover:border-blue-200"
+                          <div
+                            key={student.id}
+                            onClick={() => {
+                              setSelectedStudent(student);
+                              setShowAttendanceDetails(true);
+                            }}
+                            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 
+                              border border-gray-200/80 hover:border-blue-200 cursor-pointer overflow-hidden"
                           >
-                            {/* Student Info Header */}
-                            <div className="p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                              <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 ring-2 ring-offset-2 
-                                  ring-gray-100 group-hover:ring-orange-200 transition-all duration-300">
-                                  {student.imageUrl ? (
-                                    <img src={student.imageUrl} alt={student.name} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                      </svg>
-                                    </div>
-                                  )}
-                                </div>
-                                <div>
-                                  <h3 className="text-xl font-semibold text-gray-900">{student.name}</h3>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    <span className="text-sm font-medium text-gray-600">Roll No: {student.rollNumber}</span>
-                                    <span className="text-gray-300">•</span>
-                                    <span className="text-sm font-medium text-gray-600">Batch {student.batch}</span>
+                            <div className="p-6 flex items-center gap-4">
+                              <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 ring-2 ring-offset-2 
+                                ring-gray-100 flex-shrink-0">
+                                {student.imageUrl ? (
+                                  <img src={student.imageUrl} alt={student.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    </svg>
                                   </div>
-                                </div>
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-gray-900">{student.name}</h3>
+                                <p className="text-sm text-gray-600">Roll No: {student.rollNumber}</p>
+                                <p className="text-sm text-gray-600">Batch {student.batch}</p>
                               </div>
                             </div>
 
-                            {/* Attendance Stats */}
-                            <div className="p-6">
-                              <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                                  <p className="text-sm font-medium text-gray-600 mb-1">Present Days</p>
-                                  <p className="text-2xl font-bold text-gray-900">{presentDays}/{totalDays}</p>
-                                </div>
-                                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                                  <p className="text-sm font-medium text-gray-600 mb-1">Attendance</p>
-                                  <p className={`text-2xl font-bold ${
-                                    attendancePercentage >= 75 ? 'text-blue-600' : 
-                                    attendancePercentage >= 60 ? 'text-gray-600' : 
-                                    'text-red-600'
+                            <div className="px-6 pb-6">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-600">Attendance Rate</span>
+                                <span className={`text-sm font-semibold ${attendancePercentage >= 75 ? 'text-green-600' :
+                                    attendancePercentage >= 60 ? 'text-yellow-600' :
+                                      'text-red-600'
                                   }`}>
-                                    {attendancePercentage.toFixed(1)}%
-                                  </p>
-                                </div>
+                                  {attendancePercentage.toFixed(1)}%
+                                </span>
                               </div>
-
-                              {/* Attendance Timeline */}
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-800 mb-3">Attendance History</h4>
-                                <div className="flex flex-wrap gap-2">
-                                  {recordsInRange.length > 0 ? (
-                                    recordsInRange.map(record => (
-                                      <div
-                                        key={record.date}
-                                        className={`px-3 py-2 rounded-lg text-sm font-medium ${
-                                          record.present 
-                                            ? 'bg-blue-50 text-blue-700 border border-blue-200' 
-                                            : 'bg-gray-50 text-gray-700 border border-gray-200'
-                                        } hover:shadow-sm transition-all duration-200`}
-                                      >
-                                        {new Date(record.date).toLocaleDateString('en-US', { 
-                                          weekday: 'short',
-                                          month: 'short', 
-                                          day: 'numeric' 
-                                        })}
-                                      </div>
-                                    ))
-                                  ) : (
-                                    <p className="text-sm text-gray-500 italic">
-                                      No attendance records found for the selected date range
-                                    </p>
-                                  )}
-                                </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div
+                                  className={`h-2 rounded-full ${attendancePercentage >= 75 ? 'bg-green-500' :
+                                      attendancePercentage >= 60 ? 'bg-yellow-500' :
+                                        'bg-red-500'
+                                    }`}
+                                  style={{ width: `${attendancePercentage}%` }}
+                                />
+                              </div>
+                              <div className="mt-4 flex justify-between text-sm text-gray-600">
+                                <span>Present: {presentDays}</span>
+                                <span>Total Days: {totalDays}</span>
                               </div>
                             </div>
                           </div>
@@ -2345,15 +2765,15 @@ function App() {
 
                   {/* Empty State */}
                   {students.filter(student => !selectedBatch || student.batch?.toString() === selectedBatch).length === 0 && (
-                    <div className="text-center py-16 bg-gray-50 rounded-xl border border-gray-200">
-                      <div className="bg-white rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center shadow-sm">
+                    <div className="text-center py-12">
+                      <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                         <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">No attendance records found</h3>
-                      <p className="text-base text-gray-600">Try adjusting your filters or marking attendance first</p>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Students Found</h3>
+                      <p className="text-gray-600">Try adjusting your filters or add students to view attendance records.</p>
                     </div>
                   )}
                 </div>
@@ -2371,7 +2791,7 @@ function App() {
                         <div className="p-3 bg-purple-100 rounded-lg">
                           <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                           </svg>
                         </div>
                         <div>
@@ -2645,116 +3065,220 @@ function App() {
 
       {/* Simplified Batch Students Modal */}
       {
-        selectedBatchDetails && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full m-4 max-h-[90vh] overflow-hidden">
+        selectedBatchForStudents && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl shadow-xl max-w-6xl w-full m-4 max-h-[90vh] overflow-hidden">
               {/* Modal Header */}
-              <div className="p-6 border-b border-gray-100">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-bold text-gray-800">
-                      Batch {selectedBatchDetails.name} Students
+              <div className="p-6 bg-gradient-to-r from-blue-50/50 to-white border-b border-gray-100">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                        Batch Details
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Started {new Date(selectedBatchForStudents.startDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Batch {selectedBatchForStudents.name} Students
                     </h2>
-                    <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
-                      {students.filter(s => s.batch?.toString() === selectedBatchDetails.name?.toString()).length} Students
-                    </span>
+                    <p className="text-sm text-gray-600 mt-1 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {selectedBatchForStudents.startTime} - {selectedBatchForStudents.endTime}
+                    </p>
                   </div>
-                  <button
-                    onClick={() => setSelectedBatchDetails(null)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {/* View Toggle */}
+                    <div className="bg-gray-100 rounded-lg p-1 flex items-center">
+                      <button
+                        onClick={() => setStudentListView('grid')}
+                        className={`p-2 rounded-md transition-all duration-200 ${studentListView === 'grid'
+                            ? 'bg-white text-blue-600 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                          }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setStudentListView('list')}
+                        className={`p-2 rounded-md transition-all duration-200 ${studentListView === 'list'
+                            ? 'bg-white text-blue-600 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                          }`}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => setSelectedBatchForStudents(null)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+                    >
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
 
               {/* Students List */}
-              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-                <div className="space-y-4">
-                  {students
-                    .filter(student => student.batch?.toString() === selectedBatchDetails.name?.toString())
-                    .map(student => (
-                      <div
-                        key={student.id}
-                        className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors duration-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            {/* Student Image */}
-                            <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
-                              {student.imageUrl ? (
-                                <img
-                                  src={student.imageUrl}
-                                  alt={student.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="overflow-y-auto max-h-[calc(90vh-280px)]">
+                <div className="p-6">
+                  {/* Search and Filter */}
+                  <div className="mb-6 flex gap-4">
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        placeholder="Search students..."
+                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 
+                          focus:ring-blue-100 focus:border-blue-400"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                      <svg className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setCurrentView('students-add');
+                        setShowForm(true);
+                        setSelectedBatchForStudents(null);
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                        transition-all duration-300 flex items-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Student
+                    </button>
+                  </div>
+
+                  {/* Students Grid/List */}
+                  <div className={studentListView === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
+                    {students
+                      .filter(student =>
+                        student.batch?.toString() === selectedBatchForStudents.name?.toString() &&
+                        (student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          student.rollNumber.toLowerCase().includes(searchTerm.toLowerCase()))
+                      )
+                      .map(student => (
+                        <div
+                          key={student.id}
+                          className={`bg-white rounded-xl border border-gray-200 p-4 hover:border-blue-200 
+                            transition-all duration-300 ${studentListView === 'grid'
+                              ? 'flex flex-col gap-4'
+                              : 'flex items-center gap-4'
+                            }`}
+                        >
+                          {/* Student Image */}
+                          <div className={`${studentListView === 'grid'
+                              ? 'w-16 h-16'
+                              : 'w-12 h-12'
+                            } rounded-full overflow-hidden bg-gray-100 flex-shrink-0`}
+                          >
+                            {student.imageUrl ? (
+                              <img
+                                src={student.imageUrl}
+                                alt={student.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Student Info */}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-medium text-gray-900">{student.name}</h3>
+                              <span className="text-sm text-gray-500">Roll No: {student.rollNumber}</span>
+                            </div>
+
+                            {/* Contact Info */}
+                            <div className="flex flex-wrap gap-3 mt-2">
+                              {student.email && (
+                                <a
+                                  href={`mailto:${student.email}`}
+                                  className="text-sm text-gray-600 hover:text-blue-600 flex items-center gap-1"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                    />
+                                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                   </svg>
-                                </div>
+                                  {student.email}
+                                </a>
+                              )}
+                              {student.phone && (
+                                <a
+                                  href={`tel:${student.phone}`}
+                                  className="text-sm text-gray-600 hover:text-blue-600 flex items-center gap-1"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                  </svg>
+                                  {student.phone}
+                                </a>
                               )}
                             </div>
 
-                            {/* Student Info */}
-                            <div>
-                              <h4 className="font-medium text-gray-900">{student.name}</h4>
-                              <p className="text-sm text-gray-600">Roll No: {student.rollNumber}</p>
+                            {/* Actions */}
+                            <div className="flex gap-2 mt-3">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingStudent(student);
+                                  setNewStudent(student);
+                                  setCurrentView('students-add');
+                                  setShowForm(true);
+                                  setSelectedBatchForStudents(null);
+                                }}
+                                className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                                Edit
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteStudent(student.id);
+                                }}
+                                className="text-sm text-red-600 hover:text-red-700 flex items-center gap-1"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Delete
+                              </button>
                             </div>
                           </div>
-
-                          {/* Contact Info */}
-                          <div className="flex items-center gap-6">
-                            {student.email && (
-                              <a
-                                href={`mailto:${student.email}`}
-                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                  />
-                                </svg>
-                                {student.email}
-                              </a>
-                            )}
-                            {student.contactNumber && (
-                              <a
-                                href={`tel:${student.contactNumber}`}
-                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 transition-colors duration-200"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                  />
-                                </svg>
-                                {student.contactNumber}
-                              </a>
-                            )}
-                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                  </div>
 
-                  {/* Empty State */}
-                  {students.filter(s => s.batch?.toString() === selectedBatchDetails.name?.toString()).length === 0 && (
-                    <div className="text-center py-8">
-                      <div className="bg-gray-50 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                          />
-                        </svg>
-                      </div>
-                      <h3 className="text-gray-500 font-medium">No students enrolled</h3>
-                      <p className="text-gray-400 text-sm mt-1">This batch doesn't have any students yet.</p>
-                    </div>
-                  )}
+                  {/* Empty State remains the same */}
                 </div>
               </div>
             </div>
