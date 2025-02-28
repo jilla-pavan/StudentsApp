@@ -1546,7 +1546,7 @@ function App() {
     maxScore: '',
     date: getTodayDate(),
     description: '',
-    batch: ''
+    batches: [] // Changed from single batch to array of batches
   });
 
   // Calculate average attendance
@@ -1664,7 +1664,7 @@ function App() {
         maxScore: '',
         date: getTodayDate(),
         description: '',
-        batch: ''
+        batches: []
       });
 
       // Show success message
@@ -1732,6 +1732,184 @@ function App() {
       setTimeout(() => setShowAlert(false), 3000);
     }
   };
+
+  // First, add a new state for the assign mock view
+  const [selectedMockForAssignment, setSelectedMockForAssignment] = useState(null);
+  const [mockAssignmentFilter, setMockAssignmentFilter] = useState('');
+  const [expandedBatches, setExpandedBatches] = useState({});
+
+  // Add the new Assign Mock view
+  {currentView === 'mock-assign' && (
+    <div className="p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
+        <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">Assign Mock Test</h2>
+          <p className="text-sm text-gray-600 mt-1">Assign scores to students for mock tests</p>
+        </div>
+
+        <div className="p-6">
+          {/* Mock Test Filter Section */}
+          <div className="mb-6">
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Mock Test
+                </label>
+                <div className="relative">
+              <input
+                type="text"
+                    className={inputStyle}
+                    placeholder="Search mock tests..."
+                    value={mockAssignmentFilter}
+                    onChange={(e) => setMockAssignmentFilter(e.target.value)}
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+            </div>
+            </div>
+          </div>
+        </div>
+
+            {/* Mock Tests List */}
+            <div className="mt-4 space-y-4">
+          {mockTests
+                .filter(test => 
+                  test.name.toLowerCase().includes(mockAssignmentFilter.toLowerCase()) ||
+                  test.description?.toLowerCase().includes(mockAssignmentFilter.toLowerCase())
+                )
+            .map(test => (
+              <div
+                key={test.id}
+                    className={`p-4 rounded-lg border ${
+                      selectedMockForAssignment?.id === test.id
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-200'
+                    } cursor-pointer transition-all duration-200`}
+                    onClick={() => setSelectedMockForAssignment(test)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{test.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Date: {new Date(test.date).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Max Score: {test.maxScore}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {test.batches?.map(batch => (
+                          <span
+                            key={batch}
+                            className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium"
+                          >
+                            Batch {batch}
+                    </span>
+                        ))}
+                  </div>
+                    </div>
+                    </div>
+                ))}
+                  </div>
+                </div>
+
+          {/* Selected Mock Test Students Section */}
+          {selectedMockForAssignment && (
+            <div className="mt-8 border-t pt-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Assign Scores - {selectedMockForAssignment.name}
+              </h3>
+              
+              {selectedMockForAssignment.batches?.map(batchName => {
+                const batchStudents = students.filter(s => s.batch === batchName);
+                const isExpanded = expandedBatches[batchName];
+
+                return (
+                  <div key={batchName} className="mb-4">
+                    <div
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                      onClick={() => setExpandedBatches(prev => ({
+                        ...prev,
+                        [batchName]: !prev[batchName]
+                      }))}
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg
+                          className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        <h4 className="font-medium text-gray-900">Batch {batchName}</h4>
+                        <span className="text-sm text-gray-600">({batchStudents.length} students)</span>
+                  </div>
+                </div>
+
+                    {isExpanded && (
+                      <div className="mt-2 space-y-2">
+                        {batchStudents.map(student => {
+                          const currentScore = student.mockScores?.find(
+                            s => s.testId === selectedMockForAssignment.id
+                          )?.score || '';
+
+                          return (
+                            <div
+                              key={student.id}
+                              className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                  <span className="text-orange-600 font-medium">
+                                    {student.name.charAt(0)}
+                                  </span>
+              </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{student.name}</p>
+                                  <p className="text-sm text-gray-600">Roll: {student.rollNumber}</p>
+        </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max={selectedMockForAssignment.maxScore}
+                                  value={currentScore}
+                                  onChange={(e) => handleScoreChange(student, selectedMockForAssignment.id, e.target.value)}
+                                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                  placeholder="Score"
+                                />
+                                <span className="text-sm text-gray-600">
+                                  / {selectedMockForAssignment.maxScore}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Save Button */}
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={updateBulkMockScore}
+                  className={primaryButtonStyle}
+                >
+                  Save All Scores
+                </button>
+            </div>
+          </div>
+        )}
+        </div>
+      </div>
+    </div>
+  )}
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -2983,7 +3161,7 @@ function App() {
                         <div className="bg-gray-50 rounded-full p-4 mb-4">
                           <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                         </div>
                         <h3 className="text-lg font-medium text-gray-900 mb-2">No Students Found</h3>
@@ -3279,7 +3457,7 @@ function App() {
                       <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                         <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
                       <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Batch</h3>
@@ -3473,8 +3651,8 @@ function App() {
 
             {/* Mock Create View */}
             {currentView === 'mock-create' && (
-              <div className="p-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 max-w-4xl mx-auto">
+              <div className="">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 mx-auto">
                   <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
                     <h2 className="text-xl font-bold text-gray-900">Create Mock Test</h2>
                     <p className="text-sm text-gray-600 mt-1">Create a new mock test for students</p>
@@ -3491,8 +3669,7 @@ function App() {
                           type="text"
                           value={newMockTest.name}
                           onChange={(e) => setNewMockTest({ ...newMockTest, name: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                            focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
+                          className={inputStyle}
                           placeholder="Enter test name"
                           required
                         />
@@ -3507,8 +3684,7 @@ function App() {
                           type="number"
                           value={newMockTest.maxScore}
                           onChange={(e) => setNewMockTest({ ...newMockTest, maxScore: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                            focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
+                          className={inputStyle}
                           placeholder="Enter maximum score"
                           required
                           min="0"
@@ -3524,8 +3700,7 @@ function App() {
                           type="date"
                           value={newMockTest.date}
                           onChange={(e) => setNewMockTest({ ...newMockTest, date: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                            focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
+                          className={inputStyle}
                           required
                         />
                       </div>
@@ -3533,22 +3708,26 @@ function App() {
                       {/* Batch Selection */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Select Batch
+                          Select Batches
                         </label>
-                        <select
-                          value={newMockTest.batch || ''}
-                          onChange={(e) => setNewMockTest({ ...newMockTest, batch: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                            focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
-                          required
-                        >
-                          <option value="">Select a batch</option>
+                        <div className="space-y-2 max-h-40 overflow-y-auto p-2 border border-gray-200 rounded-lg">
                           {batches.map(batch => (
-                            <option key={batch.id} value={batch.name}>
-                              Batch {batch.name}
-                            </option>
+                            <label key={batch.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
+                              <input
+                                type="checkbox"
+                                checked={newMockTest.batches.includes(batch.name)}
+                                onChange={(e) => {
+                                  const updatedBatches = e.target.checked
+                                    ? [...newMockTest.batches, batch.name]
+                                    : newMockTest.batches.filter(b => b !== batch.name);
+                                  setNewMockTest({ ...newMockTest, batches: updatedBatches });
+                                }}
+                                className="rounded text-orange-600 focus:ring-orange-500"
+                              />
+                              <span className="text-sm text-gray-700">Batch {batch.name}</span>
+                            </label>
                           ))}
-                        </select>
+                        </div>
                       </div>
 
                       {/* Description */}
@@ -3559,8 +3738,7 @@ function App() {
                         <textarea
                           value={newMockTest.description}
                           onChange={(e) => setNewMockTest({ ...newMockTest, description: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                            focus:ring-2 focus:ring-orange-200 focus:border-orange-400"
+                          className={inputStyle}
                           rows="4"
                           placeholder="Enter test description"
                         />
@@ -3577,23 +3755,333 @@ function App() {
                             maxScore: '',
                             date: getTodayDate(),
                             description: '',
-                            batch: ''
+                            batches: []
                           });
                         }}
-                        className="px-4 py-2 text-gray-700 bg-gray-50 hover:bg-gray-100
-                          rounded-lg border border-gray-300 transition-colors duration-200"
+                        className={secondaryButtonStyle}
                       >
                         Clear Form
                       </button>
                       <button
                         type="submit"
-                        className="px-4 py-2 text-white bg-orange-600 hover:bg-orange-700
-                          rounded-lg transition-colors duration-200"
+                        className={primaryButtonStyle}
                       >
                         Create Mock Test
                       </button>
                     </div>
                   </form>
+                </div>
+              </div>
+            )}
+
+            {/* Mock Report View */}
+            {currentView === 'mock-report' && (
+              <div className="p-6">
+                {/* Header Card */}
+                <div className={`${cardStyle} mb-6`}>
+                  <div className="p-6 border-b border-gray-100">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">Mock Tests</h2>
+                        <p className="text-gray-600 mt-1">View and manage all mock tests</p>
+          </div>
+                      <div className="flex items-center gap-4">
+                        <div className="px-4 py-3 bg-orange-50 rounded-lg border border-orange-100">
+                          <p className="text-sm text-gray-600">Total Tests</p>
+                          <p className="text-2xl font-bold text-orange-600">{mockTests.length}</p>
+                        </div>
+                        <button
+                          onClick={() => setCurrentView('mock-assign')}
+                          className={`${primaryButtonStyle} flex items-center gap-2`}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                          Assign Mock
+                        </button>
+                        <button
+                          onClick={() => setCurrentView('mock-create')}
+                          className={`${primaryButtonStyle} flex items-center gap-2`}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                          Create New Test
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mock Tests Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {mockTests.map(test => (
+                    <div
+                      key={test.id}
+                      className={`${cardStyle} overflow-hidden`}
+                    >
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="text-lg font-semibold text-gray-900">{test.name}</h3>
+                          {test.batches && test.batches.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {test.batches.map(batch => (
+                                <span key={batch} className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-medium">
+                                  Batch {batch}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div className="flex items-center text-sm text-gray-600">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {new Date(test.date).toLocaleDateString('en-US', {
+                              weekday: 'long',
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </div>
+                          
+                          <div className="flex items-center text-sm text-gray-600">
+                            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            Maximum Score: {test.maxScore}
+                          </div>
+
+                          {test.description && (
+                            <p className="text-sm text-gray-600 line-clamp-2">{test.description}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                        <div className="flex justify-between items-center">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                            new Date(test.date) > new Date() 
+                              ? 'bg-blue-100 text-blue-800'
+                              : new Date(test.date).toDateString() === new Date().toDateString()
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {new Date(test.date) > new Date() 
+                              ? 'Upcoming'
+                              : new Date(test.date).toDateString() === new Date().toDateString()
+                              ? 'Today'
+                              : 'Completed'}
+                          </span>
+                          <div className="flex gap-3">
+                            <button
+                              onClick={() => handleEditMock(test)}
+                              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteMock(test.id)}
+                              className="text-red-600 hover:text-red-700 text-sm font-medium"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Empty State */}
+                {mockTests.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                      <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No mock tests found</h3>
+                    <p className="text-gray-600">Create your first mock test to get started.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Assign Mock View */}
+            {currentView === 'mock-assign' && (
+              <div className="p-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
+                  <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
+                    <h2 className="text-xl font-bold text-gray-900">Assign Mock Test</h2>
+                    <p className="text-sm text-gray-600 mt-1">Assign scores to students for mock tests</p>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Mock Test Filter Section */}
+                    <div className="mb-6">
+                      <div className="flex gap-4 items-end">
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Mock Test
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              className={inputStyle}
+                              placeholder="Search mock tests..."
+                              value={mockAssignmentFilter}
+                              onChange={(e) => setMockAssignmentFilter(e.target.value)}
+                            />
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Mock Tests List */}
+                      <div className="mt-4 space-y-4">
+                        {mockTests
+                          .filter(test => 
+                            test.name.toLowerCase().includes(mockAssignmentFilter.toLowerCase()) ||
+                            test.description?.toLowerCase().includes(mockAssignmentFilter.toLowerCase())
+                          )
+                          .map(test => (
+                            <div
+                              key={test.id}
+                              className={`p-4 rounded-lg border ${
+                                selectedMockForAssignment?.id === test.id
+                                  ? 'border-orange-500 bg-orange-50'
+                                  : 'border-gray-200 hover:border-orange-200'
+                              } cursor-pointer transition-all duration-200`}
+                              onClick={() => setSelectedMockForAssignment(test)}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h3 className="font-semibold text-gray-900">{test.name}</h3>
+                                  <p className="text-sm text-gray-600 mt-1">
+                                    Date: {new Date(test.date).toLocaleDateString()}
+                                  </p>
+                                  <p className="text-sm text-gray-600">
+                                    Max Score: {test.maxScore}
+                                  </p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {test.batches?.map(batch => (
+                                    <span
+                                      key={batch}
+                                      className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium"
+                                    >
+                                      Batch {batch}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Selected Mock Test Students Section */}
+                    {selectedMockForAssignment && (
+                      <div className="mt-8 border-t pt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                          Assign Scores - {selectedMockForAssignment.name}
+                        </h3>
+                        
+                        {selectedMockForAssignment.batches?.map(batchName => {
+                          const batchStudents = students.filter(s => s.batch === batchName);
+                          const isExpanded = expandedBatches[batchName];
+
+                          return (
+                            <div key={batchName} className="mb-4">
+                              <div
+                                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                                onClick={() => setExpandedBatches(prev => ({
+                                  ...prev,
+                                  [batchName]: !prev[batchName]
+                                }))}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <svg
+                                    className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                  </svg>
+                                  <h4 className="font-medium text-gray-900">Batch {batchName}</h4>
+                                  <span className="text-sm text-gray-600">({batchStudents.length} students)</span>
+                                </div>
+                              </div>
+
+                              {isExpanded && (
+                                <div className="mt-2 space-y-2">
+                                  {batchStudents.map(student => {
+                                    const currentScore = student.mockScores?.find(
+                                      s => s.testId === selectedMockForAssignment.id
+                                    )?.score || '';
+
+                                    return (
+                                      <div
+                                        key={student.id}
+                                        className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+                                      >
+                                        <div className="flex items-center gap-4">
+                                          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                            <span className="text-orange-600 font-medium">
+                                              {student.name.charAt(0)}
+                                            </span>
+                                          </div>
+                                          <div>
+                                            <p className="font-medium text-gray-900">{student.name}</p>
+                                            <p className="text-sm text-gray-600">Roll: {student.rollNumber}</p>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <input
+                                            type="number"
+                                            min="0"
+                                            max={selectedMockForAssignment.maxScore}
+                                            value={currentScore}
+                                            onChange={(e) => handleScoreChange(student, selectedMockForAssignment.id, e.target.value)}
+                                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            placeholder="Score"
+                                          />
+                                          <span className="text-sm text-gray-600">
+                                            / {selectedMockForAssignment.maxScore}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+
+                        {/* Save Button */}
+                        <div className="mt-6 flex justify-end">
+                          <button
+                            onClick={updateBulkMockScore}
+                            className={primaryButtonStyle}
+                          >
+                            Save All Scores
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
