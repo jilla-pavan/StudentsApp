@@ -109,9 +109,9 @@ const badgeStyle = (color) => `
   inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
   ${color === 'green' ? 'bg-green-100 text-green-800' :
     color === 'red' ? 'bg-red-100 text-red-800' :
-    color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-    color === 'blue' ? 'bg-blue-100 text-blue-800' :
-    'bg-gray-100 text-gray-800'}
+      color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
+        color === 'blue' ? 'bg-blue-100 text-blue-800' :
+          'bg-gray-100 text-gray-800'}
 `
 
 const modalStyle = `
@@ -195,9 +195,9 @@ const attendanceButtonStyle = (isActive, type) => `
 
 const attendanceStatusBadge = (status) => `
   ${badgeStyle(
-    status === 'present' ? 'green' :
+  status === 'present' ? 'green' :
     status === 'absent' ? 'red' : 'gray'
-  )}
+)}
 `
 
 const mockTestCardStyle = `
@@ -212,9 +212,9 @@ const mockTestHeaderStyle = `
 
 const mockScoreStyle = (score, maxScore) => `
   ${badgeStyle(
-    score >= maxScore * 0.8 ? 'green' :
+  score >= maxScore * 0.8 ? 'green' :
     score >= maxScore * 0.6 ? 'yellow' : 'red'
-  )}
+)}
 `
 
 // Add back the search input style
@@ -250,7 +250,7 @@ const Alert = ({ type, message, onClose }) => (
       rounded-lg shadow-lg p-4
       ${type === 'success' ? 'bg-green-50 border border-green-200' :
         type === 'error' ? 'bg-red-50 border border-red-200' :
-        'bg-blue-50 border border-blue-200'}
+          'bg-blue-50 border border-blue-200'}
     `}>
       <div className="flex items-center gap-3">
         {type === 'success' ? (
@@ -262,11 +262,10 @@ const Alert = ({ type, message, onClose }) => (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         )}
-        <p className={`font-medium ${
-          type === 'success' ? 'text-green-800' :
-          type === 'error' ? 'text-red-800' :
-          'text-blue-800'
-        }`}>
+        <p className={`font-medium ${type === 'success' ? 'text-green-800' :
+            type === 'error' ? 'text-red-800' :
+              'text-blue-800'
+          }`}>
           {message}
         </p>
         <button
@@ -367,11 +366,10 @@ const AttendanceDetailsModal = ({ student, onClose }) => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  activeTab === tab
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === tab
                     ? 'bg-blue-100 text-blue-700'
                     : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -433,11 +431,10 @@ const AttendanceDetailsModal = ({ student, onClose }) => {
                         {new Date(record.date).toLocaleDateString('en-US', { year: 'numeric' })}
                       </p>
                     </div>
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                      record.present
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${record.present
                         ? 'bg-green-100 text-green-800'
                         : 'bg-red-100 text-red-800'
-                    }`}>
+                      }`}>
                       {record.present ? 'Present' : 'Absent'}
                     </span>
                   </div>
@@ -712,7 +709,7 @@ function App() {
     const records = [];
     const start = new Date(startDate);
     const today = new Date();
-    
+
     // Loop through each date from start date to today
     for (let date = new Date(start); date <= today; date.setDate(date.getDate() + 1)) {
       const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'long' });
@@ -1282,30 +1279,50 @@ function App() {
 
   // Update the score input component
   const handleScoreChange = (student, testId, value) => {
-    const test = mockTests.find(t => t.id === testId)
-    const isAbsent = value === 'absent'
-    const score = isAbsent ? 0 : parseInt(value)
+    const test = mockTests.find(t => t.id === testId);
+    if (!test) return;
 
-    if (!isAbsent && (isNaN(score) || score < 0 || score > test.maxScore)) {
-      return
+    // Check if student can take this test
+    if (!canTakeMockTest(student, test.level)) {
+      alert('Student must complete previous level tests first!');
+      return;
     }
 
-    const updatedMockScores = [
-      ...(student.mockScores || []).filter(s => s.mockId !== testId),
-      {
-        mockId: testId,
-        score: score,
-        date: test.date,
-        absent: isAbsent
-      }
-    ]
+    const score = parseInt(value);
+    if (isNaN(score) || score < 0 || score > test.maxScore) {
+      return;
+    }
 
+    // Update the student's mock scores
+    const updatedStudent = {
+      ...student,
+      mockScores: [
+        ...(student.mockScores || []).filter(s => s.mockId !== testId),
+        {
+          mockId: testId,
+          score: score,
+          date: new Date().toISOString(),
+          level: test.level
+        }
+      ]
+    };
+
+    // Update students state
     setStudents(students.map(s =>
-      s.id === student.id
-        ? { ...s, mockScores: updatedMockScores }
-        : s
-    ))
-  }
+      s.id === student.id ? updatedStudent : s
+    ));
+
+    // Show level up message if student passed the test
+    if (score >= (test.maxScore * 0.7)) {
+      const newLevel = getStudentLevel(updatedStudent);
+      if (newLevel > getStudentLevel(student)) {
+        setAlertMessage(`${student.name} has advanced to Level ${newLevel}!`);
+        setAlertType('success');
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    }
+  };
 
   // Add new state for expanded menu
   const [expandedMenu, setExpandedMenu] = useState('')
@@ -1405,9 +1422,9 @@ function App() {
   // Function to handle attendance submission
   const handleAttendanceSubmit = async (e) => {
     if (e) e.preventDefault();
-    
-    if (!selectedBatch || (attendanceFilterType === 'single' && !selectedDate) || 
-        (attendanceFilterType === 'range' && (!attendanceDateRange.start || !attendanceDateRange.end))) {
+
+    if (!selectedBatch || (attendanceFilterType === 'single' && !selectedDate) ||
+      (attendanceFilterType === 'range' && (!attendanceDateRange.start || !attendanceDateRange.end))) {
       setAlertMessage('Please select all required fields');
       setAlertType('error');
       setShowAlert(true);
@@ -1416,7 +1433,7 @@ function App() {
 
     try {
       // Get all students from the selected batch
-      const filteredStudents = students.filter(student => 
+      const filteredStudents = students.filter(student =>
         student.batch?.toString() === selectedBatch?.toString()
       );
 
@@ -1466,7 +1483,7 @@ function App() {
         present: student.attendance?.class?.find(a => a.date === dateStr)?.present || false
       });
     }
-    
+
     return dates;
   }
 
@@ -1475,7 +1492,7 @@ function App() {
     try {
       const studentRef = doc(db, 'students', studentId);
       const student = attendanceStudents.find(s => s.id === studentId);
-      
+
       if (!student) {
         throw new Error('Student not found');
       }
@@ -1495,7 +1512,7 @@ function App() {
             ...s,
             attendance: {
               ...s.attendance,
-              class: [...filteredAttendance, newAttendance].sort((a, b) => 
+              class: [...filteredAttendance, newAttendance].sort((a, b) =>
                 new Date(b.date) - new Date(a.date)
               )
             }
@@ -1506,7 +1523,7 @@ function App() {
 
       // Update both students and attendanceStudents states
       setStudents(updatedStudents);
-      setAttendanceStudents(updatedStudents.filter(s => 
+      setAttendanceStudents(updatedStudents.filter(s =>
         s.batch?.toString() === selectedBatch?.toString()
       ));
 
@@ -1515,7 +1532,7 @@ function App() {
         attendance: {
           ...student.attendance,
           class: [...(student.attendance?.class || [])
-            .filter(a => a.date !== selectedDate), 
+            .filter(a => a.date !== selectedDate),
             newAttendance
           ].sort((a, b) => new Date(b.date) - new Date(a.date))
         }
@@ -1546,7 +1563,8 @@ function App() {
     maxScore: '',
     date: getTodayDate(),
     description: '',
-    batches: [] // Changed from single batch to array of batches
+    batches: [], // Changed from single batch to array of batches
+    level: 1 // Adding level field
   });
 
   // Calculate average attendance
@@ -1633,7 +1651,8 @@ function App() {
       id: 1,
       name: 'Mock Test 1',
       date: getTodayDate(),
-      maxScore: 100
+      maxScore: 100,
+      level: 1 // Adding level field
     }
   ]);
   const [currentMockTest, setCurrentMockTest] = useState(null);
@@ -1642,7 +1661,7 @@ function App() {
   // Move handleCreateMock before the JSX
   const handleCreateMock = async (e) => {
     e.preventDefault();
-    
+
     try {
       // Create a new mock test document in Firebase
       const mockTestRef = collection(db, 'mockTests');
@@ -1735,53 +1754,82 @@ function App() {
 
   // First, add a new state for the assign mock view
   const [selectedMockForAssignment, setSelectedMockForAssignment] = useState(null);
-  const [mockAssignmentFilter, setMockAssignmentFilter] = useState('');
+  const [mockAssignmentFilter, setMockAssignmentFilter] = useState({
+    batch: '',
+    search: ''
+  });
   const [expandedBatches, setExpandedBatches] = useState({});
 
   // Add the new Assign Mock view
-  {currentView === 'mock-assign' && (
-    <div className="p-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
-        <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Assign Mock Test</h2>
-          <p className="text-sm text-gray-600 mt-1">Assign scores to students for mock tests</p>
-        </div>
-
-        <div className="p-6">
-          {/* Mock Test Filter Section */}
-          <div className="mb-6">
-            <div className="flex gap-4 items-end">
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Mock Test
-                </label>
-                <div className="relative">
-              <input
-                type="text"
-                    className={inputStyle}
-                    placeholder="Search mock tests..."
-                    value={mockAssignmentFilter}
-                    onChange={(e) => setMockAssignmentFilter(e.target.value)}
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-            </div>
-            </div>
+  {
+    currentView === 'mock-assign' && (
+      <div className="p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
+          <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">Assign Mock Test</h2>
+            <p className="text-sm text-gray-600 mt-1">Assign scores to students for mock tests</p>
           </div>
-        </div>
+
+          <div className="p-6">
+            {/* Filter Section */}
+            <div className="mb-6">
+              <div className="flex gap-4 items-end">
+                {/* Batch Filter */}
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Filter by Batch
+                  </label>
+                  <select
+                    value={mockAssignmentFilter.batch || ''}
+                    onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }))}
+                    className={`${inputStyle} pr-10`}
+                  >
+                    <option value="">All Batches</option>
+                    {Array.from(new Set(students.map(s => s.batch))).sort().map(batch => (
+                      <option key={batch} value={batch}>Batch {batch}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Mock Test Search */}
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Search Mock Tests
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className={inputStyle}
+                      placeholder="Search mock tests..."
+                      value={mockAssignmentFilter.search || ''}
+                      onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, search: e.target.value }))}
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Mock Tests List */}
             <div className="mt-4 space-y-4">
-          {mockTests
-                .filter(test => 
-                  test.name.toLowerCase().includes(mockAssignmentFilter.toLowerCase()) ||
-                  test.description?.toLowerCase().includes(mockAssignmentFilter.toLowerCase())
-                )
-            .map(test => (
-              <div
-                key={test.id}
+              {mockTests
+                .filter(test => {
+                  const searchMatch = !mockAssignmentFilter.search || 
+                    test.name.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase()) ||
+                    test.description?.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase());
+                  
+                  const batchMatch = !mockAssignmentFilter.batch || 
+                    test.batches?.includes(mockAssignmentFilter.batch);
+                  
+                  return searchMatch && batchMatch;
+                })
+                .map(test => (
+                  <div
+                    key={test.id}
                     className={`p-4 rounded-lg border ${
                       selectedMockForAssignment?.id === test.id
                         ? 'border-orange-500 bg-orange-50'
@@ -1806,110 +1854,110 @@ function App() {
                             className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium"
                           >
                             Batch {batch}
-                    </span>
+                          </span>
                         ))}
-                  </div>
-                    </div>
-                    </div>
-                ))}
-                  </div>
-                </div>
-
-          {/* Selected Mock Test Students Section */}
-          {selectedMockForAssignment && (
-            <div className="mt-8 border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Assign Scores - {selectedMockForAssignment.name}
-              </h3>
-              
-              {selectedMockForAssignment.batches?.map(batchName => {
-                const batchStudents = students.filter(s => s.batch === batchName);
-                const isExpanded = expandedBatches[batchName];
-
-                return (
-                  <div key={batchName} className="mb-4">
-                    <div
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                      onClick={() => setExpandedBatches(prev => ({
-                        ...prev,
-                        [batchName]: !prev[batchName]
-                      }))}
-                    >
-                      <div className="flex items-center gap-2">
-                        <svg
-                          className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                        <h4 className="font-medium text-gray-900">Batch {batchName}</h4>
-                        <span className="text-sm text-gray-600">({batchStudents.length} students)</span>
-                  </div>
-                </div>
-
-                    {isExpanded && (
-                      <div className="mt-2 space-y-2">
-                        {batchStudents.map(student => {
-                          const currentScore = student.mockScores?.find(
-                            s => s.testId === selectedMockForAssignment.id
-                          )?.score || '';
-
-                          return (
-                            <div
-                              key={student.id}
-                              className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
-                            >
-                              <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                  <span className="text-orange-600 font-medium">
-                                    {student.name.charAt(0)}
-                                  </span>
-              </div>
-                                <div>
-                                  <p className="font-medium text-gray-900">{student.name}</p>
-                                  <p className="text-sm text-gray-600">Roll: {student.rollNumber}</p>
-        </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="number"
-                                  min="0"
-                                  max={selectedMockForAssignment.maxScore}
-                                  value={currentScore}
-                                  onChange={(e) => handleScoreChange(student, selectedMockForAssignment.id, e.target.value)}
-                                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                  placeholder="Score"
-                                />
-                                <span className="text-sm text-gray-600">
-                                  / {selectedMockForAssignment.maxScore}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
                       </div>
-                    )}
+                    </div>
                   </div>
-                );
-              })}
-
-              {/* Save Button */}
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={updateBulkMockScore}
-                  className={primaryButtonStyle}
-                >
-                  Save All Scores
-                </button>
+                ))}
             </div>
+
+            {/* Selected Mock Test Students Section */}
+            {selectedMockForAssignment && (
+              <div className="mt-8 border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Assign Scores - {selectedMockForAssignment.name}
+                </h3>
+
+                {selectedMockForAssignment.batches?.map(batchName => {
+                  const batchStudents = students.filter(s => s.batch === batchName);
+                  const isExpanded = expandedBatches[batchName];
+
+                  return (
+                    <div key={batchName} className="mb-4">
+                      <div
+                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                        onClick={() => setExpandedBatches(prev => ({
+                          ...prev,
+                          [batchName]: !prev[batchName]
+                        }))}
+                      >
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                          <h4 className="font-medium text-gray-900">Batch {batchName}</h4>
+                          <span className="text-sm text-gray-600">({batchStudents.length} students)</span>
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="mt-2 space-y-2">
+                          {batchStudents.map(student => {
+                            const currentScore = student.mockScores?.find(
+                              s => s.testId === selectedMockForAssignment.id
+                            )?.score || '';
+
+                            return (
+                              <div
+                                key={student.id}
+                                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+                              >
+                                <div className="flex items-center gap-4">
+                                  <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                    <span className="text-orange-600 font-medium">
+                                      {student.name.charAt(0)}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-gray-900">{student.name}</p>
+                                    <p className="text-sm text-gray-600">Roll: {student.rollNumber}</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    max={selectedMockForAssignment.maxScore}
+                                    value={currentScore}
+                                    onChange={(e) => handleScoreChange(student, selectedMockForAssignment.id, e.target.value)}
+                                    className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    placeholder="Score"
+                                  />
+                                  <span className="text-sm text-gray-600">
+                                    / {selectedMockForAssignment.maxScore}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {/* Save Button */}
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={updateBulkMockScore}
+                    className={primaryButtonStyle}
+                  >
+                    Save All Scores
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
         </div>
       </div>
-    </div>
-  )}
+    )
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -2064,21 +2112,16 @@ function App() {
         <div className="space-y-1">
           <button
             onClick={() => setExpandedMenu(expandedMenu === 'mock' ? '' : 'mock')}
-            className={`${sidebarButtonStyle} flex items-center justify-between w-full ${
-              currentView.startsWith('mock') ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
-            }`}
+            className={`${sidebarButtonStyle} flex items-center justify-between w-full ${currentView.startsWith('mock') ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'}`}
           >
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               Mock Tests
             </div>
             <svg
-              className={`w-4 h-4 transform transition-transform ${
-                expandedMenu === 'mock' ? 'rotate-180' : ''
-              }`}
+              className={`w-4 h-4 transform transition-transform ${expandedMenu === 'mock' ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -2088,24 +2131,34 @@ function App() {
           </button>
 
           {/* Mock Tests Submenu */}
-          <div className={`pl-4 space-y-1 ${expandedMenu === 'mock' ? 'block' : 'hidden'}`}>
-            <button
-              onClick={() => setCurrentView('mock-create')}
-              className={`${sidebarButtonStyle} text-sm ${
-                currentView === 'mock-create' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
-              }`}
-            >
-              Create Mock
-            </button>
-            <button
-              onClick={() => setCurrentView('mock-report')}
-              className={`${sidebarButtonStyle} text-sm ${
-                currentView === 'mock-report' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
-              }`}
-            >
-              View Mock
-            </button>
-          </div>
+          {expandedMenu === 'mock' && (
+            <div className="pl-10 space-y-1">
+              <button
+                onClick={() => setCurrentView('mock')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setCurrentView('mock-create')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-create' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Create Test
+              </button>
+              <button
+                onClick={() => setCurrentView('mock-assign')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-assign' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Assign Scores
+              </button>
+              <button
+                onClick={() => setCurrentView('mock-report')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-report' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Reports
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -2189,21 +2242,19 @@ function App() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => setStudentListView('grid')}
-                          className={`flex-1 px-4 py-2.5 rounded-lg border ${
-                            studentListView === 'grid'
+                          className={`flex-1 px-4 py-2.5 rounded-lg border ${studentListView === 'grid'
                               ? 'bg-blue-50 border-blue-200 text-blue-700'
                               : 'border-gray-300 text-gray-600 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           Grid View
                         </button>
                         <button
                           onClick={() => setStudentListView('list')}
-                          className={`flex-1 px-4 py-2.5 rounded-lg border ${
-                            studentListView === 'list'
+                          className={`flex-1 px-4 py-2.5 rounded-lg border ${studentListView === 'list'
                               ? 'bg-blue-50 border-blue-200 text-blue-700'
                               : 'border-gray-300 text-gray-600 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           List View
                         </button>
@@ -2217,10 +2268,10 @@ function App() {
                   {students
                     .filter(student => {
                       const searchLower = searchTerm.toLowerCase();
-                      const matchesSearch = !searchTerm || 
+                      const matchesSearch = !searchTerm ||
                         student.name?.toLowerCase().includes(searchLower) ||
                         student.rollNumber?.toLowerCase().includes(searchLower);
-                      const matchesBatch = !selectedBatch || 
+                      const matchesBatch = !selectedBatch ||
                         student.batch?.toString() === selectedBatch?.toString();
                       return matchesSearch && matchesBatch;
                     })
@@ -2291,32 +2342,32 @@ function App() {
                 {/* Empty State */}
                 {students.filter(student => {
                   const searchLower = searchTerm.toLowerCase();
-                  const matchesSearch = !searchTerm || 
+                  const matchesSearch = !searchTerm ||
                     student.name?.toLowerCase().includes(searchLower) ||
                     student.rollNumber?.toLowerCase().includes(searchLower);
-                  const matchesBatch = !selectedBatch || 
+                  const matchesBatch = !selectedBatch ||
                     student.batch?.toString() === selectedBatch?.toString();
                   return matchesSearch && matchesBatch;
                 }).length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                      <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                      </svg>
+                    <div className="text-center py-12">
+                      <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                        <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
+                      <p className="text-gray-600">
+                        {searchTerm && selectedBatch
+                          ? `No students found matching "${searchTerm}" in Batch ${selectedBatch}`
+                          : searchTerm
+                            ? `No students found matching "${searchTerm}"`
+                            : selectedBatch
+                              ? `No students found in Batch ${selectedBatch}`
+                              : 'No students available'}
+                      </p>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
-                    <p className="text-gray-600">
-                      {searchTerm && selectedBatch
-                        ? `No students found matching "${searchTerm}" in Batch ${selectedBatch}`
-                        : searchTerm
-                          ? `No students found matching "${searchTerm}"`
-                          : selectedBatch
-                            ? `No students found in Batch ${selectedBatch}`
-                            : 'No students available'}
-                    </p>
-                  </div>
-                )}
+                  )}
               </div>
             )}
 
@@ -2917,11 +2968,11 @@ function App() {
                           onClick={() => {
                             const currentDate = new Date(selectedDate);
                             const newDate = new Date(currentDate.setDate(currentDate.getDate() - 1));
-                            
+
                             // Get the batch start date
                             const selectedBatchData = batches.find(b => b.name === selectedBatch);
                             const batchStartDate = selectedBatchData ? new Date(selectedBatchData.startDate) : new Date();
-                            
+
                             // Only allow navigation if new date is not before batch start date
                             if (newDate >= batchStartDate) {
                               setSelectedDate(newDate.toISOString().split('T')[0]);
@@ -2945,7 +2996,7 @@ function App() {
                               const newDate = new Date(e.target.value);
                               const selectedBatchData = batches.find(b => b.name === selectedBatch);
                               const batchStartDate = selectedBatchData ? new Date(selectedBatchData.startDate) : new Date();
-                              
+
                               // Only allow date selection if it's not before batch start date
                               if (!selectedBatch || newDate >= batchStartDate) {
                                 setSelectedDate(e.target.value);
@@ -2963,7 +3014,7 @@ function App() {
                           onClick={() => {
                             const currentDate = new Date(selectedDate);
                             const newDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
-                            
+
                             // Don't allow navigation beyond today
                             if (newDate <= new Date()) {
                               setSelectedDate(newDate.toISOString().split('T')[0]);
@@ -2979,7 +3030,7 @@ function App() {
                           </svg>
                         </button>
                       </div>
-                      
+
                       {/* Show batch start date info if selected */}
                       {selectedBatch && (
                         <p className="text-sm text-gray-500 mt-1">
@@ -3308,7 +3359,7 @@ function App() {
                           Detailed Attendance Report - Batch {selectedBatch}
                         </h3>
                         <p className="text-sm text-gray-600 mt-1">
-                          {filterType === 'range' 
+                          {filterType === 'range'
                             ? `${new Date(dateRange.start).toLocaleDateString()} - ${new Date(dateRange.end).toLocaleDateString()}`
                             : new Date(singleDate).toLocaleDateString()}
                         </p>
@@ -3350,8 +3401,8 @@ function App() {
                                 const attendanceRecords = student.attendance?.class || [];
                                 const recordsInRange = filterType === 'range'
                                   ? attendanceRecords.filter(record =>
-                                      record.date >= dateRange.start && record.date <= dateRange.end
-                                    )
+                                    record.date >= dateRange.start && record.date <= dateRange.end
+                                  )
                                   : attendanceRecords.filter(record => record.date === singleDate);
 
                                 const totalDays = recordsInRange.length;
@@ -3384,7 +3435,7 @@ function App() {
                                         </div>
                                       </div>
                                     </td>
-                                    
+
                                     {filterType === 'range' ? (
                                       <>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -3395,11 +3446,10 @@ function App() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                           <div className="flex items-center">
-                                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                                              attendancePercentage >= 75 ? 'bg-green-100 text-green-800' :
-                                              attendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                                              'bg-red-100 text-red-800'
-                                            }`}>
+                                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${attendancePercentage >= 75 ? 'bg-green-100 text-green-800' :
+                                                attendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                                                  'bg-red-100 text-red-800'
+                                              }`}>
                                               {attendancePercentage.toFixed(1)}%
                                             </span>
                                           </div>
@@ -3561,7 +3611,7 @@ function App() {
                                 <div>
                                   <h3 className="font-medium text-gray-900">{test.name}</h3>
                                   <p className="text-sm text-gray-600">
-                                    Date: {formatDate(test.date)} • Max Score: {test.maxScore}
+                                    Date: {formatDate(test.date)} • Max Score: {test.maxScore} • Level: {test.level}
                                   </p>
                                 </div>
                               </div>
@@ -3600,49 +3650,63 @@ function App() {
                             student.name?.toLowerCase().includes(searchLower) ||
                             student.rollNumber?.toLowerCase().includes(searchLower);
                         })
-                        .map(student => (
-                          <div key={student.id}
-                            className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all duration-200"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 rounded-full overflow-hidden bg-gray-200">
-                                  {student.imageUrl ? (
-                                    <img
-                                      src={student.imageUrl}
-                                      alt={student.name}
-                                      className="h-full w-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="h-full w-full flex items-center justify-center">
-                                      <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                      </svg>
-                                    </div>
-                                  )}
-                                </div>
-                                <div>
-                                  <h4 className="font-medium text-gray-900">{student.name}</h4>
-                                  <p className="text-sm text-gray-600">Roll No: {student.rollNumber}</p>
+                        .map(student => {
+                          const currentLevel = getStudentLevel(student);
+                          return (
+                            <div key={student.id}
+                              className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all duration-200"
+                            >
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <span className="text-purple-600 font-medium">{student.name.charAt(0)}</span>
+                                  </div>
+                                  <div>
+                                    <h4 className="font-medium text-gray-900">{student.name}</h4>
+                                    <p className="text-sm text-gray-600">Current Level: {currentLevel}</p>
+                                  </div>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-4">
-                                {student.mockScores.map(score => {
-                                  const test = mockTests.find(t => t.id === score.mockId);
-                                  return (
-                                    <div key={score.mockId} className="text-center">
-                                      <p className="text-sm text-gray-600 mb-1">{test?.name}</p>
-                                      <span className={mockScoreStyle(score.score, test?.maxScore)}>
-                                        {score.score}/{test?.maxScore}
-                                      </span>
-                                    </div>
-                                  );
-                                })}
+                              <div className="space-y-4">
+                                {mockTests
+                                  .filter(test => test.level <= currentLevel)
+                                  .map(test => {
+                                    const score = student.mockScores?.find(s => s.mockId === test.id);
+                                    const isPassed = score && score.score >= (test.maxScore * 0.7);
+                                    const canTake = canTakeMockTest(student, test.level);
+
+                                    return (
+                                      <div key={test.id} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                        <div>
+                                          <h5 className="font-medium text-gray-900">{test.name}</h5>
+                                          <p className="text-sm text-gray-600">Level {test.level}</p>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                          {score ? (
+                                            <div className={`px-3 py-1 rounded-full text-sm font-medium ${isPassed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                              }`}>
+                                              {score.score}/{test.maxScore} {isPassed ? '(Passed)' : '(Failed)'}
+                                            </div>
+                                          ) : canTake ? (
+                                            <button
+                                              onClick={() => handleScoreChange(student, test.id, '')}
+                                              className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                                            >
+                                              Take Test
+                                            </button>
+                                          ) : (
+                                            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                                              Locked
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
@@ -3660,20 +3724,6 @@ function App() {
 
                   <form onSubmit={handleCreateMock} className="p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Mock Test Name */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Test Name
-                        </label>
-                        <input
-                          type="text"
-                          value={newMockTest.name}
-                          onChange={(e) => setNewMockTest({ ...newMockTest, name: e.target.value })}
-                          className={inputStyle}
-                          placeholder="Enter test name"
-                          required
-                        />
-                      </div>
 
                       {/* Maximum Score */}
                       <div>
@@ -3689,6 +3739,23 @@ function App() {
                           required
                           min="0"
                         />
+                      </div>
+
+                      {/* Level Selection */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Level
+                        </label>
+                        <select
+                          value={newMockTest.level}
+                          onChange={(e) => setNewMockTest({ ...newMockTest, level: parseInt(e.target.value) })}
+                          className={selectStyle}
+                          required
+                        >
+                          {[...Array(10)].map((_, i) => (
+                            <option key={i + 1} value={i + 1}>Level {i + 1}</option>
+                          ))}
+                        </select>
                       </div>
 
                       {/* Test Date */}
@@ -3784,7 +3851,7 @@ function App() {
                       <div>
                         <h2 className="text-xl font-bold text-gray-900">Mock Tests</h2>
                         <p className="text-gray-600 mt-1">View and manage all mock tests</p>
-          </div>
+                      </div>
                       <div className="flex items-center gap-4">
                         <div className="px-4 py-3 bg-orange-50 rounded-lg border border-orange-100">
                           <p className="text-sm text-gray-600">Total Tests</p>
@@ -3833,11 +3900,11 @@ function App() {
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="space-y-3">
                           <div className="flex items-center text-sm text-gray-600">
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                             {new Date(test.date).toLocaleDateString('en-US', {
@@ -3847,10 +3914,10 @@ function App() {
                               day: 'numeric'
                             })}
                           </div>
-                          
+
                           <div className="flex items-center text-sm text-gray-600">
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
                             Maximum Score: {test.maxScore}
@@ -3864,18 +3931,17 @@ function App() {
 
                       <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
                         <div className="flex justify-between items-center">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                            new Date(test.date) > new Date() 
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${new Date(test.date) > new Date()
                               ? 'bg-blue-100 text-blue-800'
                               : new Date(test.date).toDateString() === new Date().toDateString()
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {new Date(test.date) > new Date() 
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
+                            {new Date(test.date) > new Date()
                               ? 'Upcoming'
                               : new Date(test.date).toDateString() === new Date().toDateString()
-                              ? 'Today'
-                              : 'Completed'}
+                                ? 'Today'
+                                : 'Completed'}
                           </span>
                           <div className="flex gap-3">
                             <button
@@ -3902,7 +3968,7 @@ function App() {
                   <div className="text-center py-12">
                     <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
                       <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
                           d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
                     </div>
@@ -3923,20 +3989,38 @@ function App() {
                   </div>
 
                   <div className="p-6">
-                    {/* Mock Test Filter Section */}
+                    {/* Filter Section */}
                     <div className="mb-6">
                       <div className="flex gap-4 items-end">
+                        {/* Batch Filter */}
                         <div className="flex-1">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Select Mock Test
+                            Filter by Batch
+                          </label>
+                          <select
+                            value={mockAssignmentFilter.batch || ''}
+                            onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }))}
+                            className={`${inputStyle} pr-10`}
+                          >
+                            <option value="">All Batches</option>
+                            {Array.from(new Set(students.map(s => s.batch))).sort().map(batch => (
+                              <option key={batch} value={batch}>Batch {batch}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Mock Test Search */}
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Search Mock Tests
                           </label>
                           <div className="relative">
                             <input
                               type="text"
                               className={inputStyle}
                               placeholder="Search mock tests..."
-                              value={mockAssignmentFilter}
-                              onChange={(e) => setMockAssignmentFilter(e.target.value)}
+                              value={mockAssignmentFilter.search || ''}
+                              onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, search: e.target.value }))}
                             />
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3946,48 +4030,54 @@ function App() {
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Mock Tests List */}
-                      <div className="mt-4 space-y-4">
-                        {mockTests
-                          .filter(test => 
-                            test.name.toLowerCase().includes(mockAssignmentFilter.toLowerCase()) ||
-                            test.description?.toLowerCase().includes(mockAssignmentFilter.toLowerCase())
-                          )
-                          .map(test => (
-                            <div
-                              key={test.id}
-                              className={`p-4 rounded-lg border ${
-                                selectedMockForAssignment?.id === test.id
-                                  ? 'border-orange-500 bg-orange-50'
-                                  : 'border-gray-200 hover:border-orange-200'
-                              } cursor-pointer transition-all duration-200`}
-                              onClick={() => setSelectedMockForAssignment(test)}
-                            >
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h3 className="font-semibold text-gray-900">{test.name}</h3>
-                                  <p className="text-sm text-gray-600 mt-1">
-                                    Date: {new Date(test.date).toLocaleDateString()}
-                                  </p>
-                                  <p className="text-sm text-gray-600">
-                                    Max Score: {test.maxScore}
-                                  </p>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {test.batches?.map(batch => (
-                                    <span
-                                      key={batch}
-                                      className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium"
-                                    >
-                                      Batch {batch}
-                                    </span>
-                                  ))}
-                                </div>
+                    {/* Mock Tests List */}
+                    <div className="mt-4 space-y-4">
+                      {mockTests
+                        .filter(test => {
+                          const searchMatch = !mockAssignmentFilter.search || 
+                            test.name.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase()) ||
+                            test.description?.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase());
+                          
+                          const batchMatch = !mockAssignmentFilter.batch || 
+                            test.batches?.includes(mockAssignmentFilter.batch);
+                          
+                          return searchMatch && batchMatch;
+                        })
+                        .map(test => (
+                          <div
+                            key={test.id}
+                            className={`p-4 rounded-lg border ${
+                              selectedMockForAssignment?.id === test.id
+                                ? 'border-orange-500 bg-orange-50'
+                                : 'border-gray-200 hover:border-orange-200'
+                            } cursor-pointer transition-all duration-200`}
+                            onClick={() => setSelectedMockForAssignment(test)}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="font-semibold text-gray-900">{test.name}</h3>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  Date: {new Date(test.date).toLocaleDateString()}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Max Score: {test.maxScore}
+                                </p>
+                              </div>
+                              <div className="flex flex-wrap gap-2">
+                                {test.batches?.map(batch => (
+                                  <span
+                                    key={batch}
+                                    className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium"
+                                  >
+                                    Batch {batch}
+                                  </span>
+                                ))}
                               </div>
                             </div>
-                          ))}
-                      </div>
+                          </div>
+                        ))}
                     </div>
 
                     {/* Selected Mock Test Students Section */}
@@ -3996,7 +4086,7 @@ function App() {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">
                           Assign Scores - {selectedMockForAssignment.name}
                         </h3>
-                        
+
                         {selectedMockForAssignment.batches?.map(batchName => {
                           const batchStudents = students.filter(s => s.batch === batchName);
                           const isExpanded = expandedBatches[batchName];
@@ -4222,8 +4312,8 @@ function App() {
                       <button
                         onClick={() => setStudentListView('grid')}
                         className={`p-2 rounded-md transition-all duration-200 ${studentListView === 'grid'
-                            ? 'bg-white text-blue-600 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
+                          ? 'bg-white text-blue-600 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
                           }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4234,8 +4324,8 @@ function App() {
                       <button
                         onClick={() => setStudentListView('list')}
                         className={`p-2 rounded-md transition-all duration-200 ${studentListView === 'list'
-                            ? 'bg-white text-blue-600 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
+                          ? 'bg-white text-blue-600 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
                           }`}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -4296,10 +4386,10 @@ function App() {
                     {students
                       .filter(student => {
                         const searchLower = searchTerm.toLowerCase();
-                        const matchesSearch = !searchTerm || 
+                        const matchesSearch = !searchTerm ||
                           student.name?.toLowerCase().includes(searchLower) ||
                           student.rollNumber?.toLowerCase().includes(searchLower);
-                        const matchesBatch = !selectedBatchForStudents || 
+                        const matchesBatch = !selectedBatchForStudents ||
                           student.batch?.toString() === selectedBatchForStudents?.toString();
                         return matchesSearch && matchesBatch;
                       })
@@ -4314,8 +4404,8 @@ function App() {
                         >
                           {/* Student Image */}
                           <div className={`${studentListView === 'grid'
-                              ? 'w-16 h-16'
-                              : 'w-12 h-12'
+                            ? 'w-16 h-16'
+                            : 'w-12 h-12'
                             } rounded-full overflow-hidden bg-gray-100 flex-shrink-0`}
                           >
                             {student.imageUrl ? (
@@ -4409,32 +4499,32 @@ function App() {
                     {/* No Results Message */}
                     {students.filter(student => {
                       const searchLower = searchTerm.toLowerCase();
-                      const matchesSearch = !searchTerm || 
+                      const matchesSearch = !searchTerm ||
                         student.name?.toLowerCase().includes(searchLower) ||
                         student.rollNumber?.toLowerCase().includes(searchLower);
-                      const matchesBatch = !selectedBatchForStudents || 
+                      const matchesBatch = !selectedBatchForStudents ||
                         student.batch?.toString() === selectedBatchForStudents?.toString();
                       return matchesSearch && matchesBatch;
                     }).length === 0 && (
-                      <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
-                        <div className="bg-gray-50 rounded-full p-4 mb-4">
-                          <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                        <div className="col-span-full flex flex-col items-center justify-center py-12 px-4">
+                          <div className="bg-gray-50 rounded-full p-4 mb-4">
+                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-lg font-medium text-gray-900 mb-1">No students found</h3>
+                          <p className="text-gray-500 text-center max-w-sm">
+                            {searchTerm && selectedBatchForStudents
+                              ? `No students found matching "${searchTerm}" in Batch ${selectedBatchForStudents}`
+                              : searchTerm
+                                ? `No students found matching "${searchTerm}"`
+                                : selectedBatchForStudents
+                                  ? `No students found in Batch ${selectedBatchForStudents}`
+                                  : 'No students available'}
+                          </p>
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-1">No students found</h3>
-                        <p className="text-gray-500 text-center max-w-sm">
-                          {searchTerm && selectedBatchForStudents
-                            ? `No students found matching "${searchTerm}" in Batch ${selectedBatchForStudents}`
-                            : searchTerm
-                              ? `No students found matching "${searchTerm}"`
-                              : selectedBatchForStudents
-                                ? `No students found in Batch ${selectedBatchForStudents}`
-                                : 'No students available'}
-                        </p>
-                      </div>
-                    )}
+                      )}
                   </div>
                 </div>
               </div>
