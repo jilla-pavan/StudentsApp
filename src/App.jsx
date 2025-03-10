@@ -448,7 +448,7 @@ const AttendanceDetailsModal = ({ student, onClose }) => {
   );
 };
 
-// Add this with other style constants at the top of the file
+// Add back the cardHoverStyle with improvements
 const cardHoverStyle = `
   hover:shadow-lg hover:border-blue-200/50
   transition-all duration-300 transform
@@ -1278,49 +1278,73 @@ function App() {
   }
 
   // Update the score input component
-  const handleScoreChange = (student, testId, value) => {
-    const test = mockTests.find(t => t.id === testId);
-    if (!test) return;
+  const handleScoreChange = async (student, testId, value) => {
+    // Handle empty value
+    if (value === '') return;
 
-    // Check if student can take this test
-    if (!canTakeMockTest(student, test.level)) {
-      alert('Student must complete previous level tests first!');
-      return;
-    }
-
+    // Parse and validate score
     const score = parseInt(value);
-    if (isNaN(score) || score < 0 || score > test.maxScore) {
+
+    // Check if it's a valid number
+    if (isNaN(score)) {
+      setAlert({
+        type: 'warning',
+        message: 'Please enter a valid number'
+      });
       return;
     }
 
-    // Update the student's mock scores
-    const updatedStudent = {
-      ...student,
-      mockScores: [
-        ...(student.mockScores || []).filter(s => s.mockId !== testId),
-        {
+    // Check score range
+    if (score < 0 || score > 10) {
+      setAlert({
+        type: 'warning',
+        message: 'Score must be between 0 and 10 marks'
+      });
+      return;
+    }
+
+    try {
+      // Create score object
+      const scoreData = {
           mockId: testId,
           score: score,
-          date: new Date().toISOString(),
-          level: test.level
-        }
-      ]
-    };
+        date: new Date().toISOString()
+      };
 
-    // Update students state
-    setStudents(students.map(s =>
-      s.id === student.id ? updatedStudent : s
-    ));
+      // Get existing scores or initialize empty array
+      const existingScores = student.mockScores || [];
+      const scoreIndex = existingScores.findIndex(s => s.mockId === testId);
 
-    // Show level up message if student passed the test
-    if (score >= (test.maxScore * 0.7)) {
-      const newLevel = getStudentLevel(updatedStudent);
-      if (newLevel > getStudentLevel(student)) {
-        setAlertMessage(`${student.name} has advanced to Level ${newLevel}!`);
-        setAlertType('success');
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 3000);
-      }
+      // Update or add new score
+      const updatedScores = scoreIndex >= 0
+        ? existingScores.map((s, i) => i === scoreIndex ? scoreData : s)
+        : [...existingScores, scoreData];
+
+      // Update in Firestore
+      const studentRef = doc(db, 'students', student.id);
+      await updateDoc(studentRef, {
+        mockScores: updatedScores
+      });
+
+      // Update local state
+      setStudents(prev => prev.map(s =>
+        s.id === student.id
+          ? { ...s, mockScores: updatedScores }
+          : s
+      ));
+
+      // Show success message
+      setAlert({
+        type: 'success',
+        message: `Score updated for ${student.name}`
+      });
+
+    } catch (error) {
+      console.error('Error updating score:', error);
+      setAlert({
+        type: 'error',
+        message: 'Failed to update score. Please try again.'
+      });
     }
   };
 
@@ -1560,12 +1584,71 @@ function App() {
   // Add these new states
   const [newMockTest, setNewMockTest] = useState({
     name: '',
-    maxScore: '',
     date: getTodayDate(),
+    maxScore: 10,
     description: '',
-    batches: [], // Changed from single batch to array of batches
-    level: 1 // Adding level field
+    batches: []
   });
+
+  const handleCreateMock = async (e) => {
+    e.preventDefault();
+
+    try {
+      // Validate form
+      if (!newMockTest.name) {
+        setAlert({
+          type: 'error',
+          message: 'Please enter a mock test name'
+        });
+        return;
+      }
+
+      if (parseInt(newMockTest.maxScore) !== 10) {
+        setAlert({
+          type: 'error',
+          message: 'Maximum score must be 10'
+        });
+        return;
+      }
+
+      const mockData = {
+        name: newMockTest.name,
+        date: newMockTest.date,
+        maxScore: 10,
+        description: newMockTest.description || '',
+        createdAt: new Date().toISOString()
+      };
+
+      const docRef = await addDoc(collection(db, 'mockTests'), mockData);
+
+      setMockTests(prevTests => [...prevTests, { id: docRef.id, ...mockData }]);
+
+      // Reset form
+      setNewMockTest({
+        name: '',
+        date: getTodayDate(),
+        maxScore: 10,
+        description: '',
+        batches: []
+      });
+
+      setAlert({
+        type: 'success',
+        message: `Mock test "${mockData.name}" has been created successfully. You can now assign this test to students and record their scores.`
+      });
+
+      // Wait for 1 second before redirecting to show the success message
+      setTimeout(() => {
+        setCurrentView('mock-list');
+      }, 1000);
+    } catch (error) {
+      console.error('Error creating mock test:', error);
+      setAlert({
+        type: 'error',
+        message: 'Failed to create mock test. Please try again.'
+      });
+    }
+  };
 
   // Calculate average attendance
   const calculateAverageAttendance = () => {
@@ -1646,60 +1729,9 @@ function App() {
   const [studentListView, setStudentListView] = useState('grid'); // 'grid' or 'list'
 
   // Add this after your other state declarations
-  const [mockTests, setMockTests] = useState([
-    {
-      id: 1,
-      name: 'Mock Test 1',
-      date: getTodayDate(),
-      maxScore: 100,
-      level: 1 // Adding level field
-    }
-  ]);
+  const [mockTests, setMockTests] = useState([]);
   const [currentMockTest, setCurrentMockTest] = useState(null);
   const [showMockForm, setShowMockForm] = useState(false);
-
-  // Move handleCreateMock before the JSX
-  const handleCreateMock = async (e) => {
-    e.preventDefault();
-
-    try {
-      // Create a new mock test document in Firebase
-      const mockTestRef = collection(db, 'mockTests');
-      const newMockData = {
-        ...newMockTest,
-        createdAt: new Date().toISOString(),
-        maxScore: Number(newMockTest.maxScore),
-        students: [] // Will store student scores later
-      };
-
-      const docRef = await addDoc(mockTestRef, newMockData);
-
-      // Update local state
-      setMockTests([...mockTests, { id: docRef.id, ...newMockData }]);
-
-      // Reset form
-      setNewMockTest({
-        name: '',
-        maxScore: '',
-        date: getTodayDate(),
-        description: '',
-        batches: []
-      });
-
-      // Show success message
-      setAlertMessage('Mock test created successfully');
-      setAlertType('success');
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
-
-    } catch (error) {
-      console.error('Error creating mock test:', error);
-      setAlertMessage('Failed to create mock test');
-      setAlertType('error');
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
-    }
-  };
 
   // Add fetchMockTests function
   const fetchMockTests = async () => {
@@ -1754,11 +1786,9 @@ function App() {
 
   // First, add a new state for the assign mock view
   const [selectedMockForAssignment, setSelectedMockForAssignment] = useState(null);
-  const [mockAssignmentFilter, setMockAssignmentFilter] = useState({
-    batch: '',
-    search: ''
-  });
+  const [mockAssignmentFilter, setMockAssignmentFilter] = useState({ batch: '' });
   const [expandedBatches, setExpandedBatches] = useState({});
+  const [showFilteredStudents, setShowFilteredStudents] = useState(false);
 
   // Add the new Assign Mock view
   {
@@ -1781,7 +1811,10 @@ function App() {
                   </label>
                   <select
                     value={mockAssignmentFilter.batch || ''}
-                    onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }))}
+                    onChange={(e) => {
+                      setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }));
+                      setShowFilteredStudents(false); // Hide students list when batch changes
+                    }}
                     className={`${inputStyle} pr-10`}
                   >
                     <option value="">All Batches</option>
@@ -1790,166 +1823,286 @@ function App() {
                     ))}
                   </select>
                 </div>
-
-                {/* Mock Test Search */}
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Search Mock Tests
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      className={inputStyle}
-                      placeholder="Search mock tests..."
-                      value={mockAssignmentFilter.search || ''}
-                      onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, search: e.target.value }))}
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                {/* Add Filter Button */}
+                <button
+                  onClick={() => setShowFilteredStudents(true)}
+                  className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                    transition-colors duration-200 flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                       </svg>
-                    </div>
-                  </div>
-                </div>
+                  Show Students
+                </button>
               </div>
             </div>
 
-            {/* Mock Tests List */}
-            <div className="mt-4 space-y-4">
-              {mockTests
-                .filter(test => {
-                  const searchMatch = !mockAssignmentFilter.search || 
-                    test.name.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase()) ||
-                    test.description?.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase());
-                  
-                  const batchMatch = !mockAssignmentFilter.batch || 
-                    test.batches?.includes(mockAssignmentFilter.batch);
-                  
-                  return searchMatch && batchMatch;
-                })
-                .map(test => (
-                  <div
-                    key={test.id}
-                    className={`p-4 rounded-lg border ${
-                      selectedMockForAssignment?.id === test.id
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-200'
-                    } cursor-pointer transition-all duration-200`}
-                    onClick={() => setSelectedMockForAssignment(test)}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{test.name}</h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Date: {new Date(test.date).toLocaleDateString()}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Max Score: {test.maxScore}
-                        </p>
+            {/* Students List with Close Button */}
+            {showFilteredStudents && (
+              <div className="mt-6">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                  <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 className="text-lg font-semibold text-gray-900">Filtered Students</h3>
+                    <button
+                      onClick={() => setShowFilteredStudents(false)}
+                      className="text-gray-500 hover:text-gray-700 p-1"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {test.batches?.map(batch => (
-                          <span
-                            key={batch}
-                            className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium"
+                  <div className="p-4">
+                    <div className="space-y-4">
+                      {students
+                        .filter(student => !mockAssignmentFilter.batch ||
+                          student.batch?.toString() === mockAssignmentFilter.batch)
+                        .map(student => (
+                          <div
+                            key={student.id}
+                            className="flex items-center justify-between p-4 bg-gray-50 
+                              rounded-lg hover:bg-gray-100 transition-colors duration-200"
                           >
-                            Batch {batch}
-                          </span>
-                        ))}
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                <span className="text-blue-600 font-medium">{student.name.charAt(0)}</span>
                       </div>
+                              <div>
+                                <h4 className="font-medium text-gray-900">{student.name}</h4>
+                                <p className="text-sm text-gray-600">Roll Number: {student.rollNumber}</p>
                     </div>
                   </div>
-                ))}
-            </div>
-
-            {/* Selected Mock Test Students Section */}
-            {selectedMockForAssignment && (
-              <div className="mt-8 border-t pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Assign Scores - {selectedMockForAssignment.name}
-                </h3>
-
-                {selectedMockForAssignment.batches?.map(batchName => {
-                  const batchStudents = students.filter(s => s.batch === batchName);
-                  const isExpanded = expandedBatches[batchName];
-
-                  return (
-                    <div key={batchName} className="mb-4">
-                      <div
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                        onClick={() => setExpandedBatches(prev => ({
-                          ...prev,
-                          [batchName]: !prev[batchName]
-                        }))}
-                      >
-                        <div className="flex items-center gap-2">
-                          <svg
-                            className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                          </svg>
-                          <h4 className="font-medium text-gray-900">Batch {batchName}</h4>
-                          <span className="text-sm text-gray-600">({batchStudents.length} students)</span>
-                        </div>
-                      </div>
-
-                      {isExpanded && (
-                        <div className="mt-2 space-y-2">
-                          {batchStudents.map(student => {
-                            const currentScore = student.mockScores?.find(
-                              s => s.testId === selectedMockForAssignment.id
-                            )?.score || '';
-
-                            return (
-                              <div
-                                key={student.id}
-                                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+                            {/* Mock Test Selection */}
+                            <div className="flex items-center gap-3">
+                              <select
+                                value={student.selectedMockId || ''}
+                                onChange={(e) => {
+                                  const mockId = e.target.value;
+                                  setStudents(prevStudents =>
+                                    prevStudents.map(s =>
+                                      s.id === student.id
+                                        ? { ...s, selectedMockId: mockId }
+                                        : s
+                                    )
+                                  );
+                                }}
+                                className="px-3 py-2 rounded-lg border border-gray-300 
+                                  focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
+                                  text-sm bg-white shadow-sm"
                               >
-                                <div className="flex items-center gap-4">
-                                  <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                    <span className="text-orange-600 font-medium">
-                                      {student.name.charAt(0)}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <p className="font-medium text-gray-900">{student.name}</p>
-                                    <p className="text-sm text-gray-600">Roll: {student.rollNumber}</p>
-                                  </div>
-                                </div>
+                                <option value="">Select Mock Test</option>
+                                {/* Default Level Mocks (1-10) */}
+                                <optgroup label="Default Level Tests">
+                                  {Array.from({ length: 10 }, (_, i) => i + 1).map(level => {
+                                    const defaultTest = mockTests.find(
+                                      test => test.isDefaultLevel && test.level === level
+                                    );
+                                    return (
+                                      <option
+                                        key={`level-${level}`}
+                                        value={defaultTest?.id || `default-${level}`}
+                                        disabled={!defaultTest}
+                                      >
+                                        Level {level} Mock Test
+                                      </option>
+                                    );
+                                  })}
+                                </optgroup>
+                                {/* Custom Created Mocks */}
+                                {mockTests.filter(test => !test.isDefaultLevel).length > 0 && (
+                                  <optgroup label="Custom Mock Tests">
+                                    {mockTests
+                                      .filter(test => !test.isDefaultLevel)
+                                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                      .map(test => (
+                                        <option key={test.id} value={test.id}>
+                                          {test.name} ({formatDate(test.date)})
+                                        </option>
+                                      ))}
+                                  </optgroup>
+                                )}
+                              </select>
+                              {student.selectedMockId && (
                                 <div className="flex items-center gap-2">
                                   <input
                                     type="number"
-                                    min="0"
-                                    max={selectedMockForAssignment.maxScore}
-                                    value={currentScore}
-                                    onChange={(e) => handleScoreChange(student, selectedMockForAssignment.id, e.target.value)}
-                                    className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     placeholder="Score"
+                                    min="0"
+                                    max="10" // Ensure max is set to 10
+                                    value={student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score || ''}
+                                    onChange={(e) => {
+                                      const value = e.target.value;
+                                      if (value === '') {
+                                        // Allow clearing the input
+                                        setStudents(prevStudents =>
+                                          prevStudents.map(s =>
+                                            s.id === student.id
+                                              ? {
+                                                ...s,
+                                                mockScores: [
+                                                  ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId)
+                                                ]
+                                              }
+                                              : s
+                                          )
+                                        );
+                                        return;
+                                      }
+
+                                      const score = parseInt(value);
+
+                                      if (isNaN(score) || score < 0 || score > 10) {
+                                        setAlert({
+                                          type: 'warning',
+                                          message: 'Please enter a valid score between 0 and 10'
+                                        });
+                                        return;
+                                      }
+
+                                      setStudents(prevStudents =>
+                                        prevStudents.map(s =>
+                                          s.id === student.id
+                                            ? {
+                                              ...s,
+                                              mockScores: [
+                                                ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                                {
+                                                  mockId: student.selectedMockId,
+                                                  score,
+                                                  date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                                  absent: false
+                                                }
+                                              ]
+                                            }
+                                            : s
+                                        )
+                                      );
+                                    }}
+                                    className="w-20 px-3 py-2 rounded-lg border border-gray-300 
+                                      focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
+                                      text-sm bg-white shadow-sm"
                                   />
-                                  <span className="text-sm text-gray-600">
-                                    / {selectedMockForAssignment.maxScore}
-                                  </span>
+                                  <button
+                                    onClick={async () => {
+                                      const score = student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score;
+                                      if (!score && score !== 0) {
+                                        setAlertMessage('Please enter a score first');
+                                        setAlertType('error');
+                                        setShowAlert(true);
+                                        return;
+                                      }
+
+                                      try {
+                                        // Update in Firestore
+                                        await updateDoc(doc(db, 'students', student.id), {
+                                          mockScores: [
+                                            ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                            {
+                                              mockId: student.selectedMockId,
+                                              score,
+                                              date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                              absent: false
+                                            }
+                                          ]
+                                        });
+
+                                        setAlertMessage(`Score saved successfully for ${student.name}`);
+                                        setAlertType('success');
+                                        setShowAlert(true);
+
+                                        // Clear the selection after successful save
+                                        setStudents(prevStudents =>
+                                          prevStudents.map(s =>
+                                            s.id === student.id
+                                              ? { ...s, selectedMockId: '' }
+                                              : s
+                                          )
+                                        );
+                                      } catch (error) {
+                                        console.error('Error saving score:', error);
+                                        setAlertMessage('Failed to save score');
+                                        setAlertType('error');
+                                        setShowAlert(true);
+                                      }
+                                    }}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg 
+                                      hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M5 13l4 4L19 7" />
+                          </svg>
+                                    Save Score
+                                  </button>
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        // Update in Firestore
+                                        await updateDoc(doc(db, 'students', student.id), {
+                                          mockScores: [
+                                            ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                            {
+                                              mockId: student.selectedMockId,
+                                              score: 0,
+                                              date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                              absent: true
+                                            }
+                                          ]
+                                        });
+
+                                        setAlertMessage(`${student.name} marked as absent`);
+                                        setAlertType('success');
+                                        setShowAlert(true);
+
+                                        // Clear the selection after successful save
+                                        setStudents(prevStudents =>
+                                          prevStudents.map(s =>
+                                            s.id === student.id
+                                              ? { ...s, selectedMockId: '' }
+                                              : s
+                                          )
+                                        );
+                                      } catch (error) {
+                                        console.error('Error marking absent:', error);
+                                        setAlertMessage('Failed to mark as absent');
+                                        setAlertType('error');
+                                        setShowAlert(true);
+                                      }
+                                    }}
+                                    className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg 
+                                      hover:bg-gray-200 transition-colors duration-200"
+                                  >
+                                    Mark Absent
+                                  </button>
+                                  </div>
+                              )}
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          })}
+                        ))}
+
+                      {/* Empty State */}
+                      {students.filter(student => !mockAssignmentFilter.batch ||
+                        student.batch?.toString() === mockAssignmentFilter.batch).length === 0 && (
+                          <div className="text-center py-8">
+                            <div className="bg-gray-50 rounded-full p-4 w-16 h-16 mx-auto mb-4 
+                              flex items-center justify-center">
+                              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                              </svg>
+                                </div>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
+                            <p className="text-gray-600">
+                              {mockAssignmentFilter.batch
+                                ? `No students found in Batch ${mockAssignmentFilter.batch}`
+                                : 'No students available'}
+                            </p>
                         </div>
                       )}
                     </div>
-                  );
-                })}
-
-                {/* Save Button */}
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={updateBulkMockScore}
-                    className={primaryButtonStyle}
-                  >
-                    Save All Scores
-                  </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -1959,7 +2112,231 @@ function App() {
     )
   }
 
-  return (
+  // Add this function to create default mock tests
+  const initializeDefaultMockTests = async () => {
+    try {
+      const defaultTests = [];
+      for (let level = 1; level <= 10; level++) {
+        const existingTest = await getDocs(query(collection(db, 'mockTests'), where('isDefaultLevel', '==', true), where('level', '==', level)));
+
+        if (existingTest.empty) {
+          const mockData = {
+            name: `Level ${level} Mock Test`,
+            date: getTodayDate(),
+            maxScore: 100,
+            description: `Default mock test for Level ${level}`,
+            isDefaultLevel: true,
+            level: level,
+            createdAt: new Date().toISOString()
+          };
+
+          const docRef = await addDoc(collection(db, 'mockTests'), mockData);
+          defaultTests.push({ ...mockData, id: docRef.id });
+        }
+      }
+
+      if (defaultTests.length > 0) {
+        setMockTests(prev => [...prev, ...defaultTests]);
+      }
+    } catch (error) {
+      console.error('Error initializing default mock tests:', error);
+    }
+  };
+
+  // Update the useEffect to initialize default mock tests after fetching
+  useEffect(() => {
+    const loadMockTests = async () => {
+      await fetchMockTests();
+      await initializeDefaultMockTests();
+    };
+    loadMockTests();
+  }, []);
+
+  // Update the mock test selection section
+  const getMockTestOptions = () => {
+    // Create array of 10 fixed levels
+    const fixedLevels = Array.from({ length: 10 }, (_, i) => ({
+      id: `level-${i + 1}`,
+      name: `Level ${i + 1} Mock Test`,
+      level: i + 1,
+      maxScore: 10,
+      isDefaultLevel: true
+    }));
+
+    // Get existing mock tests
+    const existingTests = mockTests.filter(test => !test.isDefaultLevel)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    return {
+      defaultTests: fixedLevels,
+      customTests: existingTests
+    };
+  };
+
+  // Function to check if a student has cleared a level
+  const hasClearedLevel = (student, level) => {
+    const score = student.mockScores?.find(s => s.mockId === `level-${level}`)?.score;
+    return score !== undefined && score >= 6; // Passing score is 6
+  };
+
+  // Update the mock test dropdown in filtered students view
+  const renderMockTestOptions = (student) => (
+    <select
+      value={student.selectedMockId || ''}
+      onChange={(e) => {
+        e.stopPropagation(); // Prevent event bubbling
+        const selected = e.target.value;
+        setStudents(prevStudents =>
+          prevStudents.map(s =>
+            s.id === student.id
+              ? { ...s, selectedMockId: selected }
+              : s
+          )
+        );
+      }}
+      onClick={(e) => e.stopPropagation()} // Prevent click from bubbling up
+      className={`${inputStyle} w-full border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500`}
+    >
+      <option value="">Select Mock Test</option>
+      <optgroup label="Default Level Tests">
+        {getMockTestOptions().defaultTests.map(test => {
+          const cleared = hasClearedLevel(student, test.level - 1);
+          const notCleared = !cleared && student.mockScores?.some(s => s.mockId === test.id);
+          return (
+            <option 
+              key={test.id} 
+              value={test.id}
+              disabled={!cleared}
+            >
+              {test.name} {cleared ? '' : notCleared ? '(Not Cleared)' : '(Locked)'}
+            </option>
+          );
+        })}
+      </optgroup>
+      {getMockTestOptions().customTests.length > 0 && (
+        <optgroup label="Custom Tests">
+          {getMockTestOptions().customTests.map(test => (
+            <option key={test.id} value={test.id}>
+              {test.name}
+            </option>
+          ))}
+        </optgroup>
+      )}
+    </select>
+  );
+  // Function to handle mock test selection
+  const handleMockTestSelection = (testId) => {
+    setSelectedMockTests(prevSelected => {
+      if (prevSelected.includes(testId)) {
+        return prevSelected.filter(id => id !== testId);
+      } else {
+        return [...prevSelected, testId];
+      }
+    });
+  };
+
+  // Add function to handle bulk deletion
+  const handleBulkDeleteMocks = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedMockTests.length} selected mock tests?`)) {
+      return;
+    }
+
+    try {
+      for (const testId of selectedMockTests) {
+        await deleteDoc(doc(db, 'mockTests', testId));
+      }
+
+      setMockTests(prev => prev.filter(test => !selectedMockTests.includes(test.id)));
+      setSelectedMockTests([]);
+
+      setAlert({
+        type: 'success',
+        message: `Successfully deleted ${selectedMockTests.length} mock tests`
+      });
+    } catch (error) {
+      console.error('Error deleting mock tests:', error);
+      setAlert({
+        type: 'error',
+        message: 'Failed to delete mock tests. Please try again.'
+      });
+    }
+  };
+
+  // Function to get student level
+  const getStudentLevel = (student) => {
+    const mockScores = student.mockScores || [];
+      for (let i = 1; i <= 10; i++) {
+      if (mockScores.some(score => score.mockId === `level-${i}` && score.score >= 6)) {
+        return `Level ${i}`;
+      }
+    }
+    return 'No Level';
+  };
+
+  // Function to mark a student as absent
+  const markStudentAbsent = async (studentId) => {
+    try {
+      const studentRef = doc(db, 'students', studentId);
+      const student = students.find(s => s.id === studentId);
+
+      if (!student) {
+        throw new Error('Student not found');
+      }
+
+      // Update attendance in Firestore
+      await updateDoc(studentRef, {
+        attendance: {
+          ...student.attendance,
+          class: [
+            ...(student.attendance?.class || []),
+            { date: new Date().toISOString(), present: false }
+          ]
+        }
+      });
+
+      // Update local state
+      setStudents(prev => prev.map(s =>
+        s.id === student.id
+          ? { ...s, attendance: { ...s.attendance, class: [...s.attendance.class, { date: new Date().toISOString(), present: false }] } }
+          : s
+      ));
+
+      setAlertMessage(`${student.name} has been marked as absent`);
+      setAlertType('success');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+
+      // Refresh data
+      await fetchStudents();
+    } catch (error) {
+      console.error('Error marking student as absent:', error);
+      setAlertMessage('Failed to mark student as absent');
+      setAlertType('error');
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
+
+  // Add a state to manage selected mock tests
+  const [selectedMockTests, setSelectedMockTests] = useState([]);
+
+  // Function to toggle selection of a mock test
+  const toggleMockSelection = (testId) => {
+    setSelectedMockTests(prev =>
+      prev.includes(testId) ? prev.filter(id => id !== testId) : [...prev, testId]
+    );
+  };
+
+  // Function to select or deselect all mock tests
+  const toggleSelectAllMocks = () => {
+    if (selectedMockTests.length === mockTests.length) {
+      setSelectedMockTests([]);
+    } else {
+      setSelectedMockTests(mockTests.map(test => test.id));
+    }
+  };
+
+    return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-64 min-h-screen bg-white shadow-lg p-4 space-y-2">
@@ -2076,7 +2453,7 @@ function App() {
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
               Attendance
             </div>
@@ -2116,7 +2493,7 @@ function App() {
           >
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               Mock Tests
             </div>
@@ -3475,8 +3852,7 @@ function App() {
                                           setSelectedStudent(student);
                                           setShowAttendanceDetails(true);
                                         }}
-                                        className="text-blue-600 hover:text-blue-900"
-                                      >
+                                        className="text-blue-600 hover:text-blue-900"                                      >
                                         View Details
                                       </button>
                                     </td>
@@ -3597,37 +3973,61 @@ function App() {
                       {mockTests
                         .filter(test => test.name.toLowerCase().includes(searchTerm.toLowerCase()))
                         .map(test => (
-                          <div key={test.id}
-                            className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all duration-200"
+                          <div
+                            key={test.id}
+                            className={`${cardStyle} overflow-hidden relative group ${selectedMockTests.includes(test.id) ? 'border-blue-500' : 'border-gray-200'}`}
+                            onClick={() => handleMockTestSelection(test.id)}
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className="p-2 bg-white rounded-lg">
-                                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
+                            {/* Selection Checkbox */}
+                            <div className="absolute top-4 left-4 z-10">
+                              <input
+                                type="checkbox"
+                                checked={selectedMockTests.includes(test.id)}
+                                onChange={(e) => { e.stopPropagation(); handleMockTestSelection(test.id); }}
+                                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-opacity duration-200"
+                              />
+                            </div>
+
+                            <div className="p-6">
+                              <div className="flex justify-between items-start mb-4">
+                                <div className="flex-1">
+                                  <h3 className="text-lg font-semibold text-gray-900 pl-8">{test.name}</h3>
+                                  {test.description && (
+                                    <p className="text-sm text-gray-600 mt-1 pl-8">{test.description}</p>
+                                  )}
                                 </div>
-                                <div>
-                                  <h3 className="font-medium text-gray-900">{test.name}</h3>
-                                  <p className="text-sm text-gray-600">
-                                    Date: {formatDate(test.date)} • Max Score: {test.maxScore} • Level: {test.level}
-                                  </p>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleEditMock(test); }}
+                                    className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                                  >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleDeleteMock(test.id); }}
+                                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                                  >
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-3">
-                                <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
-                                  {students.filter(s => s.mockScores.some(score => score.mockId === test.id)).length} Submissions
-                                </span>
-                                <button
-                                  onClick={() => handleEditTest(test)}
-                                  className="p-2 text-gray-600 hover:text-purple-600 transition-colors duration-200"
-                                >
-                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                              <div className="space-y-3">
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                   </svg>
-                                </button>
+                                  {formatDate(test.date)}
+                                </div>
+                                <div className="flex items-center text-sm text-gray-600">
+                                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                  </svg>
+                                  Max Score: {test.maxScore}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -3715,47 +4115,31 @@ function App() {
 
             {/* Mock Create View */}
             {currentView === 'mock-create' && (
-              <div className="">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 mx-auto">
-                  <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
-                    <h2 className="text-xl font-bold text-gray-900">Create Mock Test</h2>
-                    <p className="text-sm text-gray-600 mt-1">Create a new mock test for students</p>
+              <div className="p-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
+                  <div className="p-6 bg-gradient-to-r from-blue-50 to-white border-b border-gray-200">
+                    <h2 className="text-xl font-bold text-gray-900">Create Custom Mock Test</h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Design a new custom mock test by specifying test details, scoring criteria, and description.
+                      These tests can be assigned to students across different batches for performance evaluation.
+                    </p>
                   </div>
 
-                  <form onSubmit={handleCreateMock} className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                      {/* Maximum Score */}
+                  <div className="p-6">
+                    <form onSubmit={handleCreateMock} className="space-y-6">
+                      {/* Mock Test Name */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Maximum Score
+                          Mock Test Name
                         </label>
                         <input
-                          type="number"
-                          value={newMockTest.maxScore}
-                          onChange={(e) => setNewMockTest({ ...newMockTest, maxScore: e.target.value })}
+                          type="text"
+                          value={newMockTest.name}
+                          onChange={(e) => setNewMockTest(prev => ({ ...prev, name: e.target.value }))}
                           className={inputStyle}
-                          placeholder="Enter maximum score"
+                          placeholder="Enter a descriptive name for the mock test"
                           required
-                          min="0"
                         />
-                      </div>
-
-                      {/* Level Selection */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Level
-                        </label>
-                        <select
-                          value={newMockTest.level}
-                          onChange={(e) => setNewMockTest({ ...newMockTest, level: parseInt(e.target.value) })}
-                          className={selectStyle}
-                          required
-                        >
-                          {[...Array(10)].map((_, i) => (
-                            <option key={i + 1} value={i + 1}>Level {i + 1}</option>
-                          ))}
-                        </select>
                       </div>
 
                       {/* Test Date */}
@@ -3766,77 +4150,76 @@ function App() {
                         <input
                           type="date"
                           value={newMockTest.date}
-                          onChange={(e) => setNewMockTest({ ...newMockTest, date: e.target.value })}
+                          onChange={(e) => setNewMockTest(prev => ({ ...prev, date: e.target.value }))}
                           className={inputStyle}
                           required
                         />
+                        <p className="mt-1 text-sm text-gray-500">Select the date when this test will be conducted</p>
                       </div>
 
-                      {/* Batch Selection */}
+                      {/* Maximum Score */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Select Batches
+                          Maximum Score
                         </label>
-                        <div className="space-y-2 max-h-40 overflow-y-auto p-2 border border-gray-200 rounded-lg">
-                          {batches.map(batch => (
-                            <label key={batch.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded">
                               <input
-                                type="checkbox"
-                                checked={newMockTest.batches.includes(batch.name)}
-                                onChange={(e) => {
-                                  const updatedBatches = e.target.checked
-                                    ? [...newMockTest.batches, batch.name]
-                                    : newMockTest.batches.filter(b => b !== batch.name);
-                                  setNewMockTest({ ...newMockTest, batches: updatedBatches });
-                                }}
-                                className="rounded text-orange-600 focus:ring-orange-500"
-                              />
-                              <span className="text-sm text-gray-700">Batch {batch.name}</span>
-                            </label>
-                          ))}
-                        </div>
+                          type="number"
+                          value={newMockTest.maxScore}
+                          onChange={(e) => setNewMockTest(prev => ({ ...prev, maxScore: e.target.value }))}
+                          className={inputStyle}
+                          min="10"
+                          max="10"
+                          required
+                          readOnly
+                        />
+                        <p className="mt-1 text-sm text-gray-500">Maximum score is fixed at 10 marks</p>
                       </div>
 
                       {/* Description */}
-                      <div className="col-span-full">
+                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Description
+                          Test Description
                         </label>
                         <textarea
                           value={newMockTest.description}
-                          onChange={(e) => setNewMockTest({ ...newMockTest, description: e.target.value })}
-                          className={inputStyle}
-                          rows="4"
-                          placeholder="Enter test description"
+                          onChange={(e) => setNewMockTest(prev => ({ ...prev, description: e.target.value }))}
+                          className={`${inputStyle} min-h-[100px]`}
+                          placeholder="Provide details about the test format, topics covered, and any special instructions"
                         />
-                      </div>
                     </div>
 
                     {/* Submit Button */}
-                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-100">
+                      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                       <button
                         type="button"
                         onClick={() => {
                           setNewMockTest({
                             name: '',
-                            maxScore: '',
                             date: getTodayDate(),
+                              maxScore: 10,
                             description: '',
                             batches: []
                           });
+                            setCurrentView('mock-list');
                         }}
-                        className={secondaryButtonStyle}
+                          className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 
+                            transition-colors duration-200"
                       >
-                        Clear Form
+                          Cancel
                       </button>
                       <button
                         type="submit"
-                        className={primaryButtonStyle}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                            transition-colors duration-200 flex items-center gap-2"
                       >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
                         Create Mock Test
                       </button>
                     </div>
                   </form>
+                  </div>
                 </div>
               </div>
             )}
@@ -3853,19 +4236,38 @@ function App() {
                         <p className="text-gray-600 mt-1">View and manage all mock tests</p>
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="px-4 py-3 bg-orange-50 rounded-lg border border-orange-100">
+                        <div className="px-4 py-3 bg-blue-50 rounded-lg border border-blue-100">
                           <p className="text-sm text-gray-600">Total Tests</p>
-                          <p className="text-2xl font-bold text-orange-600">{mockTests.length}</p>
+                          <p className="text-2xl font-bold text-blue-600">{mockTests.length}</p>
                         </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedMockTests.length === mockTests.length}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedMockTests(mockTests.map(test => test.id));
+                              } else {
+                                setSelectedMockTests([]);
+                              }
+                            }}
+                            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-opacity duration-200"
+                          />
+                          <label className="text-sm text-gray-600">Select All</label>
+                        </div>
+                        {selectedMockTests.length > 0 && (
                         <button
-                          onClick={() => setCurrentView('mock-assign')}
-                          className={`${primaryButtonStyle} flex items-center gap-2`}
+                            onClick={handleBulkDeleteMocks}
+                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 
+                              transition-colors duration-200 flex items-center gap-2"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
-                          Assign Mock
+                            Delete Selected ({selectedMockTests.length})
                         </button>
+                        )}
                         <button
                           onClick={() => setCurrentView('mock-create')}
                           className={`${primaryButtonStyle} flex items-center gap-2`}
@@ -3885,97 +4287,67 @@ function App() {
                   {mockTests.map(test => (
                     <div
                       key={test.id}
-                      className={`${cardStyle} overflow-hidden`}
+                      className={`${cardStyle} overflow-hidden relative group ${selectedMockTests.includes(test.id) ? 'border-blue-500' : 'border-gray-200'}`}
+                      onClick={() => handleMockTestSelection(test.id)}
                     >
+                      {/* Selection Checkbox */}
+                      <div className="absolute top-4 left-4 z-10">
+                        <input
+                          type="checkbox"
+                          checked={selectedMockTests.includes(test.id)}
+                          onChange={(e) => { e.stopPropagation(); handleMockTestSelection(test.id); }}
+                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-opacity duration-200"
+                        />
+                      </div>
+
                       <div className="p-6">
                         <div className="flex justify-between items-start mb-4">
-                          <h3 className="text-lg font-semibold text-gray-900">{test.name}</h3>
-                          {test.batches && test.batches.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                              {test.batches.map(batch => (
-                                <span key={batch} className="px-3 py-1 bg-orange-50 text-orange-700 rounded-full text-xs font-medium">
-                                  Batch {batch}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900 pl-8">{test.name}</h3>
+                            {test.description && (
+                              <p className="text-sm text-gray-600 mt-1 pl-8">{test.description}</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleEditMock(test); }}
+                              className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDeleteMock(test.id); }}
+                              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
 
                         <div className="space-y-3">
                           <div className="flex items-center text-sm text-gray-600">
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            {new Date(test.date).toLocaleDateString('en-US', {
-                              weekday: 'long',
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
+                            {formatDate(test.date)}
                           </div>
-
                           <div className="flex items-center text-sm text-gray-600">
                             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
-                            Maximum Score: {test.maxScore}
-                          </div>
-
-                          {test.description && (
-                            <p className="text-sm text-gray-600 line-clamp-2">{test.description}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-                        <div className="flex justify-between items-center">
-                          <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${new Date(test.date) > new Date()
-                              ? 'bg-blue-100 text-blue-800'
-                              : new Date(test.date).toDateString() === new Date().toDateString()
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                            {new Date(test.date) > new Date()
-                              ? 'Upcoming'
-                              : new Date(test.date).toDateString() === new Date().toDateString()
-                                ? 'Today'
-                                : 'Completed'}
-                          </span>
-                          <div className="flex gap-3">
-                            <button
-                              onClick={() => handleEditMock(test)}
-                              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeleteMock(test.id)}
-                              className="text-red-600 hover:text-red-700 text-sm font-medium"
-                            >
-                              Delete
-                            </button>
+                            Max Score: {test.maxScore}
                           </div>
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
-
-                {/* Empty State */}
-                {mockTests.length === 0 && (
-                  <div className="text-center py-12">
-                    <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                      <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No mock tests found</h3>
-                    <p className="text-gray-600">Create your first mock test to get started.</p>
-                  </div>
-                )}
               </div>
             )}
 
@@ -3999,7 +4371,10 @@ function App() {
                           </label>
                           <select
                             value={mockAssignmentFilter.batch || ''}
-                            onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }))}
+                            onChange={(e) => {
+                              setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }));
+                              setShowFilteredStudents(false); // Hide students list when batch changes
+                            }}
                             className={`${inputStyle} pr-10`}
                           >
                             <option value="">All Batches</option>
@@ -4007,167 +4382,282 @@ function App() {
                               <option key={batch} value={batch}>Batch {batch}</option>
                             ))}
                           </select>
-                        </div>
-
-                        {/* Mock Test Search */}
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Search Mock Tests
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              className={inputStyle}
-                              placeholder="Search mock tests..."
-                              value={mockAssignmentFilter.search || ''}
-                              onChange={(e) => setMockAssignmentFilter(prev => ({ ...prev, search: e.target.value }))}
-                            />
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                              </svg>
-                            </div>
-                          </div>
-                        </div>
+                        </div>  
+                        {/* Add Filter Button */}
+                        <button
+                          onClick={() => setShowFilteredStudents(true)}
+                          className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                            transition-colors duration-200 flex items-center gap-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                          </svg>
+                          Show Students
+                        </button>
                       </div>
                     </div>
 
-                    {/* Mock Tests List */}
-                    <div className="mt-4 space-y-4">
-                      {mockTests
-                        .filter(test => {
-                          const searchMatch = !mockAssignmentFilter.search || 
-                            test.name.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase()) ||
-                            test.description?.toLowerCase().includes(mockAssignmentFilter.search.toLowerCase());
-                          
-                          const batchMatch = !mockAssignmentFilter.batch || 
-                            test.batches?.includes(mockAssignmentFilter.batch);
-                          
-                          return searchMatch && batchMatch;
-                        })
-                        .map(test => (
-                          <div
-                            key={test.id}
-                            className={`p-4 rounded-lg border ${
-                              selectedMockForAssignment?.id === test.id
-                                ? 'border-orange-500 bg-orange-50'
-                                : 'border-gray-200 hover:border-orange-200'
-                            } cursor-pointer transition-all duration-200`}
-                            onClick={() => setSelectedMockForAssignment(test)}
-                          >
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="font-semibold text-gray-900">{test.name}</h3>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  Date: {new Date(test.date).toLocaleDateString()}
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                  Max Score: {test.maxScore}
-                                </p>
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {test.batches?.map(batch => (
-                                  <span
-                                    key={batch}
-                                    className="px-2 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium"
+                    {/* Students List with Close Button */}
+                    {showFilteredStudents && (
+                      <div className="mt-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 className="text-lg font-semibold text-gray-900">Filtered Students</h3>
+                            <button
+                              onClick={() => setShowFilteredStudents(false)}
+                              className="text-gray-500 hover:text-gray-700 p-1"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                  </div>
+                          <div className="p-4">
+                            <div className="space-y-4">
+                              {students
+                                .filter(student => !mockAssignmentFilter.batch ||
+                                  student.batch?.toString() === mockAssignmentFilter.batch)
+                                .map(student => (
+                                  <div
+                                    key={student.id}
+                                    className="flex items-center justify-between p-4 bg-gray-50 
+                                      rounded-lg hover:bg-gray-100 transition-colors duration-200"
                                   >
-                                    Batch {batch}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-
-                    {/* Selected Mock Test Students Section */}
-                    {selectedMockForAssignment && (
-                      <div className="mt-8 border-t pt-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                          Assign Scores - {selectedMockForAssignment.name}
-                        </h3>
-
-                        {selectedMockForAssignment.batches?.map(batchName => {
-                          const batchStudents = students.filter(s => s.batch === batchName);
-                          const isExpanded = expandedBatches[batchName];
-
-                          return (
-                            <div key={batchName} className="mb-4">
-                              <div
-                                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-                                onClick={() => setExpandedBatches(prev => ({
-                                  ...prev,
-                                  [batchName]: !prev[batchName]
-                                }))}
-                              >
-                                <div className="flex items-center gap-2">
-                                  <svg
-                                    className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                                  </svg>
-                                  <h4 className="font-medium text-gray-900">Batch {batchName}</h4>
-                                  <span className="text-sm text-gray-600">({batchStudents.length} students)</span>
-                                </div>
-                              </div>
-
-                              {isExpanded && (
-                                <div className="mt-2 space-y-2">
-                                  {batchStudents.map(student => {
-                                    const currentScore = student.mockScores?.find(
-                                      s => s.testId === selectedMockForAssignment.id
-                                    )?.score || '';
-
-                                    return (
-                                      <div
-                                        key={student.id}
-                                        className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
-                                      >
-                                        <div className="flex items-center gap-4">
-                                          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                            <span className="text-orange-600 font-medium">
-                                              {student.name.charAt(0)}
-                                            </span>
-                                          </div>
-                                          <div>
-                                            <p className="font-medium text-gray-900">{student.name}</p>
-                                            <p className="text-sm text-gray-600">Roll: {student.rollNumber}</p>
-                                          </div>
-                                        </div>
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span className="text-blue-600 font-medium">{student.name.charAt(0)}</span>
+                </div>
+                                      <div>
+                                        <h4 className="font-medium text-gray-900">{student.name}</h4>
+                                        <p className="text-sm text-gray-600">Roll Number: {student.rollNumber}</p>
+              </div>
+                                    </div>
+                                    {/* Mock Test Selection */}
+                                    <div className="flex items-center gap-3">
+      <select
+        value={student.selectedMockId || ''}
+        onChange={(e) => {
+                                          const mockId = e.target.value;
+          setStudents(prevStudents =>
+            prevStudents.map(s =>
+              s.id === student.id
+                                                ? { ...s, selectedMockId: mockId }
+                : s
+            )
+          );
+        }}
+                                        className="px-3 py-2 rounded-lg border border-gray-300 
+                                          focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
+                                          text-sm bg-white shadow-sm"
+      >
+        <option value="">Select Mock Test</option>
+                                        {/* Default Level Mocks (1-10) */}
+        <optgroup label="Default Level Tests">
+          {getMockTestOptions().defaultTests.map(test => {
+                                            const cleared = hasClearedLevel(student, test.level - 1);
+                                            const notCleared = !cleared && student.mockScores?.some(s => s.mockId === test.id);
+                                            return (
+                                              <option 
+                                                key={test.id} 
+                                                value={test.id}
+                                                disabled={!cleared}
+                                              >
+                                                {test.name} {cleared ? '' : notCleared ? '(Not Cleared)' : '(Locked)'}
+                                              </option>
+                                            );
+                                          })}
+                                        </optgroup>
+                                        {getMockTestOptions().customTests.length > 0 && (
+                                          <optgroup label="Custom Tests">
+                                            {getMockTestOptions().customTests.map(test => (
+                                              <option key={test.id} value={test.id}>
+                                                {test.name}
+                                              </option>
+                                            ))}
+                                          </optgroup>
+                                        )}
+                                      </select>
+                                      {student.selectedMockId && (
                                         <div className="flex items-center gap-2">
                                           <input
                                             type="number"
-                                            min="0"
-                                            max={selectedMockForAssignment.maxScore}
-                                            value={currentScore}
-                                            onChange={(e) => handleScoreChange(student, selectedMockForAssignment.id, e.target.value)}
-                                            className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                             placeholder="Score"
-                                          />
-                                          <span className="text-sm text-gray-600">
-                                            / {selectedMockForAssignment.maxScore}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                                            min="0"
+                                            max="10" // Set max to 10
+                                            value={student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score || ''}
+                                            onChange={(e) => {
+                                              const value = e.target.value;
+                                              if (value === '') {
+                                                // Allow clearing the input
+                                                setStudents(prevStudents =>
+                                                  prevStudents.map(s =>
+                                                    s.id === student.id
+                                                      ? {
+                                                        ...s,
+                                                        mockScores: [
+                                                          ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId)
+                                                        ]
+                                                      }
+                                                      : s
+                                                  )
+                                                );
+                                                return;
+                                              }
 
-                        {/* Save Button */}
-                        <div className="mt-6 flex justify-end">
-                          <button
-                            onClick={updateBulkMockScore}
-                            className={primaryButtonStyle}
-                          >
-                            Save All Scores
-                          </button>
+                                              const score = parseInt(value);
+
+                                              if (isNaN(score) || score < 0 || score > 10) {
+                                                setAlert({
+                                                  type: 'warning',
+                                                  message: 'Please enter a valid score between 0 and 10'
+                                                });
+                                                return;
+                                              }
+
+                                              setStudents(prevStudents =>
+                                                prevStudents.map(s =>
+                                                  s.id === student.id
+                                                    ? {
+                                                      ...s,
+                                                      mockScores: [
+                                                        ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                                        {
+                                                          mockId: student.selectedMockId,
+                                                          score,
+                                                          date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                                          absent: false
+                                                        }
+                                                      ]
+                                                    }
+                                                    : s
+                                                )
+                                              );
+                                            }}
+                                            className="w-20 px-3 py-2 rounded-lg border border-gray-300 
+                                              focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
+                                              text-sm bg-white shadow-sm"
+                                          />
+                                          <button
+                                            onClick={async () => {
+                                              const score = student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score;
+                                              if (!score && score !== 0) {
+                                                setAlertMessage('Please enter a score first');
+                                                setAlertType('error');
+                                                setShowAlert(true);
+                                                return;
+                                              }
+
+                                              try {
+                                                // Update in Firestore
+                                                await updateDoc(doc(db, 'students', student.id), {
+                                                  mockScores: [
+                                                    ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                                    {
+                                                      mockId: student.selectedMockId,
+                                                      score,
+                                                      date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                                      absent: false
+                                                    }
+                                                  ]
+                                                });
+
+                                                setAlertMessage(`Score saved successfully for ${student.name}`);
+                                                setAlertType('success');
+                                                setShowAlert(true);
+
+                                                // Clear the selection after successful save
+                                                setStudents(prevStudents =>
+                                                  prevStudents.map(s =>
+                                                    s.id === student.id
+                                                      ? { ...s, selectedMockId: '' }
+                                                      : s
+                                                  )
+                                                );
+                                              } catch (error) {
+                                                console.error('Error saving score:', error);
+                                                setAlertMessage('Failed to save score');
+                                                setAlertType('error');
+                                                setShowAlert(true);
+                                              }
+                                            }}
+                                            className="px-4 py-2 bg-green-600 text-white rounded-lg 
+                                              hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+                                          >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                                d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Save Score
+                                          </button>
+                                          <button
+                                            onClick={async () => {
+                                              try {
+                                                // Update in Firestore
+                                                await updateDoc(doc(db, 'students', student.id), {
+                                                  mockScores: [
+                                                    ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                                    {
+                                                      mockId: student.selectedMockId,
+                                                      score: 0,
+                                                      date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                                      absent: true
+                                                    }
+                                                  ]
+                                                });
+
+                                                setAlertMessage(`${student.name} marked as absent`);
+                                                setAlertType('success');
+                                                setShowAlert(true);
+
+                                                // Clear the selection after successful save
+                                                setStudents(prevStudents =>
+                                                  prevStudents.map(s =>
+                                                    s.id === student.id
+                                                      ? { ...s, selectedMockId: '' }
+                                                      : s
+                                                  )
+                                                );
+                                              } catch (error) {
+                                                console.error('Error marking absent:', error);
+                                                setAlertMessage('Failed to mark as absent');
+                                                setAlertType('error');
+                                                setShowAlert(true);
+                                              }
+                                            }}
+                                            className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg 
+                                              hover:bg-gray-200 transition-colors duration-200"
+                                          >
+                                            Mark Absent
+                                          </button>
+          </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+
+                              {/* Empty State */}
+                              {students.filter(student => !mockAssignmentFilter.batch ||
+                                student.batch?.toString() === mockAssignmentFilter.batch).length === 0 && (
+                                  <div className="text-center py-8">
+                                    <div className="bg-gray-50 rounded-full p-4 w-16 h-16 mx-auto mb-4 
+                                    flex items-center justify-center">
+                                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                      </svg>
+                                    </div>
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
+                                    <p className="text-gray-600">
+                                      {mockAssignmentFilter.batch
+                                        ? `No students found in Batch ${mockAssignmentFilter.batch}`
+                                        : 'No students available'}
+                                    </p>
+                                  </div>
+                                )}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
