@@ -1748,9 +1748,12 @@ function App() {
     }
   };
 
-  // Add useEffect for fetching mock tests
+  // Update the useEffect to only fetch mock tests
   useEffect(() => {
-    fetchMockTests();
+    const loadMockTests = async () => {
+      await fetchMockTests();
+    };
+    loadMockTests();
   }, []);
 
   // Add these new states for mock test filtering and sorting
@@ -2112,70 +2115,29 @@ function App() {
     )
   }
 
-  // Add this function to create default mock tests
-  const initializeDefaultMockTests = async () => {
-    try {
-      const defaultTests = [];
-      for (let level = 1; level <= 10; level++) {
-        const existingTest = await getDocs(query(collection(db, 'mockTests'), where('isDefaultLevel', '==', true), where('level', '==', level)));
-
-        if (existingTest.empty) {
-          const mockData = {
-            name: `Level ${level} Mock Test`,
-            date: getTodayDate(),
-            maxScore: 100,
-            description: `Default mock test for Level ${level}`,
-            isDefaultLevel: true,
-            level: level,
-            createdAt: new Date().toISOString()
-          };
-
-          const docRef = await addDoc(collection(db, 'mockTests'), mockData);
-          defaultTests.push({ ...mockData, id: docRef.id });
-        }
-      }
-
-      if (defaultTests.length > 0) {
-        setMockTests(prev => [...prev, ...defaultTests]);
-      }
-    } catch (error) {
-      console.error('Error initializing default mock tests:', error);
-    }
-  };
-
-  // Update the useEffect to initialize default mock tests after fetching
-  useEffect(() => {
-    const loadMockTests = async () => {
-      await fetchMockTests();
-      await initializeDefaultMockTests();
-    };
-    loadMockTests();
-  }, []);
-
-  // Update the mock test selection section
+  // Add getMockTestOptions function
   const getMockTestOptions = () => {
-    // Create array of 10 fixed levels
-    const fixedLevels = Array.from({ length: 10 }, (_, i) => ({
-      id: `level-${i + 1}`,
-      name: `Level ${i + 1} Mock Test`,
-      level: i + 1,
-      maxScore: 10,
-      isDefaultLevel: true
-    }));
-
-    // Get existing mock tests
-    const existingTests = mockTests.filter(test => !test.isDefaultLevel)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    // Get existing mock tests and sort them
+    const existingTests = mockTests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    // Separate tests into default level tests and custom tests
+    const defaultTests = existingTests.filter(test => test.isDefaultLevel)
+      .sort((a, b) => a.level - b.level); // Sort by level
+    const customTests = existingTests.filter(test => !test.isDefaultLevel);
 
     return {
-      defaultTests: fixedLevels,
-      customTests: existingTests
+      defaultTests,
+      customTests
     };
   };
 
   // Function to check if a student has cleared a level
   const hasClearedLevel = (student, level) => {
-    const score = student.mockScores?.find(s => s.mockId === `level-${level}`)?.score;
+    if (level === 0) return true; // Level 1 is always enabled
+    const score = student.mockScores?.find(s => {
+      const test = mockTests.find(t => t.id === s.mockId);
+      return test?.level === level && test?.isDefaultLevel;
+    })?.score;
     return score !== undefined && score >= 6; // Passing score is 6
   };
 
@@ -2198,32 +2160,67 @@ function App() {
       className={`${inputStyle} w-full border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500`}
     >
       <option value="">Select Mock Test</option>
-      <optgroup label="Default Level Tests">
-        {getMockTestOptions().defaultTests.map(test => {
-          const cleared = hasClearedLevel(student, test.level - 1);
-          const notCleared = !cleared && student.mockScores?.some(s => s.mockId === test.id);
-          return (
-            <option 
-              key={test.id} 
-              value={test.id}
-              disabled={!cleared}
-            >
-              {test.name} {cleared ? '' : notCleared ? '(Not Cleared)' : '(Locked)'}
-            </option>
-          );
-        })}
-      </optgroup>
+      {getMockTestOptions().defaultTests.length > 0 && (
+        <optgroup label="Level Tests">
+          {getMockTestOptions().defaultTests.map(test => {
+            const cleared = hasClearedLevel(student, test.level - 1);
+            const currentLevelScore = student.mockScores?.find(s => s.mockId === test.id)?.score;
+            const hasAttempted = currentLevelScore !== undefined;
+            const hasCleared = hasAttempted && currentLevelScore >= 6;
+            const isLocked = !cleared;
+            
+            let status = '';
+            let className = '';
+            
+            if (hasCleared) {
+              status = '✅ Cleared';
+              className = 'text-green-600 font-medium';
+            } else if (hasAttempted) {
+              status = `❌ Score: ${currentLevelScore}/10`;
+              className = 'text-red-600';
+            } else if (isLocked) {
+              status = '🔒 Locked';
+              className = 'text-gray-400';
+            } else {
+              status = '📝 Available';
+              className = 'text-blue-600';
+            }
+            
+            return (
+              <option 
+                key={test.id} 
+                value={test.id}
+                disabled={isLocked}
+                className={className}
+              >
+                {test.name} ({status})
+              </option>
+            );
+          })}
+        </optgroup>
+      )}
       {getMockTestOptions().customTests.length > 0 && (
         <optgroup label="Custom Tests">
-          {getMockTestOptions().customTests.map(test => (
-            <option key={test.id} value={test.id}>
-              {test.name}
-            </option>
-          ))}
+          {getMockTestOptions().customTests.map(test => {
+            const score = student.mockScores?.find(s => s.mockId === test.id)?.score;
+            const hasAttempted = score !== undefined;
+            let status = hasAttempted ? `Score: ${score}/10` : 'Not attempted';
+            
+            return (
+              <option 
+                key={test.id} 
+                value={test.id}
+                className={hasAttempted ? 'text-green-600' : 'text-blue-600'}
+              >
+                {test.name} ({status})
+              </option>
+            );
+          })}
         </optgroup>
       )}
     </select>
   );
+
   // Function to handle mock test selection
   const handleMockTestSelection = (testId) => {
     setSelectedMockTests(prevSelected => {
@@ -4456,25 +4453,57 @@ function App() {
         <optgroup label="Default Level Tests">
           {getMockTestOptions().defaultTests.map(test => {
                                             const cleared = hasClearedLevel(student, test.level - 1);
-                                            const notCleared = !cleared && student.mockScores?.some(s => s.mockId === test.id);
+                                            const currentLevelScore = student.mockScores?.find(s => s.mockId === test.id)?.score;
+                                            const hasAttempted = currentLevelScore !== undefined;
+                                            const hasCleared = hasAttempted && currentLevelScore >= 6;
+                                            const isLocked = !cleared;
+                                            
+                                            let status = '';
+                                            let className = '';
+                                            
+                                            if (hasCleared) {
+                                              status = '✅ Cleared';
+                                              className = 'text-green-600 font-medium';
+                                            } else if (hasAttempted) {
+                                              status = `❌ Score: ${currentLevelScore}/10`;
+                                              className = 'text-red-600';
+                                            } else if (isLocked) {
+                                              status = '🔒 Locked';
+                                              className = 'text-gray-400';
+                                            } else {
+                                              status = '📝 Available';
+                                              className = 'text-blue-600';
+                                            }
+                                            
                                             return (
                                               <option 
                                                 key={test.id} 
                                                 value={test.id}
-                                                disabled={!cleared}
+                                                disabled={isLocked}
+                                                className={className}
                                               >
-                                                {test.name} {cleared ? '' : notCleared ? '(Not Cleared)' : '(Locked)'}
+                                                {test.name} ({status})
                                               </option>
                                             );
                                           })}
                                         </optgroup>
                                         {getMockTestOptions().customTests.length > 0 && (
                                           <optgroup label="Custom Tests">
-                                            {getMockTestOptions().customTests.map(test => (
-                                              <option key={test.id} value={test.id}>
-                                                {test.name}
-                                              </option>
-                                            ))}
+                                            {getMockTestOptions().customTests.map(test => {
+                                              const score = student.mockScores?.find(s => s.mockId === test.id)?.score;
+                                              const hasAttempted = score !== undefined;
+                                              let status = hasAttempted ? `Score: ${score}/10` : 'Not attempted';
+                                              
+                                              return (
+                                                <option 
+                                                  key={test.id} 
+                                                  value={test.id}
+                                                  className={hasAttempted ? 'text-green-600' : 'text-blue-600'}
+                                                >
+                                                  {test.name} ({status})
+                                                </option>
+                                              );
+                                            })}
                                           </optgroup>
                                         )}
                                       </select>
