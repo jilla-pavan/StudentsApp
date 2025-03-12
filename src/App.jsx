@@ -2425,22 +2425,15 @@ function App() {
   const renderMockTestOptions = (student) => {
     const { defaultTests, customTests } = getMockTestOptions();
 
-    // Find the next available level test
-    let nextAvailableLevel = 1;
+    // Determine the highest level cleared by the student
+    let highestClearedLevel = 0;
     for (let i = 1; i <= 10; i++) {
-      if (!hasClearedLevel(student, i)) {
-        nextAvailableLevel = i;
+      if (hasClearedLevel(student, i)) {
+        highestClearedLevel = i;
+      } else {
         break;
       }
     }
-
-    // Get the next level test
-    const nextLevelTest = defaultTests.find(test => test.level === nextAvailableLevel);
-    const availableDefaultTests = nextLevelTest ? [nextLevelTest] : [];
-
-    // Filter available custom tests (exclude taken tests)
-    const takenTestIds = new Set(student.mockScores?.map(score => score.mockId) || []);
-    const availableCustomTests = customTests.filter(test => !takenTestIds.has(test.id));
 
     return (
       <select
@@ -2457,23 +2450,21 @@ function App() {
           );
         }}
         onClick={(e) => e.stopPropagation()}
-        className={`${inputStyle} w-full border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500`}
+        className={`${inputStyle} w-full border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 shadow-md`}
       >
         <option value="">Select Mock Test</option>
-        {availableDefaultTests.length > 0 && (
-          <optgroup label="Level Tests">
-            {availableDefaultTests.map(test => (
-              <option key={test.id} value={test.id}>
-                Level {test.level} Test {hasClearedLevel(student, test.level - 1) ? '' : '(Previous level not cleared)'}
-              </option>
-            ))}
-          </optgroup>
-        )}
-        {availableCustomTests.length > 0 && (
+        <optgroup label="Level Tests">
+          {defaultTests.map(test => (
+            <option key={test.id} value={test.id} disabled={test.level > highestClearedLevel + 1}>
+              {test.level <= highestClearedLevel ? '✅' : '🔒'} Level {test.level} Test
+            </option>
+          ))}
+        </optgroup>
+        {customTests.length > 0 && (
           <optgroup label="Custom Tests">
-            {availableCustomTests.map(test => (
+            {customTests.map(test => (
               <option key={test.id} value={test.id}>
-                {test.name}
+                📝 {test.name}
               </option>
             ))}
           </optgroup>
@@ -2743,6 +2734,17 @@ function App() {
     initializeApp();
   }, []);
 
+  const [scoreboardView, setScoreboardView] = useState('overview');
+  const [mockTestFilter, setMockTestFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // ... existing code ...
+  }, [selectedStudents, selectedMockTests, scoreboardView]);
+
+  // Add alert state
+  const [alert, setAlert] = useState({ type: '', message: '' });
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -2924,6 +2926,12 @@ function App() {
                 Create Custom Test
               </button>
               <button
+                onClick={() => setCurrentView('view-mocks')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'view-mocks' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                View Mocks
+              </button>
+              <button
                 onClick={() => setCurrentView('mock-assign')}
                 className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-assign' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
               >
@@ -2935,7 +2943,6 @@ function App() {
               >
                 Mock Reports
               </button>
-
             </div>
           )}
         </div>
@@ -3689,7 +3696,7 @@ function App() {
                               <div className="p-2 bg-purple-50 rounded-lg">
                                 <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                               </div>
                               <div>
@@ -4177,7 +4184,7 @@ function App() {
                           <tbody className="bg-white divide-y divide-gray-200">
                             {students
                               .filter(student => !selectedBatch || student.batch?.toString() === selectedBatch)
-                              .map(student => {
+                              .map((student) => {
                                 const attendanceRecords = student.attendance?.class || [];
                                 const recordsInRange = filterType === 'range'
                                   ? attendanceRecords.filter(record =>
@@ -4188,7 +4195,7 @@ function App() {
                                 const totalDays = recordsInRange.length;
                                 const presentDays = recordsInRange.filter(record => record.present).length;
                                 const attendancePercentage = totalDays > 0 ? (presentDays / totalDays) * 100 : 0;
-
+                                { console.log(student, "1234567890"); }
                                 return (
                                   <tr key={student.id} className="hover:bg-gray-50 transition-colors duration-200">
                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -4204,7 +4211,8 @@ function App() {
                                             <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
                                               <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                                />
                                               </svg>
                                             </div>
                                           )}
@@ -4507,97 +4515,210 @@ function App() {
                 </div>
 
                 {/* Student List Table */}
-                <div className={`${cardStyle} mb-6`}>
+                <div className={`${cardStyle} overflow-hidden mb-6`}>
+                  <div className="p-6 bg-gradient-to-r from-blue-50 to-white border-b border-gray-200">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Student Level Progress</h3>
+                        <p className="text-sm text-gray-600 mt-1">Track student progress through different levels</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                          <span className="text-xs text-gray-600">Completed</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full bg-blue-500"></span>
+                          <span className="text-xs text-gray-600">Current</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full bg-gray-300"></span>
+                          <span className="text-xs text-gray-600">Locked</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Student
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                            Student Info
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Batch
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            Level Status
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Tests Taken
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                            Progress Overview
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Average Score
-                          </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                             Latest Score
                           </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                            Next Steps
                           </th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {students
-                          .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                          .sort((a, b) => parseFloat(getStudentPerformanceSummary(b).averageScore) - parseFloat(getStudentPerformanceSummary(a).averageScore))
-                          .map(student => {
-                            const performance = getStudentPerformanceSummary(student);
-                            const latestScore = student.mockScores?.length > 0 
-                              ? student.mockScores[student.mockScores.length - 1].score 
-                              : null;
+                          .filter(student => !selectedBatch || student.batch?.toString() === selectedBatch)
+                          .map((student) => {
+                            // Calculate current level and progress
+                            let currentLevel = 1;
+                            const levelScores = {};
+
+                            // First, collect all level test scores
+                            student.mockScores?.forEach(score => {
+                              // Check if the mockId follows the pattern 'level-X'
+                              const levelMatch = score.mockId?.match(/^level-(\d+)$/);
+                              if (levelMatch) {
+                                const level = parseInt(levelMatch[1]);
+                                // Keep the highest score if multiple attempts exist
+                                if (!levelScores[level] || score.score > levelScores[level]) {
+                                  levelScores[level] = score.score;
+                                }
+                              }
+                            });
+
+                            // Then calculate the highest consecutive level completed
+                            for (let i = 1; i <= 10; i++) {
+                              if (levelScores[i] !== undefined && levelScores[i] >= 6) {
+                                currentLevel = i + 1;
+                              } else {
+                                break;
+                              }
+                            }
+                            currentLevel = Math.min(currentLevel, 10);
+
+                            // Get latest mock test score for current level
+                            const latestScore = student.mockScores
+                              ?.filter(score => {
+                                const levelMatch = score.mockId?.match(/^level-(\d+)$/);
+                                return levelMatch && parseInt(levelMatch[1]) === currentLevel - 1;
+                              })
+                              .sort((a, b) => {
+                                const dateA = new Date(a.date);
+                                const dateB = new Date(b.date);
+                                return dateB - dateA;
+                              })[0];
+
+                            // Calculate number of levels completed
+                            const completedLevels = Object.entries(levelScores)
+                              .filter(([_, score]) => score >= 6)
+                              .length;
+
+                            // Debug logging
+                            console.log('Student:', student.name);
+                            console.log('Level Scores:', levelScores);
+                            console.log('Current Level:', currentLevel);
+                            console.log('Completed Levels:', completedLevels);
+
                             return (
                               <tr key={student.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className="px-4 py-4">
                                   <div className="flex items-center">
-                                    <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                      <span className="text-blue-600 font-medium text-sm">
-                                        {student.name?.charAt(0)?.toUpperCase()}
-                                      </span>
+                                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center border-2 border-white shadow-sm">
+                                      <span className="text-blue-600 font-semibold">{student.name.charAt(0).toUpperCase()}</span>
                                     </div>
                                     <div className="ml-3">
-                                      <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                                      <div className="text-sm text-gray-500">Roll: {student.rollNumber}</div>
+                                      <div className="text-sm font-semibold text-gray-900 truncate max-w-[150px]">{student.name}</div>
+                                      <div className="flex items-center gap-1 mt-1">
+                                        <span className="text-xs text-gray-500 truncate">B-{student.batch}</span>
+                                        <span className="text-xs text-gray-500">•</span>
+                                        <span className="text-xs text-gray-500 truncate">R-{student.rollNumber}</span>
+                                      </div>
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                    Batch {student.batch}
-                                  </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                  {performance.totalTests}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <div className="flex items-center">
-                                    <span className={`text-sm font-medium ${
-                                      parseFloat(performance.averageScore) >= 8 ? 'text-green-600' :
-                                      parseFloat(performance.averageScore) >= 6 ? 'text-yellow-600' :
-                                      'text-red-600'
-                                    }`}>
-                                      {performance.averageScore}/10
-                                    </span>
+                                <td className="px-4 py-4">
+                                  <div className="flex flex-col items-start">
+                                    <div className="text-sm font-medium text-gray-900">Level {currentLevel}</div>
+                                    <div className="mt-1">
+                                      <span className={`px-2 py-0.5 inline-flex text-xs leading-4 font-medium rounded-full ${currentLevel === 10
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-blue-100 text-blue-800'
+                                        }`}>
+                                        {currentLevel === 10 ? 'Max Level' : 'In Progress'}
+                                      </span>
+                                    </div>
                                   </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <span className={`text-sm font-medium ${
-                                    latestScore >= 8 ? 'text-green-600' :
-                                    latestScore >= 6 ? 'text-yellow-600' :
-                                    'text-red-600'
-                                  }`}>
-                                    {latestScore !== null ? `${latestScore}/10` : '-'}
-                                  </span>
+                                <td className="px-4 py-4">
+                                  <div className="flex flex-col gap-2 max-w-[200px]">
+                                    <div className="flex items-center gap-0.5">
+                                      {[...Array(10)].map((_, index) => (
+                                        <div
+                                          key={index}
+                                          className={`h-2 w-4 first:rounded-l-full last:rounded-r-full ${index + 1 <= completedLevels
+                                            ? 'bg-green-500'
+                                            : index + 1 === currentLevel
+                                              ? 'bg-blue-500'
+                                              : 'bg-gray-200'
+                                            }`}
+                                        />
+                                      ))}
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-xs font-medium text-gray-900">
+                                        {completedLevels}/10
+                                      </span>
+                                      <span className="text-xs text-gray-500">
+                                        {((completedLevels / 10) * 100).toFixed(0)}%
+                                      </span>
+                                    </div>
+                                  </div>
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    parseFloat(performance.averageScore) >= 8 
-                                      ? 'bg-green-100 text-green-800'
-                                      : parseFloat(performance.averageScore) >= 6
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : 'bg-red-100 text-red-800'
-                                  }`}>
-                                    {parseFloat(performance.averageScore) >= 8 
-                                      ? 'Excellent'
-                                      : parseFloat(performance.averageScore) >= 6
-                                      ? 'Good'
-                                      : 'Needs Improvement'}
-                                  </span>
+                                <td className="px-4 py-4">
+                                  {latestScore ? (
+                                    <div className="flex flex-col">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className={`text-sm font-bold ${latestScore.score >= 8 ? 'text-green-600' :
+                                          latestScore.score >= 6 ? 'text-blue-600' :
+                                            'text-yellow-600'
+                                          }`}>
+                                          {latestScore.score}/10
+                                        </span>
+                                        <span className={`px-1.5 py-0.5 text-xs rounded-full ${latestScore.score >= 8 ? 'bg-green-100 text-green-800' :
+                                          latestScore.score >= 6 ? 'bg-blue-100 text-blue-800' :
+                                            'bg-yellow-100 text-yellow-800'
+                                          }`}>
+                                          {latestScore.score >= 8 ? 'Excellent' :
+                                            latestScore.score >= 6 ? 'Good' : 'Practice'}
+                                        </span>
+                                      </div>
+                                      <div className="text-xs text-gray-500 mt-1 truncate">
+                                        L{currentLevel - 1} • {new Date(latestScore.date).toLocaleDateString()}
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-sm text-gray-500">No attempts</div>
+                                  )}
+                                </td>
+                                <td className="px-4 py-4">
+                                  <div className="flex flex-col gap-1">
+                                    <span className={`px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full 
+                                      ${currentLevel === 10
+                                        ? 'bg-green-100 text-green-800'
+                                        : latestScore?.score >= 6
+                                          ? 'bg-blue-100 text-blue-800'
+                                          : 'bg-yellow-100 text-yellow-800'
+                                      }`}>
+                                      {currentLevel === 10
+                                        ? '🎉 Complete'
+                                        : latestScore?.score >= 6
+                                          ? '✨ Next Level'
+                                          : '📚 Practice'
+                                      }
+                                    </span>
+                                    {currentLevel < 10 && (
+                                      <span className="text-xs text-gray-500 truncate">
+                                        {latestScore?.score >= 6
+                                          ? `Go to L${currentLevel}`
+                                          : `Master L${currentLevel - 1}`
+                                        }
+                                      </span>
+                                    )}
+                                  </div>
                                 </td>
                               </tr>
                             );
@@ -4607,386 +4728,248 @@ function App() {
                   </div>
                 </div>
 
-                {/* Performance Overview Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                  {/* Total Tests Card */}
-                  <div className={`${cardStyle} p-6`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-600">Total Tests</p>
-                        <h3 className="text-2xl font-bold text-green-600 mt-1">
-                          {mockTests.filter(test => !test.isDefaultLevel).length}
-                        </h3>
-                      </div>
-                      <div className="p-3 bg-green-50 rounded-full">
-                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">Total mock tests conducted</p>
-                  </div>
-
-                  {/* Students Participating Card */}
-                  <div className={`${cardStyle} p-6`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-600">Active Students</p>
-                        <h3 className="text-2xl font-bold text-purple-600 mt-1">
-                          {students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length}
-                        </h3>
-                      </div>
-                      <div className="p-3 bg-purple-50 rounded-full">
-                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">Students taking mock tests</p>
-                  </div>
-
-                  {/* Average Score Card */}
-                  <div className={`${cardStyle} p-6`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-600">Average Score</p>
-                        <h3 className="text-2xl font-bold text-blue-600 mt-1">
-                          {(students
-                            .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                            .reduce((acc, student) => acc + parseFloat(getStudentPerformanceSummary(student).averageScore), 0) / 
-                            students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length || 0).toFixed(1)}/10
-                        </h3>
-                      </div>
-                      <div className="p-3 bg-blue-50 rounded-full">
-                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">Overall performance average</p>
-                  </div>
-
-                  {/* Pass Rate Card */}
-                  <div className={`${cardStyle} p-6`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-600">Pass Rate</p>
-                        <h3 className="text-2xl font-bold text-yellow-600 mt-1">
-                          {((students
-                            .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                            .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) >= 6).length /
-                            students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length) * 100).toFixed(1)}%
-                        </h3>
-                      </div>
-                      <div className="p-3 bg-yellow-50 rounded-full">
-                        <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
-                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">Students scoring 6+ out of 10</p>
-                  </div>
-                </div>
-
-                {/* Recent Mock Tests Table */}
-                <div className={`${cardStyle} overflow-hidden mb-6`}>
-                  <div className="p-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-900">Recent Mock Tests</h3>
-                    <button
-                      onClick={() => setCurrentView('mock-create')}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                        transition-colors duration-200 flex items-center gap-2 text-sm"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                      </svg>
-                      Create New Test
-                    </button>
-                  </div>
-                  {/* Existing table content */}
-                </div>
-
                 {/* Scoreboard Section */}
                 <div className={`${cardStyle} mb-6`}>
                   <div className="p-6 bg-gradient-to-r from-indigo-50 to-white border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-900">Class Scoreboard</h3>
                     <p className="text-sm text-gray-600 mt-1">Top performers and performance distribution</p>
                   </div>
+
+                  {/* Scoreboard Navigation */}
+                  <div className="border-b border-gray-200">
+                    <nav className="flex space-x-8 px-6" aria-label="Scoreboard Navigation">
+                      <button
+                        onClick={() => setScoreboardView('overview')}
+                        className={`py-4 px-1 inline-flex items-center border-b-2 text-sm font-medium ${scoreboardView === 'overview'
+                          ? 'border-indigo-500 text-indigo-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          }`}
+                      >
+                        <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Overview
+                      </button>
+
+                      <button
+                        onClick={() => setScoreboardView('top-performers')}
+                        className={`py-4 px-1 inline-flex items-center border-b-2 text-sm font-medium ${scoreboardView === 'top-performers'
+                          ? 'border-indigo-500 text-indigo-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          }`}
+                      >
+                        <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Top Performers
+                      </button>
+
+                      <button
+                        onClick={() => setScoreboardView('progress')}
+                        className={`py-4 px-1 inline-flex items-center border-b-2 text-sm font-medium ${scoreboardView === 'progress'
+                          ? 'border-indigo-500 text-indigo-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          }`}
+                      >
+                        <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                        </svg>
+                        Progress
+                      </button>
+                    </nav>
+                  </div>
+
                   <div className="p-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      {/* Top Performers Podium */}
-                      <div className="lg:col-span-2 bg-white rounded-lg p-6 border border-gray-100">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-4">Top Performers</h4>
-                          <div className="flex justify-center items-end mb-8 space-x-4">
-                            {/* Second Place */}
-                            <div className="flex flex-col items-center">
-                              <div className="w-20 h-20 mb-2 rounded-full border-4 border-gray-200 overflow-hidden">
-                                <img 
-                                  src={students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .sort((a, b) => parseFloat(getStudentPerformanceSummary(b).averageScore) - parseFloat(getStudentPerformanceSummary(a).averageScore))[1]?.profileImage || 'https://via.placeholder.com/80'} 
-                                  alt="2nd" 
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="h-24 w-20 bg-gray-100 rounded-t-lg flex items-center justify-center">
-                                <span className="text-2xl font-bold text-gray-600">2</span>
-                              </div>
-                            </div>
-
-                            {/* First Place */}
-                            <div className="flex flex-col items-center">
-                              <div className="w-24 h-24 mb-2 rounded-full border-4 border-yellow-400 overflow-hidden">
-                                <img 
-                                  src={students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .sort((a, b) => parseFloat(getStudentPerformanceSummary(b).averageScore) - parseFloat(getStudentPerformanceSummary(a).averageScore))[0]?.profileImage || 'https://via.placeholder.com/96'} 
-                                  alt="1st" 
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="h-32 w-24 bg-yellow-100 rounded-t-lg flex items-center justify-center">
-                                <span className="text-3xl font-bold text-yellow-600">1</span>
-                              </div>
-                            </div>
-
-                            {/* Third Place */}
-                            <div className="flex flex-col items-center">
-                              <div className="w-16 h-16 mb-2 rounded-full border-4 border-orange-200 overflow-hidden">
-                                <img 
-                                  src={students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .sort((a, b) => parseFloat(getStudentPerformanceSummary(b).averageScore) - parseFloat(getStudentPerformanceSummary(a).averageScore))[2]?.profileImage || 'https://via.placeholder.com/64'} 
-                                  alt="3rd" 
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="h-20 w-16 bg-orange-50 rounded-t-lg flex items-center justify-center">
-                                <span className="text-xl font-bold text-orange-600">3</span>
-                              </div>
+                    {/* Overview View */}
+                    {scoreboardView === 'overview' && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Class Average */}
+                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium text-gray-600">Class Average</h4>
+                            <div className="p-2 bg-green-50 rounded-full">
+                              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                              </svg>
                             </div>
                           </div>
+                          <p className="mt-4 text-3xl font-bold text-gray-900">
+                            {(students
+                              .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
+                              .reduce((acc, student) => acc + parseFloat(getStudentPerformanceSummary(student).averageScore), 0) /
+                              students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length
+                            ).toFixed(1)}
+                            <span className="text-sm font-normal text-gray-500 ml-1">/10</span>
+                          </p>
+                        </div>
 
-                        {/* Performance Distribution */}
-                        <div className="space-y-6">
-                          <h4 className="text-lg font-semibold text-gray-700 mb-4">Performance Distribution</h4>
-                          
-                          {/* Excellent (≥8) */}
-                          <div className="transform transition-all duration-300 hover:scale-[1.02]">
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-600 font-medium">Excellent (≥8)</span>
-                              <div className="flex items-center">
-                                <span className="text-green-600 font-semibold">
+                        {/* Improvement Rate */}
+                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium text-gray-600">Improvement Rate</h4>
+                            <div className="p-2 bg-purple-50 rounded-full">
+                              <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                              </svg>
+                            </div>
+                          </div>
+                          <p className="mt-4 text-3xl font-bold text-gray-900">
+                            {((students
+                              .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
+                              .filter(s => {
+                                const scores = s.mockScores || [];
+                                return scores.length >= 2 &&
+                                  scores[scores.length - 1].score > scores[scores.length - 2].score;
+                              }).length /
+                              students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length
+                            ) * 100).toFixed(1)}%
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Top Performers View */}
+                    {scoreboardView === 'top-performers' && (
+                      <div className="space-y-6 p-4">
+                        {/* Top 3 Performers - Modern Cards */}
+                        <div className="grid grid-cols-3 gap-4">
+                          {students
+                            .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
+                            .sort((a, b) => parseFloat(getStudentPerformanceSummary(b).averageScore) - parseFloat(getStudentPerformanceSummary(a).averageScore))
+                            .slice(0, 3)
+                            .map((student, index) => {
+                              const performance = getStudentPerformanceSummary(student);
+                              const medals = ['bg-gradient-to-r from-yellow-400 to-yellow-300', 'bg-gradient-to-r from-gray-300 to-gray-200', 'bg-gradient-to-r from-orange-400 to-orange-300'];
+                              const borders = ['ring-yellow-400', 'ring-gray-300', 'ring-orange-400'];
+                              const textColors = ['text-yellow-700', 'text-gray-700', 'text-orange-700'];
+
+                              return (
+                                <div key={student.id} className="relative transform transition-all duration-300 hover:scale-105">
+                                  <div className={`absolute -top-2 left-1/2 transform -translate-x-1/2 ${medals[index]} w-8 h-8 rounded-full flex items-center justify-center shadow-md z-10`}>
+                                    <span className="text-white text-sm font-bold">#{index + 1}</span>
+                                  </div>
+                                  <div className={`bg-white rounded-lg shadow p-4 pt-8 ${index === 0 ? 'border border-yellow-400' : 'border border-gray-100'}`}>
+                                    <div className="flex flex-col items-center">
+                                      <div className={`w-16 h-16 rounded-full ring-2 ${borders[index]} overflow-hidden mb-3`}>
+                                        <img src={student.profileImage || 'https://via.placeholder.com/64'} alt={`${index + 1}st place`} className="w-full h-full object-cover" />
+                                      </div>
+                                      <h3 className="text-sm font-semibold text-gray-900 text-center mb-0.5">{student.name}</h3>
+                                      <p className="text-xs text-gray-500 mb-2">Batch {student.batch}</p>
+                                      <div className={`text-xl font-bold ${textColors[index]} mb-2`}>{performance.averageScore}/10</div>
+                                      <div className="w-full bg-gray-100 rounded-full h-1.5 mb-2">
+                                        <div className={`${medals[index]} h-1.5 rounded-full`} style={{ width: `${(performance.averageScore / 10) * 100}%` }}></div>
+                                      </div>
+                                      <div className="flex items-center space-x-1 text-xs text-gray-500">
+                                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                        <span>{student.mockScores?.length || 0} tests</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                        </div>
+
+                        {/* Rest of Top Performers */}
+                        <div className="bg-white rounded-lg shadow p-4">
+                          <h4 className="text-base font-semibold text-gray-900 mb-4">Other Top Performers</h4>
+                          <div className="space-y-2">
                             {students
                               .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) >= 8).length}
-                                </span>
-                                <span className="text-gray-500 ml-1">students</span>
+                              .sort((a, b) => parseFloat(getStudentPerformanceSummary(b).averageScore) - parseFloat(getStudentPerformanceSummary(a).averageScore))
+                              .slice(3, 10)
+                              .map((student, index) => {
+                                const performance = getStudentPerformanceSummary(student);
+                                return (
+                                  <div key={student.id} className="flex items-center p-2 rounded hover:bg-gray-50 transition-colors duration-200">
+                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 mr-3">
+                                      <span className="text-xs font-semibold text-gray-600">#{index + 4}</span>
+                                    </div>
+                                    <div className="w-8 h-8 rounded-full ring-1 ring-gray-200 overflow-hidden mr-3">
+                                      <img src={student.profileImage || 'https://via.placeholder.com/32'} alt="" className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <h5 className="text-sm font-medium text-gray-900">{student.name}</h5>
+                                      <div className="flex items-center">
+                                        <div className="text-xs text-gray-500">Batch {student.batch}</div>
+                                        <span className="mx-1 text-gray-300">•</span>
+                                        <div className="text-xs text-gray-500">{student.mockScores?.length || 0} tests</div>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <div className="text-sm font-semibold text-indigo-600">{performance.averageScore}/10</div>
+                                      <div className="w-20 bg-gray-100 rounded-full h-1 mt-1">
+                                        <div className="bg-indigo-600 h-1 rounded-full" style={{ width: `${(performance.averageScore / 10) * 100}%` }}></div>
+                                      </div>
+                                    </div>
                                   </div>
+                                );
+                              })}
                           </div>
-                            <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-green-500 rounded-full transition-all duration-500 ease-out"
-                                style={{
-                                  width: `${(students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) >= 8).length /
-                                    students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length * 100)}%`
-                                }}
-                              ></div>
                         </div>
-                          </div>
+                      </div>
+                    )}
 
-                          {/* Good (6-8) */}
-                          <div className="transform transition-all duration-300 hover:scale-[1.02]">
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-600 font-medium">Good (6-8)</span>
-                              <div className="flex items-center">
-                                <span className="text-blue-600 font-semibold">
-                                  {students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => {
-                                      const score = parseFloat(getStudentPerformanceSummary(s).averageScore);
-                                      return score >= 6 && score < 8;
-                                    }).length}
-                                </span>
-                                <span className="text-gray-500 ml-1">students</span>
-                              </div>
-                            </div>
-                            <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
-                                style={{
-                                  width: `${(students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => {
-                                      const score = parseFloat(getStudentPerformanceSummary(s).averageScore);
-                                      return score >= 6 && score < 8;
-                                    }).length /
-                                    students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length * 100)}%`
-                                }}
-                              ></div>
-                            </div>
-                          </div>
 
-                          {/* Needs Improvement (<6) */}
-                          <div className="transform transition-all duration-300 hover:scale-[1.02]">
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-600 font-medium">Needs Improvement (&lt;6)</span>
-                              <div className="flex items-center">
-                                <span className="text-red-600 font-semibold">
-                                  {students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) < 6).length}
-                                </span>
-                                <span className="text-gray-500 ml-1">students</span>
-                              </div>
-                            </div>
-                            <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-red-500 rounded-full transition-all duration-500 ease-out"
-                                style={{
-                                  width: `${(students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) < 6).length /
-                                    students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length * 100)}%`
-                                }}
-                              ></div>
-                            </div>
-                          </div>
 
-                          {/* Class Average */}
-                          <div className="mt-8 pt-6 border-t border-gray-100">
+                    {/* Progress View */}
+                    {scoreboardView === 'progress' && (
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {/* Monthly Progress */}
+                          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-4">Monthly Progress</h4>
                             <div className="flex items-center justify-between">
                               <div>
-                                <h5 className="text-sm font-medium text-gray-600">Class Average</h5>
-                                <div className="flex items-center mt-1">
-                                  <span className="text-3xl font-bold text-indigo-600">
-                                    {(students
-                                      .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                      .reduce((acc, student) => acc + parseFloat(getStudentPerformanceSummary(student).averageScore), 0) /
-                                      students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length
-                                    ).toFixed(1)}
-                                  </span>
-                                  <span className="text-gray-500 ml-2">/ 10</span>
-                                </div>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                </svg>
-                                <span className="text-sm font-medium text-gray-600">Class Performance</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Performance Distribution */}
-                      <div className="bg-white rounded-lg p-6 border border-gray-100">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-4">Score Distribution</h4>
-                        <div className="space-y-4">
-                          {/* Excellent (8-10) */}
-                          <div>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-600">Excellent (8-10)</span>
-                              <span className="text-green-600 font-medium">
-                                {students
-                                  .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                  .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) >= 8).length} students
-                              </span>
-                            </div>
-                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-green-500 rounded-full"
-                                style={{
-                                  width: `${(students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) >= 8).length /
-                                    students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length * 100)}%`
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-
-                          {/* Good (6-7.9) */}
-                          <div>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-600">Good (6-7.9)</span>
-                              <span className="text-yellow-600 font-medium">
-                                {students
-                                  .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                  .filter(s => {
-                                    const score = parseFloat(getStudentPerformanceSummary(s).averageScore);
-                                    return score >= 6 && score < 8;
-                                  }).length} students
-                              </span>
-                            </div>
-                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-yellow-500 rounded-full"
-                                style={{
-                                  width: `${(students
+                                <p className="text-3xl font-bold text-gray-900">
+                                  {((students
                                     .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
                                     .filter(s => {
-                                      const score = parseFloat(getStudentPerformanceSummary(s).averageScore);
-                                      return score >= 6 && score < 8;
+                                      const scores = s.mockScores || [];
+                                      return scores.length >= 2 &&
+                                        scores[scores.length - 1].score > scores[scores.length - 2].score;
                                     }).length /
-                                    students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length * 100)}%`
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-
-                          {/* Needs Improvement (<6) */}
-                          <div>
-                            <div className="flex justify-between text-sm mb-1">
-                              <span className="text-gray-600">Needs Improvement (&lt;6)</span>
-                              <span className="text-red-600 font-medium">
-                                {students
-                                  .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                  .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) < 6).length} students
-                              </span>
-                            </div>
-                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-red-500 rounded-full"
-                                style={{
-                                  width: `${(students
-                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                    .filter(s => parseFloat(getStudentPerformanceSummary(s).averageScore) < 6).length /
-                                    students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length * 100)}%`
-                                }}
-                              ></div>
-                            </div>
-                          </div>
-
-                          {/* Average Score Indicator */}
-                          <div className="mt-6 pt-4 border-t border-gray-100">
-                            <div className="text-sm text-gray-600 mb-2">Class Average</div>
-                            <div className="flex items-center">
-                              <div className="text-2xl font-bold text-indigo-600">
-                                {(students
-                                  .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
-                                  .reduce((acc, student) => acc + parseFloat(getStudentPerformanceSummary(student).averageScore), 0) /
-                                  students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length).toFixed(1)}
+                                    students.filter(s => !selectedBatch || s.batch?.toString() === selectedBatch).length
+                                  ) * 100).toFixed(1)}%
+                                </p>
+                                <p className="text-sm text-gray-500">Students showing improvement</p>
                               </div>
-                              <div className="text-sm text-gray-500 ml-2">/10</div>
+                              <div className="p-3 bg-green-50 rounded-full">
+                                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Test Completion */}
+                          <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                            <h4 className="text-sm font-semibold text-gray-700 mb-4">Test Completion</h4>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-3xl font-bold text-gray-900">
+                                  {students
+                                    .filter(s => !selectedBatch || s.batch?.toString() === selectedBatch)
+                                    .reduce((acc, s) => acc + (s.mockScores?.length || 0), 0)}
+                                </p>
+                                <p className="text-sm text-gray-500">Total tests completed</p>
+                              </div>
+                              <div className="p-3 bg-blue-50 rounded-full">
+                                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
-
               </div>
             )}
-
             {/* Assign Mock View */}
             {currentView === 'mock-assign' && (
               <div className="p-6">
@@ -5071,81 +5054,7 @@ function App() {
                                     </div>
                                     {/* Mock Test Selection */}
                                     <div className="flex items-center gap-3">
-                                      <select
-                                        value={student.selectedMockId || ''}
-                                        onChange={(e) => {
-                                          const mockId = e.target.value;
-                                          setStudents(prevStudents =>
-                                            prevStudents.map(s =>
-                                              s.id === student.id
-                                                ? { ...s, selectedMockId: mockId }
-                                                : s
-                                            )
-                                          );
-                                        }}
-                                        className="px-3 py-2 rounded-lg border border-gray-300 
-                                          focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
-                                          text-sm bg-white shadow-sm"
-                                      >
-                                        <option value="">Select Mock Test</option>
-                                        {/* Default Level Mocks (1-10) */}
-                                        <optgroup label="Default Level Tests">
-                                          {getMockTestOptions().defaultTests.map(test => {
-                                            const cleared = hasClearedLevel(student, test.level - 1);
-                                            const currentLevelScore = student.mockScores?.find(s => s.mockId === test.id)?.score;
-                                            const hasAttempted = currentLevelScore !== undefined;
-                                            const hasCleared = hasAttempted && currentLevelScore >= 6;
-                                            const isLocked = !cleared;
-
-                                            let status = '';
-                                            let className = '';
-
-                                            if (hasCleared) {
-                                              status = '✅ Cleared';
-                                              className = 'text-green-600 font-medium';
-                                            } else if (hasAttempted) {
-                                              status = `❌ Score: ${currentLevelScore}/10`;
-                                              className = 'text-red-600';
-                                            } else if (isLocked) {
-                                              status = '🔒 Locked';
-                                              className = 'text-gray-400';
-                                            } else {
-                                              status = '📝 Available';
-                                              className = 'text-blue-600';
-                                            }
-
-                                            return (
-                                              <option
-                                                key={test.id}
-                                                value={test.id}
-                                                disabled={isLocked}
-                                                className={className}
-                                              >
-                                                {test.name} ({status})
-                                              </option>
-                                            );
-                                          })}
-                                        </optgroup>
-                                        {getMockTestOptions().customTests.length > 0 && (
-                                          <optgroup label="Custom Tests">
-                                            {getMockTestOptions().customTests.map(test => {
-                                              const score = student.mockScores?.find(s => s.mockId === test.id)?.score;
-                                              const hasAttempted = score !== undefined;
-                                              let status = hasAttempted ? `Score: ${score}/10` : 'Not attempted';
-
-                                              return (
-                                                <option
-                                                  key={test.id}
-                                                  value={test.id}
-                                                  className={hasAttempted ? 'text-green-600' : 'text-blue-600'}
-                                                >
-                                                  {test.name} ({status})
-                                                </option>
-                                              );
-                                            })}
-                                          </optgroup>
-                                        )}
-                                      </select>
+                                      {renderMockTestOptions(student)}
                                       {student.selectedMockId && (
                                         <div className="flex items-center gap-2">
                                           <input
@@ -5287,6 +5196,225 @@ function App() {
                         </div>
                       </div>
                     )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentView === 'view-mocks' && (
+              <div className="space-y-6 p-6">
+                {/* Header */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Mock Tests</h2>
+                      <p className="text-gray-600 mt-1">View and manage all mock tests</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex gap-2">
+                        <div className="px-4 py-3 bg-blue-50 rounded-lg border border-blue-100">
+                          <p className="text-sm text-gray-600">Total Tests</p>
+                          <p className="text-2xl font-bold text-blue-600">{mockTests.filter(test => !test.isDefaultLevel).length}</p>
+                        </div>
+                        <div className="px-4 py-3 bg-green-50 rounded-lg border border-green-100">
+                          <p className="text-sm text-gray-600">Completed</p>
+                          <p className="text-2xl font-bold text-green-600">
+                            {mockTests.filter(test => test.status === 'completed').length}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setCurrentView('mock-create')}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                          transition-colors duration-200 flex items-center gap-2 text-sm"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create New Test
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Filters and Search */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                  <div className="flex flex-wrap gap-4 items-center justify-between">
+                    <div className="flex gap-4 items-center">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Search mock tests..."
+                          value={mockSearchTerm}
+                          onChange={(e) => setMockSearchTerm(e.target.value)}
+                          className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 
+                            focus:ring-blue-500 focus:border-blue-500 w-64"
+                        />
+                        <svg
+                          className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </div>
+                      <select
+                        value={mockBatchFilter}
+                        onChange={(e) => setMockBatchFilter(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
+                          focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="all">All Batches</option>
+                        {Array.from(new Set(mockTests.flatMap(test => test.batches || []))).map(batch => (
+                          <option key={batch} value={batch}>Batch {batch}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-600">Sort by:</label>
+                      <select
+                        value={mockSortBy}
+                        onChange={(e) => setMockSortBy(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
+                          focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="date-desc">Date (Newest)</option>
+                        <option value="date-asc">Date (Oldest)</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mock Tests Table */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Test Name
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Batches
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {getFilteredMockTests()
+                          .filter(test =>
+                            test.name.toLowerCase().includes(mockSearchTerm.toLowerCase()) ||
+                            test.description?.toLowerCase().includes(mockSearchTerm.toLowerCase())
+                          )
+                          .sort((a, b) => {
+                            switch (mockSortBy) {
+                              case 'date-desc':
+                                return new Date(b.date) - new Date(a.date);
+                              case 'date-asc':
+                                return new Date(a.date) - new Date(b.date);
+                              case 'name-asc':
+                                return a.name.localeCompare(b.name);
+                              case 'name-desc':
+                                return b.name.localeCompare(a.name);
+                              default:
+                                return 0;
+                            }
+                          })
+                          .map((test) => (
+                            <tr key={test.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-blue-50">
+                                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                  </div>
+                                  <div className="ml-4">
+                                    <div className="text-sm font-medium text-gray-900">{test.name}</div>
+                                    {test.description && (
+                                      <div className="text-sm text-gray-500">{test.description}</div>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{new Date(test.date).toLocaleDateString()}</div>
+                                {test.duration && (
+                                  <div className="text-sm text-gray-500">Duration: {test.duration} mins</div>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex flex-wrap gap-1">
+                                  {test.batches?.map(batch => (
+                                    <span
+                                      key={batch}
+                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                    >
+                                      Batch {batch}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                  ${test.isDefaultLevel
+                                    ? 'bg-purple-100 text-purple-800'
+                                    : 'bg-green-100 text-green-800'
+                                  }`}
+                                >
+                                  {test.isDefaultLevel ? 'Default Level' : 'Custom'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                  ${test.status === 'completed'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                                  }`}
+                                >
+                                  {test.status === 'completed' ? 'Completed' : 'Pending'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div className="flex items-center gap-3">
+                                  <button
+                                    onClick={() => handleEditMock(test)}
+                                    className="text-indigo-600 hover:text-indigo-900"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteMock(test.id)}
+                                    className="text-red-600 hover:text-red-900"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -5552,7 +5680,8 @@ function App() {
                               <div className="w-full h-full flex items-center justify-center text-gray-400">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                  />
                                 </svg>
                               </div>
                             )}
@@ -5738,3 +5867,4 @@ function App() {
 }
 
 export default App
+
