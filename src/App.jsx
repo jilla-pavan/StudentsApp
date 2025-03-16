@@ -235,6 +235,11 @@ const LoadingSpinner = () => (
   <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent" />
 )
 
+// Add this helper function
+const viewDetailedReport = (student) => {
+  setSelectedStudent(student);
+};
+
 const EmptyState = ({ icon, title, description }) => (
   <div className="text-center py-12">
     <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
@@ -3090,8 +3095,6 @@ function App() {
           </div>
         </div>
 
-        {/* Add this after the Attendance section, before the closing sidebar div */}
-        {/* Mock Tests Section */}
         <div className="space-y-1">
           <button
             onClick={() => setExpandedMenu(expandedMenu === 'mock' ? '' : 'mock')}
@@ -3145,6 +3148,12 @@ function App() {
                 className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-report-score' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
               >
                 Mock Score Report
+              </button>
+              <button
+                onClick={() => setCurrentView('final-report')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'final-report' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Final Report Card
               </button>
             </div>
           )}
@@ -4860,8 +4869,7 @@ function App() {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {/* Make sure we're using the filtered students list */}
-                          {getFilteredStudents()
-                            // Apply batch filter if selectedBatch is set
+                          {students
                             .filter(student => !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch)
                             .map(student => {
                               // Find the mock test record for this student
@@ -5922,9 +5930,92 @@ function App() {
                 </div>
               </div>
             )}
+
+            {currentView === 'final-report' && (
+              <div className="p-6 space-y-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Final Report Card</h2>
+                      <p className="text-gray-600 mt-1">Comprehensive student performance report</p>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <select
+                        value={selectedBatch || ''}
+                        onChange={handleBatchChange}
+                        className="rounded-lg border border-gray-300 px-4 py-2"
+                      >
+                        <option value="">All Batches</option>
+                        {batches.map(batch => (
+                          <option key={batch.id} value={batch.id}>{batch.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Student Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {students
+                      .filter(student => !selectedBatch || student.batchId?.toString() === selectedBatch)
+                      .map(student => {
+                        const regularAttendance = calculateAttendancePercentage(student.attendance || [], 'regular');
+                        const mockAttendance = getMockAttendance(student);
+                        const overallAttendance = ((regularAttendance + mockAttendance) / 2).toFixed(1);
+                        const averageMockScore = calculateAverageScore(
+                          student.mockScores?.filter(score => score.score !== undefined) || []
+                        );
+
+                        return (
+                          <div key={student.id} className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 p-6">
+                            {/* Card Header */}
+                            <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900">{student.name}</h3>
+                                <p className="text-sm text-gray-500">{student.email}</p>
+                              </div>
+                              <span className="text-xs px-3 py-1 bg-blue-100 text-blue-700 font-medium rounded-full">Student</span>
+                            </div>
+
+                            {/* Card Body */}
+                            <div className="mt-4 space-y-4">
+                              {/* Attendance Stats */}
+                              <div className="grid grid-cols-3 text-center gap-4">
+                                {[['Regular', regularAttendance], ['Mock', mockAttendance], ['Overall', overallAttendance]].map(([label, value], index) => (
+                                  <div key={index} className="bg-gray-50 rounded-lg p-3">
+                                    <div className="text-xs text-gray-500 mb-1">{label}</div>
+                                    <div className={`text-base font-semibold ${value >= 75 ? 'text-green-600' : 'text-red-600'}`}>{value}%</div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Mock Score */}
+                              <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-gray-600 font-medium">Avg Mock Score</span>
+                                  <span className={`text-base font-semibold ${averageMockScore >= 5 ? 'text-green-600' : 'text-red-600'}`}>{averageMockScore}/10</span>
+                                </div>
+                                <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div className={`h-full rounded-full ${averageMockScore >= 7 ? 'bg-green-500' : averageMockScore >= 5 ? 'bg-yellow-500' : 'bg-red-500'}`} style={{ width: `${(averageMockScore / 10) * 100}%` }}></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+
+
+
+                </div>
+
+
+              </div>
+            )}
           </div>
         </div>
       </div>
+
 
       {/* Student Details Modal */}
       {
@@ -6132,24 +6223,7 @@ function App() {
                   <div className={studentListView === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
                     {console.log("Total students:", students.length, "Selected batch:", selectedBatchForStudents)}
                     {students
-                      // Skip batch filtering if no batch is selected
-                      .filter(student => {
-                        if (!selectedBatchForStudents) return true;
-
-                        // Print student info for debugging
-                        console.log("Student:", student.id, student.name,
-                          "batch:", student.batch,
-                          "batchId:", student.batchId,
-                          "batchName:", student.batchName);
-
-                        // Try multiple properties that might contain batch info
-                        return (
-                          (student.batch && student.batch.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchId && student.batchId.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchName && student.batchName.toString() === selectedBatchForStudents.toString())
-                        );
-                      })
-                      // Then filter by search term if provided
+                      .filter(student => !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch)
                       .filter(student => {
                         if (!searchTerm) return true;
                         const searchLower = searchTerm.toLowerCase();
@@ -6266,16 +6340,7 @@ function App() {
 
                     {/* No Results Message */}
                     {students
-                      // Filter for batch
-                      .filter(student => {
-                        if (!selectedBatchForStudents) return true;
-                        return (
-                          (student.batch && student.batch.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchId && student.batchId.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchName && student.batchName.toString() === selectedBatchForStudents.toString())
-                        );
-                      })
-                      // Filter for search
+                      .filter(student => !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch)
                       .filter(student => {
                         if (!searchTerm) return true;
                         const searchLower = searchTerm.toLowerCase();
