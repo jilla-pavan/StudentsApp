@@ -535,7 +535,6 @@ function App() {
     { id: 3, name: 'Mike Johnson', attendance: true },
   ])
 
-  console.log(students)
 
   // First, make sure the newStudent state includes gender
   const [newStudent, setNewStudent] = useState({
@@ -3149,6 +3148,34 @@ function App() {
               >
                 Mock Score Report
               </button>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1">
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'final' ? '' : 'final')}
+            className={`${sidebarButtonStyle} flex items-center justify-between w-full ${currentView.startsWith('mock') ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'}`}
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              Final Report
+            </div>
+            <svg
+              className={`w-4 h-4 transform transition-transform ${expandedMenu === 'mock' ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {/* Mock Tests Submenu */}
+          {expandedMenu === 'final' && (
+            <div className="pl-10 space-y-1">
               <button
                 onClick={() => setCurrentView('final-report')}
                 className={`${sidebarButtonStyle} w-full text-left ${currentView === 'final-report' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
@@ -3158,6 +3185,7 @@ function App() {
             </div>
           )}
         </div>
+
       </div>
 
       {/* Main Content */}
@@ -3166,6 +3194,235 @@ function App() {
         <div className="h-full">
           {/* Content Area */}
           <div className="w-full">
+            {!(
+              currentView === 'students-view' ||
+              currentView === 'batches-add' ||
+              currentView === 'batches-view' ||
+              currentView === 'students-attendance' ||
+              currentView === 'attendance-report' ||
+              currentView === 'mock-create' ||
+              currentView === 'mock-report-attendence' ||
+              currentView === 'mock-assign' ||
+              currentView === 'view-mocks' ||
+              currentView === 'mock-report-score' ||
+              currentView === 'final-report'
+            ) && (
+                <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
+                  {/* Form Header */}
+                  <div className="mb-8 border-b border-gray-100 pb-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">
+                      {editingStudent ? 'Edit Student Details' : 'Add New Student'}
+                    </h2>
+                    <p className="text-sm">
+                      {editingStudent
+                        ? 'Update the information for existing student'
+                        : 'Fill in the information to register a new student'}
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* Image Upload Section */}
+                    <div className="flex justify-center mb-8">
+                      <div className="w-40 h-40 relative group">
+                        <div className={`
+                        w-full h-40 rounded-full border-3 border-dashed
+                        flex items-center justify-center overflow-hidden
+                        transition-all duration-300 shadow-sm
+                        ${newStudent.imageUrl
+                            ? 'border-transparent'
+                            : 'border-gray-300 group-hover:border-orange-300 bg-gray-50'}
+                      `}>
+                          {newStudent.imageUrl ? (
+                            <img
+                              src={newStudent.imageUrl}
+                              alt="Student"
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ) : (
+                            <div className="text-center p-4">
+                              <svg className="w-12 h-12 text-gray-400 mx-auto mb-2 group-hover:text-orange-400 transition-colors duration-300"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              <p className="text-sm text-gray-500 group-hover:text-orange-500 transition-colors duration-300">
+                                Upload Photo
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">Click to browse</p>
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          title="Upload student image"
+                        />
+                        {newStudent.imageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setNewStudent({ ...newStudent, image: null, imageUrl: '' })}
+                            className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-2
+                            hover:bg-red-200 transition-colors duration-300 shadow-sm hover:shadow-md"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Form Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {/* Left Column */}
+                      <div className="bg-gray-50 p-6 rounded-xl space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Student Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudent.name}
+                            onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter student's full name"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Roll Number <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudent.rollNumber}
+                            onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter roll number"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Gender <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={newStudent.gender}
+                            onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200 bg-white"
+                            required
+                          >
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="bg-gray-50 p-6 rounded-xl space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Batch <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={newStudent.batch || ''}
+                            onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200 bg-white"
+                            required
+                          >
+                            <option value="">Select a batch</option>
+                            {batches.map(batch => (
+                              <option key={batch.id} value={batch.name}>
+                                Batch {batch.name} ({formatTime(batch.startTime)} - {formatTime(batch.endTime)})
+                              </option>
+                            ))}
+                          </select>
+                          {batches.length === 0 && (
+                            <p className="mt-2 text-sm text-orange-600">
+                              No batches available. Please create a batch first.
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Contact Number <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            value={newStudent.contactNumber || ''}
+                            onChange={(e) => setNewStudent({ ...newStudent, contactNumber: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter contact number"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            value={newStudent.email || ''}
+                            onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter email address"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Form Actions */}
+                    <div className="flex gap-4 pt-8 border-t border-gray-100">
+                      <button
+                        type="submit"
+                        className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-3 rounded-lg
+                        font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                      >
+                        {editingStudent ? 'Update Student' : 'Add Student'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCurrentView('students-view')
+                          setShowForm(false)
+                          setEditingStudent(null)
+                          setNewStudent({
+                            name: '',
+                            rollNumber: '',
+                            batch: '',
+                            gender: '',
+                            contactNumber: '',
+                            email: '',
+                            image: null,
+                            imageUrl: '',
+                            attendance: { scrum: [], class: [] }
+                          })
+                        }}
+                        className="px-6 py-3 rounded-lg border border-gray-200 font-medium text-gray-600
+                        hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            
             {currentView === 'students-view' && (
               <div className="p-6 space-y-6">
                 {/* Header */}
@@ -3372,226 +3629,6 @@ function App() {
               </div>
             )}
 
-            {/* Add/Edit Student Form */}
-            {currentView === 'students-add' && (
-              <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
-                {/* Form Header */}
-                <div className="mb-8 border-b border-gray-100 pb-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-2">
-                    {editingStudent ? 'Edit Student Details' : 'Add New Student'}
-                  </h2>
-                  <p className="text-sm">
-                    {editingStudent
-                      ? 'Update the information for existing student'
-                      : 'Fill in the information to register a new student'}
-                  </p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  {/* Image Upload Section */}
-                  <div className="flex justify-center mb-8">
-                    <div className="w-40 h-40 relative group">
-                      <div className={`
-                        w-full h-40 rounded-full border-3 border-dashed
-                        flex items-center justify-center overflow-hidden
-                        transition-all duration-300 shadow-sm
-                        ${newStudent.imageUrl
-                          ? 'border-transparent'
-                          : 'border-gray-300 group-hover:border-orange-300 bg-gray-50'}
-                      `}>
-                        {newStudent.imageUrl ? (
-                          <img
-                            src={newStudent.imageUrl}
-                            alt="Student"
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <div className="text-center p-4">
-                            <svg className="w-12 h-12 text-gray-400 mx-auto mb-2 group-hover:text-orange-400 transition-colors duration-300"
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                            <p className="text-sm text-gray-500 group-hover:text-orange-500 transition-colors duration-300">
-                              Upload Photo
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">Click to browse</p>
-                          </div>
-                        )}
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        title="Upload student image"
-                      />
-                      {newStudent.imageUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setNewStudent({ ...newStudent, image: null, imageUrl: '' })}
-                          className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-2
-                            hover:bg-red-200 transition-colors duration-300 shadow-sm hover:shadow-md"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Form Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Left Column */}
-                    <div className="bg-gray-50 p-6 rounded-xl space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Student Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={newStudent.name}
-                          onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter student's full name"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Roll Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={newStudent.rollNumber}
-                          onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter roll number"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Gender <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={newStudent.gender}
-                          onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200 bg-white"
-                          required
-                        >
-                          <option value="">Select Gender</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Right Column */}
-                    <div className="bg-gray-50 p-6 rounded-xl space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Select Batch <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={newStudent.batch || ''}
-                          onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200 bg-white"
-                          required
-                        >
-                          <option value="">Select a batch</option>
-                          {batches.map(batch => (
-                            <option key={batch.id} value={batch.name}>
-                              Batch {batch.name} ({formatTime(batch.startTime)} - {formatTime(batch.endTime)})
-                            </option>
-                          ))}
-                        </select>
-                        {batches.length === 0 && (
-                          <p className="mt-2 text-sm text-orange-600">
-                            No batches available. Please create a batch first.
-                          </p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Contact Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          value={newStudent.contactNumber || ''}
-                          onChange={(e) => setNewStudent({ ...newStudent, contactNumber: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter contact number"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          value={newStudent.email || ''}
-                          onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter email address"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Form Actions */}
-                  <div className="flex gap-4 pt-8 border-t border-gray-100">
-                    <button
-                      type="submit"
-                      className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-3 rounded-lg
-                        font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                      {editingStudent ? 'Update Student' : 'Add Student'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCurrentView('students-view')
-                        setShowForm(false)
-                        setEditingStudent(null)
-                        setNewStudent({
-                          name: '',
-                          rollNumber: '',
-                          batch: '',
-                          gender: '',
-                          contactNumber: '',
-                          email: '',
-                          image: null,
-                          imageUrl: '',
-                          attendance: { scrum: [], class: [] }
-                        })
-                      }}
-                      className="px-6 py-3 rounded-lg border border-gray-200 font-medium text-gray-600
-                        hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* Add/Edit Batch Form */}
-
             {currentView === 'batches-add' && (
               <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
                 {/* Form Header */}
@@ -3756,7 +3793,6 @@ function App() {
               </div>
             )}
 
-            {/* Batches View */}
             {currentView === 'batches-view' && (
               <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
                 {/* Header */}
@@ -4403,7 +4439,6 @@ function App() {
                                 const totalDays = recordsInRange.length;
                                 const presentDays = recordsInRange.filter(record => record.present).length;
                                 const attendancePercentage = totalDays > 0 ? (presentDays / totalDays) * 100 : 0;
-                                { console.log(student, "1234567890"); }
                                 return (
                                   <tr key={student.id} className="hover:bg-gray-50 transition-colors duration-200">
                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -4513,7 +4548,6 @@ function App() {
               </div>
             )}
 
-            {/* Mock Create View */}
             {currentView === 'mock-create' && (
               <div className="p-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
@@ -4687,7 +4721,6 @@ function App() {
               </div>
             )}
 
-            {/* Mock Report View */}
             {currentView === 'mock-report-attendence' && (
               <div className="p-6">
                 {/* Header Card - Keep existing */}
@@ -5000,7 +5033,6 @@ function App() {
               </div>
             )}
 
-            {/* Assign Mock View */}
             {currentView === 'mock-assign' && (
               <div className="p-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
@@ -5214,7 +5246,6 @@ function App() {
               </div>
             )}
 
-            {/* mock attendence */}
             {currentView === 'view-mocks' && (
               <div className="space-y-6 p-6">
                 {/* Header */}
@@ -5434,12 +5465,6 @@ function App() {
               </div>
             )}
 
-
-
-
-
-
-            {/* Mock Report View */}
             {currentView === 'mock-report-score' && (
               <div className="p-6">
                 {/* Header Card */}
@@ -5566,12 +5591,6 @@ function App() {
                             const completedLevels = Object.entries(levelScores)
                               .filter(([_, score]) => score >= 6)
                               .length;
-
-                            // Debug logging
-                            console.log('Student:', student.name);
-                            console.log('Level Scores:', levelScores);
-                            console.log('Current Level:', currentLevel);
-                            console.log('Completed Levels:', completedLevels);
 
                             return (
                               <tr key={student.id} className="hover:bg-gray-50">
@@ -6115,7 +6134,6 @@ function App() {
           </div>
         )
       }
-
       {/* Simplified Batch Students Modal */}
       {
         selectedBatchForStudents && (
@@ -6220,10 +6238,10 @@ function App() {
                   </div>
 
                   {/* Students Grid/List */}
+
                   <div className={studentListView === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
-                    {console.log("Total students:", students.length, "Selected batch:", selectedBatchForStudents)}
                     {students
-                      .filter(student => !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch)
+                      .filter(student => !selectedBatchForStudents.name || student.batch === selectedBatchForStudents.name)
                       .filter(student => {
                         if (!searchTerm) return true;
                         const searchLower = searchTerm.toLowerCase();
@@ -6376,7 +6394,6 @@ function App() {
           </div>
         )
       }
-
       {/* Alert Component */}
       {showAlert && (
         <div className="fixed top-4 right-4 z-50 animate-fade-in">
