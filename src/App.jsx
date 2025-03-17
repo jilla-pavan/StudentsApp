@@ -30,120 +30,25 @@ const cardStyle = `
   transition-all duration-300 hover:shadow-lg hover:border-blue-200/50
   backdrop-filter backdrop-blur-sm
 `
-
 const buttonStyle = `
   px-4 py-2.5 rounded-lg font-medium shadow-sm
   transition-all duration-300 transform active:scale-95
   focus:outline-none focus:ring-2 focus:ring-offset-2
 `
-
-const primaryButtonStyle = `
-  ${buttonStyle}
-  bg-gradient-to-r from-blue-600 to-blue-700 
-  hover:from-blue-700 hover:to-blue-800
-  text-white focus:ring-blue-500
-`
-
-const secondaryButtonStyle = `
-  ${buttonStyle}
-  bg-gray-50 hover:bg-gray-100 
-  text-gray-700 hover:text-gray-900
-  border border-gray-200 hover:border-gray-300
-  focus:ring-gray-500
-`
-
-const dangerButtonStyle = `
-  ${buttonStyle}
-  bg-red-50 hover:bg-red-100
-  text-red-600 hover:text-red-700
-  border border-red-200 hover:border-red-300
-  focus:ring-red-500
-`
-
-const successButtonStyle = `
-  ${buttonStyle}
-  bg-green-50 hover:bg-green-100
-  text-green-600 hover:text-green-700
-  border border-green-200 hover:border-green-300
-  focus:ring-green-500
-`
-
 const inputStyle = `
   w-full px-4 py-2.5 rounded-lg border border-gray-300
   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
   transition-all duration-200 bg-white
   placeholder-gray-400 text-gray-900
 `
-
-const selectStyle = `
-  ${inputStyle}
-  appearance-none bg-no-repeat
-  bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"%3E%3Cpath stroke="%236B7280" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l4 4 4-4"/%3E%3C/svg%3E')]
-  bg-[length:1.25em_1.25em] bg-[right_0.5rem_center]
-  pr-10
-`
-
-const labelStyle = `
-  block text-sm font-medium text-gray-700 mb-1
-`
-
 const cardHeaderStyle = `
   p-6 border-b border-gray-100
   bg-gradient-to-r from-gray-50 to-white
 `
-
-// Add these new professional styles
 const tableStyle = `
   min-w-full divide-y divide-gray-200 
   bg-white shadow-sm rounded-lg border border-gray-200
 `
-
-const tableHeaderStyle = `
-  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider
-  bg-gray-50 border-b border-gray-200
-`
-
-const tableRowStyle = `
-  hover:bg-gray-50 transition-colors duration-200
-`
-
-const tableCellStyle = `
-  px-6 py-4 whitespace-nowrap text-sm text-gray-900
-`
-
-const badgeStyle = (color) => `
-  inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-  ${color === 'green' ? 'bg-green-100 text-green-800' :
-    color === 'red' ? 'bg-red-100 text-red-800' :
-      color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-        color === 'blue' ? 'bg-blue-100 text-blue-800' :
-          'bg-gray-100 text-gray-800'}
-`
-
-const modalStyle = `
-  fixed inset-0 bg-black/40 backdrop-blur-sm
-  flex items-center justify-center z-50
-  transition-opacity duration-300
-`
-
-const modalContentStyle = `
-  bg-white rounded-xl shadow-xl
-  max-w-2xl w-full mx-4 max-h-[90vh]
-  overflow-y-auto border border-gray-200
-  transform transition-all duration-300
-  scale-95 opacity-0 animate-in
-`
-
-// Add new animation classes
-const fadeInAnimation = `
-  animate-[fadeIn_0.2s_ease-in-out]
-`
-
-const slideUpAnimation = `
-  animate-[slideUp_0.3s_ease-out]
-`
-
-// Add back the sidebarButtonStyle with improvements
 const sidebarButtonStyle = `
   w-full text-left px-4 py-3 rounded-lg 
   transition-all duration-300 
@@ -152,43 +57,18 @@ const sidebarButtonStyle = `
   flex items-center justify-between
   text-gray-600 hover:text-gray-900
 `
-
-// Update the sidebar styling to include both old and new styles
-const sidebarStyle = `
-  w-64 bg-white shadow-lg
-  flex flex-col
-  border-r border-gray-200
-`
-
-const sidebarItemStyle = `
-  flex items-center gap-3 px-4 py-3 rounded-lg
-  transition-all duration-200
-  text-gray-600 hover:text-gray-900
-  hover:bg-gray-50
-`
-
-const sidebarItemActiveStyle = `
-  ${sidebarItemStyle}
-  bg-blue-50 text-blue-600
-  font-medium
-`
-
-// Keep only this declaration with the other attendance-related styles
 const attendanceCardStyle = `
   ${cardStyle}
   overflow-hidden
 `
-
 const attendanceHeaderStyle = `
   ${cardHeaderStyle}
   bg-gradient-to-r from-blue-50 to-gray-50
 `
-
 const attendanceTableStyle = `
   ${tableStyle}
   bg-white backdrop-filter backdrop-blur-sm
 `
-
 const attendanceButtonStyle = (isActive, type) => `
   ${buttonStyle}
   flex items-center gap-2 text-sm
@@ -198,112 +78,6 @@ const attendanceButtonStyle = (isActive, type) => `
       : 'bg-red-100 text-red-800 border border-red-200'
     : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50'}
 `
-
-const attendanceStatusBadge = (status) => `
-  ${badgeStyle(
-  status === 'present' ? 'green' :
-    status === 'absent' ? 'red' : 'gray'
-)}
-`
-
-const mockTestCardStyle = `
-  ${cardStyle}
-  hover:border-blue-200
-`
-
-const mockTestHeaderStyle = `
-  ${cardHeaderStyle}
-  bg-gradient-to-r from-blue-50 to-gray-50
-`
-
-const mockScoreStyle = (score, maxScore) => `
-  ${badgeStyle(
-  score >= maxScore * 0.8 ? 'green' :
-    score >= maxScore * 0.6 ? 'yellow' : 'red'
-)}
-`
-
-// Add back the search input style
-const searchInputStyle = `
-  ${inputStyle}
-  w-72
-  bg-white/90 backdrop-blur-sm backdrop-filter
-`
-
-// Add these new components for better UX
-const LoadingSpinner = () => (
-  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent" />
-)
-
-// Add this helper function
-const viewDetailedReport = (student) => {
-  setSelectedStudent(student);
-};
-
-const EmptyState = ({ icon, title, description }) => (
-  <div className="text-center py-12">
-    <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-      {icon}
-    </div>
-    <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
-    <p className="text-gray-600 max-w-sm mx-auto">{description}</p>
-  </div>
-)
-
-// Update the Alert component for better visibility
-const Alert = ({ type, message, onClose }) => (
-  <div className={`
-    fixed top-4 right-4 z-50 
-    ${fadeInAnimation}
-    max-w-md w-full
-  `}>
-    <div className={`
-      rounded-lg shadow-lg p-4
-      ${type === 'success' ? 'bg-green-50 border border-green-200' :
-        type === 'error' ? 'bg-red-50 border border-red-200' :
-          'bg-blue-50 border border-blue-200'}
-    `}>
-      <div className="flex items-center gap-3">
-        {type === 'success' ? (
-          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-          </svg>
-        ) : (
-          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        )}
-        <p className={`font-medium ${type === 'success' ? 'text-green-800' :
-          type === 'error' ? 'text-red-800' :
-            'text-blue-800'
-          }`}>
-          {message}
-        </p>
-        <button
-          onClick={onClose}
-          className="ml-auto p-1 rounded-full hover:bg-white/50 transition-colors duration-200"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-)
-
-// Add a new component for form sections
-const FormSection = ({ title, description, children }) => (
-  <div className="bg-gray-50 rounded-xl p-6 space-y-4">
-    <div className="mb-4">
-      <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-      {description && <p className="text-sm text-gray-600 mt-1">{description}</p>}
-    </div>
-    {children}
-  </div>
-)
-
-// Add this new component for the attendance details modal
 const AttendanceDetailsModal = ({ student, onClose }) => {
   const [activeTab, setActiveTab] = useState('weekly'); // 'weekly', 'monthly', 'overall'
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -458,8 +232,6 @@ const AttendanceDetailsModal = ({ student, onClose }) => {
     </div>
   );
 };
-
-// Add back the cardHoverStyle with improvements
 const cardHoverStyle = `
   hover:shadow-lg hover:border-blue-200/50
   transition-all duration-300 transform
@@ -470,17 +242,6 @@ function App() {
   // Helper function to get today's date in YYYY-MM-DD format
   const getTodayDate = () => {
     return new Date().toISOString().split('T')[0]
-  }
-
-  // Helper function to get last 7 dates
-  const getLast7Days = () => {
-    const dates = []
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date()
-      date.setDate(date.getDate() - i)
-      dates.push(date.toISOString().split('T')[0])
-    }
-    return dates
   }
 
   // Change from const to state
@@ -600,25 +361,6 @@ function App() {
     return student.attendance[type]?.find(record => record.date === date)?.present || false
   }
 
-  // Add function to check if today is a mock test day
-  const isMockTestDay = (testId) => {
-    const test = mockTests.find(t => t.id === testId)
-    return test?.date === getTodayDate()
-  }
-
-  // Update the mock test table to show scheduled dates
-  const getMockTestStatus = (test) => {
-    const today = getTodayDate()
-    if (test.date < today) return 'Completed'
-    if (test.date === today) return 'Today'
-    return `Scheduled for ${formatDate(test.date)}`
-  }
-
-  // Modify the mock score input to only allow entry on test day
-  const canEnterMockScore = (testId) => {
-    const test = mockTests.find(t => t.id === testId)
-    return test?.date === getTodayDate()
-  }
 
   // Add attendance type selection
   const [attendanceType, setAttendanceType] = useState('class') // 'scrum' or 'class'
@@ -2025,56 +1767,7 @@ function App() {
     }
   };
 
-  // Add function to initialize default mock tests
-  const initializeDefaultMockTests = async () => {
-    try {
-      const mockTestsRef = collection(db, 'mockTests');
-      const querySnapshot = await getDocs(mockTestsRef);
-      const existingTests = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
 
-      // Check which default levels are missing
-      const missingLevels = [];
-      for (let level = 1; level <= 10; level++) {
-        if (!existingTests.some(test => test.isDefaultLevel && test.level === level)) {
-          missingLevels.push(level);
-        }
-      }
-
-      // Create missing default level tests
-      for (const level of missingLevels) {
-        const mockData = {
-          name: `Level ${level} Mock Test`,
-          level: level,
-          isDefaultLevel: true,
-          maxScore: 10,
-          description: `Default mock test for Level ${level}`,
-          createdAt: new Date().toISOString(),
-          date: new Date().toISOString().split('T')[0]
-        };
-
-        await addDoc(mockTestsRef, mockData);
-      }
-
-      // Refresh mock tests if any were added
-      if (missingLevels.length > 0) {
-        await fetchMockTests();
-      }
-    } catch (error) {
-      console.error('Error initializing default mock tests:', error);
-    }
-  };
-
-  // Update the useEffect to initialize default mock tests
-  useEffect(() => {
-    const loadMockTests = async () => {
-      await initializeDefaultMockTests();
-      await fetchMockTests();
-    };
-    loadMockTests();
-  }, []);
 
   // Add these new states for mock test filtering and sorting
   const [mockSearchTerm, setMockSearchTerm] = useState('');
@@ -2161,215 +1854,7 @@ function App() {
               </div>
             </div>
 
-            {/* Students List with Close Button */}
-            {showFilteredStudents && (
-              <div className="mt-6">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-900">Filtered Students</h3>
-                    <button
-                      onClick={() => setShowFilteredStudents(false)}
-                      className="text-gray-500 hover:text-gray-700 p-1"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      {students
-                        .filter(student => !mockAssignmentFilter.batch ||
-                          student.batch?.toString() === mockAssignmentFilter.batch)
-                        .map(student => (
-                          <div
-                            key={student.id}
-                            className="flex items-center justify-between p-4 bg-gray-50 
-                              rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span className="text-blue-600 font-medium">{student.name.charAt(0)}</span>
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-gray-900">{student.name}</h4>
-                                <p className="text-sm text-gray-600">Roll Number: {student.rollNumber}</p>
-                              </div>
-                            </div>
-                            {/* Mock Test Selection */}
-                            <div className="flex items-center gap-3">
-                              <select
-                                value={student.selectedMockId || ''}
-                                onChange={(e) => {
-                                  const mockId = e.target.value;
-                                  setStudents(prevStudents =>
-                                    prevStudents.map(s =>
-                                      s.id === student.id
-                                        ? { ...s, selectedMockId: mockId }
-                                        : s
-                                    )
-                                  );
-                                }}
-                                className="px-3 py-2 rounded-lg border border-gray-300 
-                                  focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
-                                  text-sm bg-white shadow-sm"
-                              >
-                                <option value="">Select Mock Test</option>
-                                {/* Default Level Mocks (1-10) */}
-                                <optgroup label="Default Level Tests">
-                                  {Array.from({ length: 10 }, (_, i) => i + 1).map(level => {
-                                    const defaultTest = mockTests.find(
-                                      test => test.isDefaultLevel && test.level === level
-                                    );
-                                    return (
-                                      <option
-                                        key={`level-${level}`}
-                                        value={defaultTest?.id || `level-${level}`}
-                                        disabled={!defaultTest}
-                                      >
-                                        Level {level} Mock Test
-                                      </option>
-                                    );
-                                  })}
-                                </optgroup>
-                                {/* Custom Created Mocks */}
-                                {mockTests.filter(test => !test.isDefaultLevel).length > 0 && (
-                                  <optgroup label="Custom Mock Tests">
-                                    {mockTests
-                                      .filter(test => !test.isDefaultLevel)
-                                      .sort((a, b) => new Date(b.date) - new Date(a.date))
-                                      .map(test => (
-                                        <option key={test.id} value={test.id}>
-                                          {test.name} ({formatDate(test.date)})
-                                        </option>
-                                      ))}
-                                  </optgroup>
-                                )}
-                              </select>
-                              {student.selectedMockId && (
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="number"
-                                    placeholder="Score"
-                                    min="0"
-                                    max="10" // Ensure max is set to 10
-                                    value={student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score || ''}
-                                    onChange={(e) => {
-                                      const value = e.target.value;
-                                      if (value === '') {
-                                        // Allow clearing the input
-                                        setStudents(prevStudents =>
-                                          prevStudents.map(s =>
-                                            s.id === student.id
-                                              ? {
-                                                ...s,
-                                                mockScores: [
-                                                  ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId)
-                                                ]
-                                              }
-                                              : s
-                                          )
-                                        );
-                                        return;
-                                      }
 
-                                      const score = parseInt(value);
-
-                                      if (isNaN(score) || score < 0 || score > 10) {
-                                        setAlert({
-                                          type: 'warning',
-                                          message: 'Please enter a valid score between 0 and 10'
-                                        });
-                                        return;
-                                      }
-
-                                      setStudents(prevStudents =>
-                                        prevStudents.map(s =>
-                                          s.id === student.id
-                                            ? {
-                                              ...s,
-                                              mockScores: [
-                                                ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
-                                                {
-                                                  mockId: student.selectedMockId,
-                                                  score,
-                                                  date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
-                                                  absent: false
-                                                }
-                                              ]
-                                            }
-                                            : s
-                                        )
-                                      );
-                                    }}
-                                    className="w-20 px-3 py-2 rounded-lg border border-gray-300 
-                                      focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
-                                      text-sm bg-white shadow-sm"
-                                  />
-                                  <button
-                                    onClick={() => handleSaveScore(student)}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg 
-                                      hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Save Score
-                                  </button>
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        // Mark student as absent for this mock test
-                                        await updateDoc(doc(db, 'students', student.id), {
-                                          mockScores: [
-                                            ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
-                                            {
-                                              mockId: student.selectedMockId,
-                                              score: 0,
-                                              date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
-                                              absent: true
-                                            }
-                                          ]
-                                        });
-                                      } catch (error) {
-                                        console.error('Error marking student absent:', error);
-                                      }
-                                    }}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                                  >
-                                    Mark Absent
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-
-                      {/* Empty State */}
-                      {students.filter(student => !mockAssignmentFilter.batch ||
-                        student.batch?.toString() === mockAssignmentFilter.batch).length === 0 && (
-                          <div className="text-center py-8">
-                            <div className="bg-gray-50 rounded-full p-4 w-16 h-16 mx-auto mb-4 
-                            flex items-center justify-center">
-                              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                              </svg>
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
-                            <p className="text-gray-600">
-                              {mockAssignmentFilter.batch
-                                ? `No students found in Batch ${mockAssignmentFilter.batch}`
-                                : 'No students available'}
-                            </p>
-                          </div>
-                        )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -2437,14 +1922,20 @@ function App() {
         onClick={(e) => e.stopPropagation()}
         className={`${inputStyle} w-full border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 shadow-md`}
       >
-
         <option value="">Select Mock Test</option>
         <optgroup label="Level Tests">
-          {defaultTests.map(test => (
-            <option key={test.id} value={test.id} disabled={test.level > highestClearedLevel + 1}>
-              {test.level <= highestClearedLevel ? '✅' : '🔒'} Level {test.level} Test
-            </option>
-          ))}
+          {defaultTests.map(test => {
+            let emoji = test.level <= highestClearedLevel
+              ? '✅'  // Cleared Level
+              : test.level === highestClearedLevel + 1
+                ? '🆓'  // Newly Unlocked Level
+                : '🔒'; // Locked Level
+            return (
+              <option key={test.id} value={test.id} disabled={test.level > highestClearedLevel + 1}>
+                {emoji} Level {test.level} Test
+              </option>
+            );
+          })}
         </optgroup>
         {customTests.length > 0 && (
           <optgroup label="Custom Tests">
@@ -2456,6 +1947,7 @@ function App() {
           </optgroup>
         )}
       </select>
+
     );
   };
 
@@ -2833,14 +2325,18 @@ function App() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
+                    {console.log(student.mockScores, "12345678901")}
+
                     {(student.mockScores || [])
                       .sort((a, b) => new Date(b.date) - new Date(a.date))
                       .map((mock, index) => (
                         <tr key={index} className={mock.mockId === student.mockDetails?.mockId ? 'bg-blue-50' : ''}>
+
                           <td className="px-4 py-2 whitespace-nowrap">
+                            {console.log(mock, "1234567890")}
                             {mock.mockId.startsWith('level-')
                               ? `Level ${mock.mockId.replace('level-', '')} Mock Test`
-                              : mock.mockId}
+                              : mock.name}
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap">
                             {formatDate(mock.date)}
@@ -2985,6 +2481,16 @@ function App() {
           <div className={`pl-4 space-y-1 ${expandedMenu === 'students' ? 'block' : 'hidden'}`}>
             <button
               onClick={() => {
+                setCurrentView('students-add')
+                setShowForm(true)
+              }}
+              className={`${sidebarButtonStyle} text-sm ${currentView === 'students-add' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
+                }`}
+            >
+              Add Student
+            </button>
+            <button
+              onClick={() => {
                 setCurrentView('students-view')
                 setShowForm(false)
               }}
@@ -2994,16 +2500,7 @@ function App() {
               View Students
             </button>
 
-            <button
-              onClick={() => {
-                setCurrentView('students-add')
-                setShowForm(true)
-              }}
-              className={`${sidebarButtonStyle} text-sm ${currentView === 'students-add' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
-                }`}
-            >
-              Add Student
-            </button>
+
           </div>
         </div>
 
@@ -3034,14 +2531,6 @@ function App() {
           {/* Batches Submenu */}
           <div className={`pl-4 space-y-1 ${expandedMenu === 'batches' ? 'block' : 'hidden'}`}>
             <button
-              onClick={() => setCurrentView('batches-view')}
-              className={`${sidebarButtonStyle} text-sm ${currentView === 'batches-view' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
-                }`}
-            >
-              View Batches
-            </button>
-
-            <button
               onClick={() => {
                 setCurrentView('batches-add')
                 setShowBatchForm(true)
@@ -3051,6 +2540,15 @@ function App() {
             >
               Add Batch
             </button>
+            <button
+              onClick={() => setCurrentView('batches-view')}
+              className={`${sidebarButtonStyle} text-sm ${currentView === 'batches-view' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
+                }`}
+            >
+              View Batches
+            </button>
+
+
           </div>
         </div>
 
@@ -3119,18 +2617,6 @@ function App() {
           {expandedMenu === 'mock' && (
             <div className="pl-10 space-y-1">
               <button
-                onClick={() => setCurrentView('mock-create')}
-                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-create' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
-              >
-                Create Custom Test
-              </button>
-              <button
-                onClick={() => setCurrentView('view-mocks')}
-                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'view-mocks' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
-              >
-                View Mocks
-              </button>
-              <button
                 onClick={() => setCurrentView('mock-assign')}
                 className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-assign' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
               >
@@ -3148,6 +2634,21 @@ function App() {
               >
                 Mock Score Report
               </button>
+              <button
+                onClick={() => setCurrentView('mock-create')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-create' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Create Custom Test
+              </button>
+              <button
+                onClick={() => setCurrentView('view-mocks')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'view-mocks' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                View Custom Mocks
+              </button>
+
+
+
             </div>
           )}
         </div>
@@ -3159,7 +2660,9 @@ function App() {
           >
             <div className="flex items-center gap-3">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
               </svg>
               Final Report
             </div>
@@ -3422,7 +2925,7 @@ function App() {
                   </form>
                 </div>
               )}
-            
+
             {currentView === 'students-view' && (
               <div className="p-6 space-y-6">
                 {/* Header */}
@@ -4757,7 +4260,7 @@ function App() {
                             className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm
                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
-                            <option value="">Select Mock Test</option>
+                            <option value="">Select Mock Tests</option>
                             {/* Default Level Mocks (1-10) */}
                             <optgroup label="Default Level Tests">
                               {Array.from({ length: 10 }, (_, i) => i + 1).map(level => {
@@ -4773,7 +4276,7 @@ function App() {
                                   <option
                                     key={mockId}
                                     value={mockId} // Always use level-X format
-                                    disabled={!defaultTest}
+                                    disabled={defaultTest}
                                   >
                                     Level {level} Mock Test
                                   </option>
@@ -5365,6 +4868,7 @@ function App() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
+                        {console.log(getFilteredMockTests(), "12345678901234567890")}
                         {getFilteredMockTests()
                           .filter(test =>
                             test.name.toLowerCase().includes(mockSearchTerm.toLowerCase()) ||
@@ -5505,9 +5009,10 @@ function App() {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900">Student Level Progress</h3>
-                        <p className="text-sm text-gray-600 mt-1">Track student progress through different levels</p>
+                        <p className="text-sm text-gray-600 mt-1">Track student progress through different levels and custom tests</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
+                        {/* Keep existing legend items */}
                         <div className="flex items-center gap-2">
                           <span className="w-3 h-3 rounded-full bg-green-500"></span>
                           <span className="text-xs text-gray-600">Completed</span>
@@ -5520,6 +5025,11 @@ function App() {
                           <span className="w-3 h-3 rounded-full bg-gray-300"></span>
                           <span className="text-xs text-gray-600">Locked</span>
                         </div>
+                        {/* Add new legend item for custom tests */}
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full bg-purple-500"></span>
+                          <span className="text-xs text-gray-600">Custom Tests</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -5527,19 +5037,19 @@ function App() {
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                             Student Info
                           </th>
                           <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                             Level Status
                           </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                             Progress Overview
                           </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                            Latest Score
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
+                            Latest Scores
                           </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                             Next Steps
                           </th>
                         </tr>
@@ -5548,49 +5058,56 @@ function App() {
                         {students
                           .filter(student => !selectedBatch || student.batch?.toString() === selectedBatch)
                           .map((student) => {
-                            // Calculate current level and progress
                             let currentLevel = 1;
                             const levelScores = {};
 
-                            // First, collect all level test scores
+                            // Collect highest scores per level
                             student.mockScores?.forEach(score => {
-                              // Check if the mockId follows the pattern 'level-X'
                               const levelMatch = score.mockId?.match(/^level-(\d+)$/);
                               if (levelMatch) {
                                 const level = parseInt(levelMatch[1]);
-                                // Keep the highest score if multiple attempts exist
                                 if (!levelScores[level] || score.score > levelScores[level]) {
                                   levelScores[level] = score.score;
                                 }
                               }
                             });
 
-                            // Then calculate the highest consecutive level completed
+                            // Determine the highest consecutive cleared level
                             for (let i = 1; i <= 10; i++) {
-                              if (levelScores[i] !== undefined && levelScores[i] >= 6) {
+                              if (levelScores[i] !== undefined) {
                                 currentLevel = i + 1;
                               } else {
                                 break;
                               }
                             }
-                            currentLevel = Math.min(currentLevel, 10);
+                            currentLevel = Math.min(currentLevel, 10); // Limit to max 10
 
-                            // Get latest mock test score for current level
+                            // Find the latest attempt for the last completed level
                             const latestScore = student.mockScores
                               ?.filter(score => {
                                 const levelMatch = score.mockId?.match(/^level-(\d+)$/);
                                 return levelMatch && parseInt(levelMatch[1]) === currentLevel - 1;
                               })
-                              .sort((a, b) => {
-                                const dateA = new Date(a.date);
-                                const dateB = new Date(b.date);
-                                return dateB - dateA;
-                              })[0];
+                              .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
-                            // Calculate number of levels completed
+                            // If the latest attempt was a failure (<6), do NOT increment currentLevel
+                            if (latestScore && latestScore.score < 6) {
+                              currentLevel -= 1;
+                            }
+                            currentLevel = Math.max(currentLevel, 1); // Ensure minimum level is 1
+
+                            // Calculate number of levels completed 
                             const completedLevels = Object.entries(levelScores)
                               .filter(([_, score]) => score >= 6)
                               .length;
+
+                            // Get custom mock tests (non-level tests)
+                            const customMockScores = student.mockScores
+                              ?.filter(score => !score.mockId?.match(/^level-(\d+)$/))
+                              .sort((a, b) => new Date(b.date) - new Date(a.date)) || [];
+
+                            // Get the latest custom mock score
+                            const latestCustomScore = customMockScores[0];
 
                             return (
                               <tr key={student.id} className="hover:bg-gray-50">
@@ -5620,6 +5137,13 @@ function App() {
                                         {currentLevel === 10 ? 'Max Level' : 'In Progress'}
                                       </span>
                                     </div>
+                                    {customMockScores.length > 0 && (
+                                      <div className="mt-1">
+                                        <span className="px-2 py-0.5 inline-flex text-xs leading-4 font-medium rounded-full bg-purple-100 text-purple-800">
+                                          {customMockScores.length} Custom Tests
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
                                 </td>
                                 <td className="px-4 py-4">
@@ -5628,11 +5152,12 @@ function App() {
                                       {[...Array(10)].map((_, index) => (
                                         <div
                                           key={index}
-                                          className={`h-2 w-4 first:rounded-l-full last:rounded-r-full ${index + 1 <= completedLevels
-                                            ? 'bg-green-500'
-                                            : index + 1 === currentLevel
-                                              ? 'bg-blue-500'
-                                              : 'bg-gray-200'
+                                          className={`h-2 w-4 first:rounded-l-full last:rounded-r-full 
+                          ${index + 1 <= completedLevels
+                                              ? 'bg-green-500'
+                                              : index + 1 === currentLevel
+                                                ? latestScore?.score < 6 ? 'bg-red-500' : 'bg-blue-500' // Red if failed
+                                                : 'bg-gray-200'
                                             }`}
                                         />
                                       ))}
@@ -5645,38 +5170,89 @@ function App() {
                                         {((completedLevels / 10) * 100).toFixed(0)}%
                                       </span>
                                     </div>
+
+                                    {/* Custom tests progress bar */}
+                                    {customMockScores.length > 0 && (
+                                      <div className="mt-1">
+                                        <div className="flex items-center gap-0.5 mt-2">
+                                          {customMockScores.slice(0, 10).map((score, index) => (
+                                            <div
+                                              key={index}
+                                              className={`h-2 w-4 first:rounded-l-full last:rounded-r-full 
+                              ${score.score >= 6 ? 'bg-purple-500' : 'bg-red-400'}`}
+                                              title={`${score.mockName || 'Custom Test'}: ${score.score}/10`}
+                                            />
+                                          ))}
+                                        </div>
+                                        <div className="flex justify-between items-center mt-1">
+                                          <span className="text-xs font-medium text-gray-900">
+                                            Custom Tests
+                                          </span>
+                                          <span className="text-xs text-gray-500">
+                                            {customMockScores.filter(s => s.score >= 6).length}/{customMockScores.length}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </td>
                                 <td className="px-4 py-4">
-                                  {latestScore ? (
-                                    <div className="flex flex-col">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className={`text-sm font-bold ${latestScore.score >= 8 ? 'text-green-600' :
-                                          latestScore.score >= 6 ? 'text-blue-600' :
-                                            'text-yellow-600'
-                                          }`}>
-                                          {latestScore.score}/10
-                                        </span>
-                                        <span className={`px-1.5 py-0.5 text-xs rounded-full ${latestScore.score >= 8 ? 'bg-green-100 text-green-800' :
-                                          latestScore.score >= 6 ? 'bg-blue-100 text-blue-800' :
-                                            'bg-yellow-100 text-yellow-800'
-                                          }`}>
-                                          {latestScore.score >= 8 ? 'Excellent' :
-                                            latestScore.score >= 6 ? 'Good' : 'Practice'}
-                                        </span>
+                                  <div className="flex flex-col gap-2">
+                                    {/* Level test score */}
+                                    {latestScore ? (
+                                      <div className="flex flex-col">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className={`text-sm font-bold ${latestScore.score >= 8 ? 'text-green-600' :
+                                            latestScore.score >= 6 ? 'text-blue-600' :
+                                              'text-red-600' // Marks in red if not cleared
+                                            }`}>
+                                            {latestScore.score}/10
+                                          </span>
+                                          <span className={`px-1.5 py-0.5 text-xs rounded-full ${latestScore.score >= 8 ? 'bg-green-100 text-green-800' :
+                                            latestScore.score >= 6 ? 'bg-blue-100 text-blue-800' :
+                                              'bg-red-100 text-red-800' // Badge turns red if failed
+                                            }`}>
+                                            {latestScore.score >= 8 ? 'Excellent' :
+                                              latestScore.score >= 6 ? 'Good' : 'Failed'}
+                                          </span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1 truncate">
+                                          L{currentLevel - 1} • {new Date(latestScore.date).toLocaleDateString()}
+                                        </div>
                                       </div>
-                                      <div className="text-xs text-gray-500 mt-1 truncate">
-                                        L{currentLevel - 1} • {new Date(latestScore.date).toLocaleDateString()}
+                                    ) : (
+                                      <div className="text-sm text-gray-500">No level attempts</div>
+                                    )}
+
+                                    {/* Custom test score */}
+                                    {latestCustomScore && (
+                                      <div className="flex flex-col mt-2 pt-2 border-t border-gray-100">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className={`text-sm font-bold ${latestCustomScore.score >= 8 ? 'text-green-600' :
+                                            latestCustomScore.score >= 6 ? 'text-purple-600' :
+                                              'text-red-600'
+                                            }`}>
+                                            {latestCustomScore.score}/10
+                                          </span>
+                                          <span className={`px-1.5 py-0.5 text-xs rounded-full ${latestCustomScore.score >= 8 ? 'bg-green-100 text-green-800' :
+                                            latestCustomScore.score >= 6 ? 'bg-purple-100 text-purple-800' :
+                                              'bg-red-100 text-red-800'
+                                            }`}>
+                                            {latestCustomScore.mockName || 'Custom Test'}
+                                          </span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1 truncate">
+                                          {new Date(latestCustomScore.date).toLocaleDateString()}
+                                        </div>
                                       </div>
-                                    </div>
-                                  ) : (
-                                    <div className="text-sm text-gray-500">No attempts</div>
-                                  )}
+                                    )}
+                                  </div>
                                 </td>
+
                                 <td className="px-4 py-4">
                                   <div className="flex flex-col gap-1">
                                     <span className={`px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full 
-                                      ${currentLevel === 10
+                      ${currentLevel === 10
                                         ? 'bg-green-100 text-green-800'
                                         : latestScore?.score >= 6
                                           ? 'bg-blue-100 text-blue-800'
@@ -5696,6 +5272,28 @@ function App() {
                                           : `Master L${currentLevel - 1}`
                                         }
                                       </span>
+                                    )}
+
+                                    {/* Custom test recommendation */}
+                                    {customMockScores.length > 0 && (
+                                      <div className="mt-2 pt-2 border-t border-gray-100">
+                                        <span className={`px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full 
+                          ${latestCustomScore?.score >= 6
+                                            ? 'bg-purple-100 text-purple-800'
+                                            : 'bg-yellow-100 text-yellow-800'
+                                          }`}>
+                                          {latestCustomScore?.score >= 6
+                                            ? '🌟 Well Done'
+                                            : '🔄 Retry Test'
+                                          }
+                                        </span>
+                                        <span className="text-xs text-gray-500 truncate block mt-1">
+                                          {latestCustomScore?.score >= 6
+                                            ? 'Ready for more tests'
+                                            : 'Practice custom tests'
+                                          }
+                                        </span>
+                                      </div>
                                     )}
                                   </div>
                                 </td>
@@ -5979,7 +5577,7 @@ function App() {
                       .filter(student => !selectedBatch || student.batchId?.toString() === selectedBatch)
                       .map(student => {
                         const regularAttendance = calculateAttendancePercentage(student.attendance || [], 'regular');
-                        const mockAttendance = getMockAttendance(student);
+                        const mockAttendance = getMockAttendance(student).toFixed(1);
                         const overallAttendance = ((regularAttendance + mockAttendance) / 2).toFixed(1);
                         const averageMockScore = calculateAverageScore(
                           student.mockScores?.filter(score => score.score !== undefined) || []
@@ -6023,12 +5621,7 @@ function App() {
                         );
                       })}
                   </div>
-
-
-
                 </div>
-
-
               </div>
             )}
           </div>
