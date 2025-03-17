@@ -30,120 +30,25 @@ const cardStyle = `
   transition-all duration-300 hover:shadow-lg hover:border-blue-200/50
   backdrop-filter backdrop-blur-sm
 `
-
 const buttonStyle = `
   px-4 py-2.5 rounded-lg font-medium shadow-sm
   transition-all duration-300 transform active:scale-95
   focus:outline-none focus:ring-2 focus:ring-offset-2
 `
-
-const primaryButtonStyle = `
-  ${buttonStyle}
-  bg-gradient-to-r from-blue-600 to-blue-700 
-  hover:from-blue-700 hover:to-blue-800
-  text-white focus:ring-blue-500
-`
-
-const secondaryButtonStyle = `
-  ${buttonStyle}
-  bg-gray-50 hover:bg-gray-100 
-  text-gray-700 hover:text-gray-900
-  border border-gray-200 hover:border-gray-300
-  focus:ring-gray-500
-`
-
-const dangerButtonStyle = `
-  ${buttonStyle}
-  bg-red-50 hover:bg-red-100
-  text-red-600 hover:text-red-700
-  border border-red-200 hover:border-red-300
-  focus:ring-red-500
-`
-
-const successButtonStyle = `
-  ${buttonStyle}
-  bg-green-50 hover:bg-green-100
-  text-green-600 hover:text-green-700
-  border border-green-200 hover:border-green-300
-  focus:ring-green-500
-`
-
 const inputStyle = `
   w-full px-4 py-2.5 rounded-lg border border-gray-300
   focus:ring-2 focus:ring-blue-500 focus:border-blue-500
   transition-all duration-200 bg-white
   placeholder-gray-400 text-gray-900
 `
-
-const selectStyle = `
-  ${inputStyle}
-  appearance-none bg-no-repeat
-  bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20"%3E%3Cpath stroke="%236B7280" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8l4 4 4-4"/%3E%3C/svg%3E')]
-  bg-[length:1.25em_1.25em] bg-[right_0.5rem_center]
-  pr-10
-`
-
-const labelStyle = `
-  block text-sm font-medium text-gray-700 mb-1
-`
-
 const cardHeaderStyle = `
   p-6 border-b border-gray-100
   bg-gradient-to-r from-gray-50 to-white
 `
-
-// Add these new professional styles
 const tableStyle = `
   min-w-full divide-y divide-gray-200 
   bg-white shadow-sm rounded-lg border border-gray-200
 `
-
-const tableHeaderStyle = `
-  px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider
-  bg-gray-50 border-b border-gray-200
-`
-
-const tableRowStyle = `
-  hover:bg-gray-50 transition-colors duration-200
-`
-
-const tableCellStyle = `
-  px-6 py-4 whitespace-nowrap text-sm text-gray-900
-`
-
-const badgeStyle = (color) => `
-  inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-  ${color === 'green' ? 'bg-green-100 text-green-800' :
-    color === 'red' ? 'bg-red-100 text-red-800' :
-      color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
-        color === 'blue' ? 'bg-blue-100 text-blue-800' :
-          'bg-gray-100 text-gray-800'}
-`
-
-const modalStyle = `
-  fixed inset-0 bg-black/40 backdrop-blur-sm
-  flex items-center justify-center z-50
-  transition-opacity duration-300
-`
-
-const modalContentStyle = `
-  bg-white rounded-xl shadow-xl
-  max-w-2xl w-full mx-4 max-h-[90vh]
-  overflow-y-auto border border-gray-200
-  transform transition-all duration-300
-  scale-95 opacity-0 animate-in
-`
-
-// Add new animation classes
-const fadeInAnimation = `
-  animate-[fadeIn_0.2s_ease-in-out]
-`
-
-const slideUpAnimation = `
-  animate-[slideUp_0.3s_ease-out]
-`
-
-// Add back the sidebarButtonStyle with improvements
 const sidebarButtonStyle = `
   w-full text-left px-4 py-3 rounded-lg 
   transition-all duration-300 
@@ -152,43 +57,18 @@ const sidebarButtonStyle = `
   flex items-center justify-between
   text-gray-600 hover:text-gray-900
 `
-
-// Update the sidebar styling to include both old and new styles
-const sidebarStyle = `
-  w-64 bg-white shadow-lg
-  flex flex-col
-  border-r border-gray-200
-`
-
-const sidebarItemStyle = `
-  flex items-center gap-3 px-4 py-3 rounded-lg
-  transition-all duration-200
-  text-gray-600 hover:text-gray-900
-  hover:bg-gray-50
-`
-
-const sidebarItemActiveStyle = `
-  ${sidebarItemStyle}
-  bg-blue-50 text-blue-600
-  font-medium
-`
-
-// Keep only this declaration with the other attendance-related styles
 const attendanceCardStyle = `
   ${cardStyle}
   overflow-hidden
 `
-
 const attendanceHeaderStyle = `
   ${cardHeaderStyle}
   bg-gradient-to-r from-blue-50 to-gray-50
 `
-
 const attendanceTableStyle = `
   ${tableStyle}
   bg-white backdrop-filter backdrop-blur-sm
 `
-
 const attendanceButtonStyle = (isActive, type) => `
   ${buttonStyle}
   flex items-center gap-2 text-sm
@@ -198,107 +78,6 @@ const attendanceButtonStyle = (isActive, type) => `
       : 'bg-red-100 text-red-800 border border-red-200'
     : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-blue-50'}
 `
-
-const attendanceStatusBadge = (status) => `
-  ${badgeStyle(
-  status === 'present' ? 'green' :
-    status === 'absent' ? 'red' : 'gray'
-)}
-`
-
-const mockTestCardStyle = `
-  ${cardStyle}
-  hover:border-blue-200
-`
-
-const mockTestHeaderStyle = `
-  ${cardHeaderStyle}
-  bg-gradient-to-r from-blue-50 to-gray-50
-`
-
-const mockScoreStyle = (score, maxScore) => `
-  ${badgeStyle(
-  score >= maxScore * 0.8 ? 'green' :
-    score >= maxScore * 0.6 ? 'yellow' : 'red'
-)}
-`
-
-// Add back the search input style
-const searchInputStyle = `
-  ${inputStyle}
-  w-72
-  bg-white/90 backdrop-blur-sm backdrop-filter
-`
-
-// Add these new components for better UX
-const LoadingSpinner = () => (
-  <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent" />
-)
-
-const EmptyState = ({ icon, title, description }) => (
-  <div className="text-center py-12">
-    <div className="bg-gray-50 rounded-full p-4 w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-      {icon}
-    </div>
-    <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
-    <p className="text-gray-600 max-w-sm mx-auto">{description}</p>
-  </div>
-)
-
-// Update the Alert component for better visibility
-const Alert = ({ type, message, onClose }) => (
-  <div className={`
-    fixed top-4 right-4 z-50 
-    ${fadeInAnimation}
-    max-w-md w-full
-  `}>
-    <div className={`
-      rounded-lg shadow-lg p-4
-      ${type === 'success' ? 'bg-green-50 border border-green-200' :
-        type === 'error' ? 'bg-red-50 border border-red-200' :
-          'bg-blue-50 border border-blue-200'}
-    `}>
-      <div className="flex items-center gap-3">
-        {type === 'success' ? (
-          <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-          </svg>
-        ) : (
-          <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        )}
-        <p className={`font-medium ${type === 'success' ? 'text-green-800' :
-          type === 'error' ? 'text-red-800' :
-            'text-blue-800'
-          }`}>
-          {message}
-        </p>
-        <button
-          onClick={onClose}
-          className="ml-auto p-1 rounded-full hover:bg-white/50 transition-colors duration-200"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  </div>
-)
-
-// Add a new component for form sections
-const FormSection = ({ title, description, children }) => (
-  <div className="bg-gray-50 rounded-xl p-6 space-y-4">
-    <div className="mb-4">
-      <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-      {description && <p className="text-sm text-gray-600 mt-1">{description}</p>}
-    </div>
-    {children}
-  </div>
-)
-
-// Add this new component for the attendance details modal
 const AttendanceDetailsModal = ({ student, onClose }) => {
   const [activeTab, setActiveTab] = useState('weekly'); // 'weekly', 'monthly', 'overall'
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -453,8 +232,6 @@ const AttendanceDetailsModal = ({ student, onClose }) => {
     </div>
   );
 };
-
-// Add back the cardHoverStyle with improvements
 const cardHoverStyle = `
   hover:shadow-lg hover:border-blue-200/50
   transition-all duration-300 transform
@@ -465,17 +242,6 @@ function App() {
   // Helper function to get today's date in YYYY-MM-DD format
   const getTodayDate = () => {
     return new Date().toISOString().split('T')[0]
-  }
-
-  // Helper function to get last 7 dates
-  const getLast7Days = () => {
-    const dates = []
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date()
-      date.setDate(date.getDate() - i)
-      dates.push(date.toISOString().split('T')[0])
-    }
-    return dates
   }
 
   // Change from const to state
@@ -530,7 +296,6 @@ function App() {
     { id: 3, name: 'Mike Johnson', attendance: true },
   ])
 
-  console.log(students)
 
   // First, make sure the newStudent state includes gender
   const [newStudent, setNewStudent] = useState({
@@ -558,7 +323,7 @@ function App() {
   const [bulkScore, setBulkScore] = useState('')
 
   // Add state for mock test selection
-  const [selectedMock, setSelectedMock] = useState('')
+  const [selectedMock, setSelectedMock] = useState(null);
   const [bulkMockScore, setBulkMockScore] = useState('')
 
   // Add new view option in state
@@ -596,25 +361,6 @@ function App() {
     return student.attendance[type]?.find(record => record.date === date)?.present || false
   }
 
-  // Add function to check if today is a mock test day
-  const isMockTestDay = (testId) => {
-    const test = mockTests.find(t => t.id === testId)
-    return test?.date === getTodayDate()
-  }
-
-  // Update the mock test table to show scheduled dates
-  const getMockTestStatus = (test) => {
-    const today = getTodayDate()
-    if (test.date < today) return 'Completed'
-    if (test.date === today) return 'Today'
-    return `Scheduled for ${formatDate(test.date)}`
-  }
-
-  // Modify the mock score input to only allow entry on test day
-  const canEnterMockScore = (testId) => {
-    const test = mockTests.find(t => t.id === testId)
-    return test?.date === getTodayDate()
-  }
 
   // Add attendance type selection
   const [attendanceType, setAttendanceType] = useState('class') // 'scrum' or 'class'
@@ -1030,9 +776,7 @@ function App() {
     fetchBatches();
   }, []);
 
-  const viewStudentReport = (student) => {
-    setSelectedStudent(student)
-  }
+
 
   const closeReport = () => {
     setSelectedStudent(null)
@@ -2023,56 +1767,7 @@ function App() {
     }
   };
 
-  // Add function to initialize default mock tests
-  const initializeDefaultMockTests = async () => {
-    try {
-      const mockTestsRef = collection(db, 'mockTests');
-      const querySnapshot = await getDocs(mockTestsRef);
-      const existingTests = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
 
-      // Check which default levels are missing
-      const missingLevels = [];
-      for (let level = 1; level <= 10; level++) {
-        if (!existingTests.some(test => test.isDefaultLevel && test.level === level)) {
-          missingLevels.push(level);
-        }
-      }
-
-      // Create missing default level tests
-      for (const level of missingLevels) {
-        const mockData = {
-          name: `Level ${level} Mock Test`,
-          level: level,
-          isDefaultLevel: true,
-          maxScore: 10,
-          description: `Default mock test for Level ${level}`,
-          createdAt: new Date().toISOString(),
-          date: new Date().toISOString().split('T')[0]
-        };
-
-        await addDoc(mockTestsRef, mockData);
-      }
-
-      // Refresh mock tests if any were added
-      if (missingLevels.length > 0) {
-        await fetchMockTests();
-      }
-    } catch (error) {
-      console.error('Error initializing default mock tests:', error);
-    }
-  };
-
-  // Update the useEffect to initialize default mock tests
-  useEffect(() => {
-    const loadMockTests = async () => {
-      await initializeDefaultMockTests();
-      await fetchMockTests();
-    };
-    loadMockTests();
-  }, []);
 
   // Add these new states for mock test filtering and sorting
   const [mockSearchTerm, setMockSearchTerm] = useState('');
@@ -2159,232 +1854,7 @@ function App() {
               </div>
             </div>
 
-            {/* Students List with Close Button */}
-            {showFilteredStudents && (
-              <div className="mt-6">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                  <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-900">Filtered Students</h3>
-                    <button
-                      onClick={() => setShowFilteredStudents(false)}
-                      className="text-gray-500 hover:text-gray-700 p-1"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      {students
-                        .filter(student => !mockAssignmentFilter.batch ||
-                          student.batch?.toString() === mockAssignmentFilter.batch)
-                        .map(student => (
-                          <div
-                            key={student.id}
-                            className="flex items-center justify-between p-4 bg-gray-50 
-                              rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span className="text-blue-600 font-medium">{student.name.charAt(0)}</span>
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-gray-900">{student.name}</h4>
-                                <p className="text-sm text-gray-600">Roll Number: {student.rollNumber}</p>
-                              </div>
-                            </div>
-                            {/* Mock Test Selection */}
-                            <div className="flex items-center gap-3">
-                              <select
-                                value={student.selectedMockId || ''}
-                                onChange={(e) => {
-                                  const mockId = e.target.value;
-                                  setStudents(prevStudents =>
-                                    prevStudents.map(s =>
-                                      s.id === student.id
-                                        ? { ...s, selectedMockId: mockId }
-                                        : s
-                                    )
-                                  );
-                                }}
-                                className="px-3 py-2 rounded-lg border border-gray-300 
-                                  focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
-                                  text-sm bg-white shadow-sm"
-                              >
-                                <option value="">Select Mock Test</option>
-                                {/* Default Level Mocks (1-10) */}
-                                <optgroup label="Default Level Tests">
-                                  {Array.from({ length: 10 }, (_, i) => i + 1).map(level => {
-                                    const defaultTest = mockTests.find(
-                                      test => test.isDefaultLevel && test.level === level
-                                    );
-                                    return (
-                                      <option
-                                        key={`level-${level}`}
-                                        value={defaultTest?.id || `default-${level}`}
-                                        disabled={!defaultTest}
-                                      >
-                                        Level {level} Mock Test
-                                      </option>
-                                    );
-                                  })}
-                                </optgroup>
-                                {/* Custom Created Mocks */}
-                                {mockTests.filter(test => !test.isDefaultLevel).length > 0 && (
-                                  <optgroup label="Custom Mock Tests">
-                                    {mockTests
-                                      .filter(test => !test.isDefaultLevel)
-                                      .sort((a, b) => new Date(b.date) - new Date(a.date))
-                                      .map(test => (
-                                        <option key={test.id} value={test.id}>
-                                          {test.name} ({formatDate(test.date)})
-                                        </option>
-                                      ))}
-                                  </optgroup>
-                                )}
-                              </select>
-                              {student.selectedMockId && (
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="number"
-                                    placeholder="Score"
-                                    min="0"
-                                    max="10" // Ensure max is set to 10
-                                    value={student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score || ''}
-                                    onChange={(e) => {
-                                      const value = e.target.value;
-                                      if (value === '') {
-                                        // Allow clearing the input
-                                        setStudents(prevStudents =>
-                                          prevStudents.map(s =>
-                                            s.id === student.id
-                                              ? {
-                                                ...s,
-                                                mockScores: [
-                                                  ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId)
-                                                ]
-                                              }
-                                              : s
-                                          )
-                                        );
-                                        return;
-                                      }
 
-                                      const score = parseInt(value);
-
-                                      if (isNaN(score) || score < 0 || score > 10) {
-                                        setAlert({
-                                          type: 'warning',
-                                          message: 'Please enter a valid score between 0 and 10'
-                                        });
-                                        return;
-                                      }
-
-                                      setStudents(prevStudents =>
-                                        prevStudents.map(s =>
-                                          s.id === student.id
-                                            ? {
-                                              ...s,
-                                              mockScores: [
-                                                ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
-                                                {
-                                                  mockId: student.selectedMockId,
-                                                  score,
-                                                  date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
-                                                  absent: false
-                                                }
-                                              ]
-                                            }
-                                            : s
-                                        )
-                                      );
-                                    }}
-                                    className="w-20 px-3 py-2 rounded-lg border border-gray-300 
-                                      focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
-                                      text-sm bg-white shadow-sm"
-                                  />
-                                  <button
-                                    onClick={() => handleSaveScore(student)}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg 
-                                      hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
-                                  >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    Save Score
-                                  </button>
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        // Update in Firestore
-                                        await updateDoc(doc(db, 'students', student.id), {
-                                          mockScores: [
-                                            ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
-                                            {
-                                              mockId: student.selectedMockId,
-                                              score: 0,
-                                              date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
-                                              absent: true
-                                            }
-                                          ]
-                                        });
-
-                                        // setAlertMessage(`${student.name} marked as absent`);
-                                        // setAlertType('success');
-                                        // setShowAlert(true);
-
-                                        // Clear the selection after successful save
-                                        setStudents(prevStudents =>
-                                          prevStudents.map(s =>
-                                            s.id === student.id
-                                              ? { ...s, selectedMockId: '' }
-                                              : s
-                                          )
-                                        );
-                                      } catch (error) {
-                                        console.error('Error marking absent:', error);
-                                        // setAlertMessage('Failed to mark as absent');
-                                        // setAlertType('error');
-                                        // setShowAlert(true);
-                                      }
-                                    }}
-                                    className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg 
-                                      hover:bg-gray-200 transition-colors duration-200"
-                                  >
-                                    Mark Absent
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-
-                      {/* Empty State */}
-                      {students.filter(student => !mockAssignmentFilter.batch ||
-                        student.batch?.toString() === mockAssignmentFilter.batch).length === 0 && (
-                          <div className="text-center py-8">
-                            <div className="bg-gray-50 rounded-full p-4 w-16 h-16 mx-auto mb-4 
-                            flex items-center justify-center">
-                              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                              </svg>
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
-                            <p className="text-gray-600">
-                              {mockAssignmentFilter.batch
-                                ? `No students found in Batch ${mockAssignmentFilter.batch}`
-                                : 'No students available'}
-                            </p>
-                          </div>
-                        )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -2454,11 +1924,18 @@ function App() {
       >
         <option value="">Select Mock Test</option>
         <optgroup label="Level Tests">
-          {defaultTests.map(test => (
-            <option key={test.id} value={test.id} disabled={test.level > highestClearedLevel + 1}>
-              {test.level <= highestClearedLevel ? '✅' : '🔒'} Level {test.level} Test
-            </option>
-          ))}
+          {defaultTests.map(test => {
+            let emoji = test.level <= highestClearedLevel
+              ? '✅'  // Cleared Level
+              : test.level === highestClearedLevel + 1
+                ? '🆓'  // Newly Unlocked Level
+                : '🔒'; // Locked Level
+            return (
+              <option key={test.id} value={test.id} disabled={test.level > highestClearedLevel + 1}>
+                {emoji} Level {test.level} Test
+              </option>
+            );
+          })}
         </optgroup>
         {customTests.length > 0 && (
           <optgroup label="Custom Tests">
@@ -2470,6 +1947,7 @@ function App() {
           </optgroup>
         )}
       </select>
+
     );
   };
 
@@ -2745,6 +2223,225 @@ function App() {
   // Add alert state
   const [alert, setAlert] = useState({ type: '', message: '' });
 
+  // First, update the getMockTestReport function to handle batch filtering
+  const getMockTestReport = (mockId) => {
+    if (!mockId) return { testResults: [], stats: { totalStudents: 0, presentStudents: 0, absentStudents: 0, attendancePercentage: 0 } };
+
+    // First filter students by selected batch
+    const batchFilteredStudents = students.filter(student =>
+      !selectedBatch || student.batch?.toString() === selectedBatch
+    );
+
+    // Then get test results for filtered students
+    const testResults = batchFilteredStudents
+      .map(student => {
+        const mockScore = student.mockScores?.find(score => score.mockId === mockId);
+        if (!mockScore) {
+          // If student hasn't taken the test, consider them absent
+          return {
+            studentName: student.name,
+            score: 0,
+            absent: true,
+            date: null,
+            batch: student.batch
+          };
+        }
+        return {
+          studentName: student.name,
+          score: mockScore.score,
+          absent: mockScore.absent || false,
+          date: mockScore.date,
+          batch: student.batch
+        };
+      })
+      .sort((a, b) => a.studentName.localeCompare(b.studentName)); // Sort by name
+
+    // Calculate statistics
+    const stats = {
+      totalStudents: batchFilteredStudents.length,
+      presentStudents: testResults.filter(r => !r.absent).length,
+      absentStudents: testResults.filter(r => r.absent).length,
+      attendancePercentage: batchFilteredStudents.length > 0
+        ? (testResults.filter(r => !r.absent).length / batchFilteredStudents.length) * 100
+        : 0
+    };
+
+    return { testResults, stats };
+  };
+
+  // Update the batch filter handler
+  const handleBatchChange = (e) => {
+    const newBatch = e.target.value;
+    setSelectedBatch(newBatch);
+  };
+
+  // Update the mock test filter handler
+  const handleMockChange = (e) => {
+    const newMockId = e.target.value;
+    setSelectedMock(newMockId);
+  };
+
+  // Modify the AttendanceDetailsModal component or create a new one for mock details
+  const MockAttendanceDetailsModal = ({ student, onClose }) => {
+    return (
+      <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Mock Test Details: {student.name}
+              </h2>
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {/* Mock Test History */}
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Mock Test History</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Mock Test
+                      </th>
+                      <th className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date
+                      </th>
+                      <th className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Score
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {console.log(student.mockScores, "12345678901")}
+
+                    {(student.mockScores || [])
+                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .map((mock, index) => (
+                        <tr key={index} className={mock.mockId === student.mockDetails?.mockId ? 'bg-blue-50' : ''}>
+
+                          <td className="px-4 py-2 whitespace-nowrap">
+                            {console.log(mock, "1234567890")}
+                            {mock.mockId.startsWith('level-')
+                              ? `Level ${mock.mockId.replace('level-', '')} Mock Test`
+                              : mock.name}
+                          </td>
+                          <td className="px-4 py-2 whitespace-nowrap">
+                            {formatDate(mock.date)}
+                          </td>
+                          <td className="px-4 py-2 whitespace-nowrap">
+                            {mock.score > 0 ? (
+                              <span className="text-green-600">Present</span>
+                            ) : (
+                              <span className="text-red-600">Absent</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-2 whitespace-nowrap">
+                            {mock.score > 0 ? (
+                              <span className={
+                                mock.score >= 8 ? 'text-green-600' :
+                                  mock.score >= 5 ? 'text-blue-600' :
+                                    'text-yellow-600'
+                              }>
+                                {mock.score}/10
+                              </span>
+                            ) : (
+                              <span className="text-gray-500">Not Scored</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Update the viewStudentReport function to use the new modal when mock details are present
+  const viewStudentReport = (student) => {
+    setSelectedStudent(student);
+    setShowAttendanceDetails(true);
+  };
+
+  // ... existing code ...
+  {/* Student Report Modal */ }
+  {
+    showAttendanceDetails && selectedStudent && (
+      selectedStudent.mockDetails ? (
+        <MockAttendanceDetailsModal
+          student={selectedStudent}
+          onClose={() => {
+            setShowAttendanceDetails(false);
+            setSelectedStudent(null);
+          }}
+        />
+      ) : (
+        <AttendanceDetailsModal
+          student={selectedStudent}
+          onClose={() => {
+            setShowAttendanceDetails(false);
+            setSelectedStudent(null);
+          }}
+        />
+      )
+    )
+  }
+  // ... existing code ...
+
+  // Add this function at the same level as other utility functions
+  const getMockAttendance = (student = null) => {
+    if (student) {
+      // For a specific student
+      // Check if student has 'mockScores' array
+      const mockRecords = student.mockScores || [];
+      if (mockRecords.length === 0) return 0;
+
+      const presentCount = mockRecords.filter(test =>
+        test.absent === false &&
+        test.score !== undefined &&
+        test.score !== null &&
+        test.score > 0
+      ).length;
+
+      return (presentCount / mockRecords.length) * 100;
+    } else {
+      // For all students
+      let totalTests = 0;
+      let totalPresent = 0;
+
+      students.forEach(student => {
+        const mockRecords = student.mockScores || [];
+        if (mockRecords.length > 0) {
+          totalTests += mockRecords.length;
+          totalPresent += mockRecords.filter(test =>
+            test.absent === false &&
+            test.score !== undefined &&
+            test.score !== null &&
+            test.score > 0
+          ).length;
+        }
+      });
+
+      return totalTests > 0 ? (totalPresent / totalTests) * 100 : 0;
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -2784,6 +2481,16 @@ function App() {
           <div className={`pl-4 space-y-1 ${expandedMenu === 'students' ? 'block' : 'hidden'}`}>
             <button
               onClick={() => {
+                setCurrentView('students-add')
+                setShowForm(true)
+              }}
+              className={`${sidebarButtonStyle} text-sm ${currentView === 'students-add' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
+                }`}
+            >
+              Add Student
+            </button>
+            <button
+              onClick={() => {
                 setCurrentView('students-view')
                 setShowForm(false)
               }}
@@ -2793,16 +2500,7 @@ function App() {
               View Students
             </button>
 
-            <button
-              onClick={() => {
-                setCurrentView('students-add')
-                setShowForm(true)
-              }}
-              className={`${sidebarButtonStyle} text-sm ${currentView === 'students-add' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
-                }`}
-            >
-              Add Student
-            </button>
+
           </div>
         </div>
 
@@ -2833,14 +2531,6 @@ function App() {
           {/* Batches Submenu */}
           <div className={`pl-4 space-y-1 ${expandedMenu === 'batches' ? 'block' : 'hidden'}`}>
             <button
-              onClick={() => setCurrentView('batches-view')}
-              className={`${sidebarButtonStyle} text-sm ${currentView === 'batches-view' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
-                }`}
-            >
-              View Batches
-            </button>
-
-            <button
               onClick={() => {
                 setCurrentView('batches-add')
                 setShowBatchForm(true)
@@ -2850,6 +2540,15 @@ function App() {
             >
               Add Batch
             </button>
+            <button
+              onClick={() => setCurrentView('batches-view')}
+              className={`${sidebarButtonStyle} text-sm ${currentView === 'batches-view' ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'
+                }`}
+            >
+              View Batches
+            </button>
+
+
           </div>
         </div>
 
@@ -2893,8 +2592,6 @@ function App() {
           </div>
         </div>
 
-        {/* Add this after the Attendance section, before the closing sidebar div */}
-        {/* Mock Tests Section */}
         <div className="space-y-1">
           <button
             onClick={() => setExpandedMenu(expandedMenu === 'mock' ? '' : 'mock')}
@@ -2920,6 +2617,24 @@ function App() {
           {expandedMenu === 'mock' && (
             <div className="pl-10 space-y-1">
               <button
+                onClick={() => setCurrentView('mock-assign')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-assign' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Assign Scores
+              </button>
+              <button
+                onClick={() => setCurrentView('mock-report-attendence')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-report-attendence' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Mock Attendence Report
+              </button>
+              <button
+                onClick={() => setCurrentView('mock-report-score')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-report-score' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+              >
+                Mock Score Report
+              </button>
+              <button
                 onClick={() => setCurrentView('mock-create')}
                 className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-create' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
               >
@@ -2929,23 +2644,51 @@ function App() {
                 onClick={() => setCurrentView('view-mocks')}
                 className={`${sidebarButtonStyle} w-full text-left ${currentView === 'view-mocks' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
               >
-                View Mocks
+                View Custom Mocks
               </button>
+
+
+
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1">
+          <button
+            onClick={() => setExpandedMenu(expandedMenu === 'final' ? '' : 'final')}
+            className={`${sidebarButtonStyle} flex items-center justify-between w-full ${currentView.startsWith('mock') ? 'bg-orange-50 text-orange-600 font-medium' : 'text-gray-600'}`}
+          >
+            <div className="flex items-center gap-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
+              </svg>
+              Final Report
+            </div>
+            <svg
+              className={`w-4 h-4 transform transition-transform ${expandedMenu === 'mock' ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          {/* Mock Tests Submenu */}
+          {expandedMenu === 'final' && (
+            <div className="pl-10 space-y-1">
               <button
-                onClick={() => setCurrentView('mock-assign')}
-                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-assign' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
+                onClick={() => setCurrentView('final-report')}
+                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'final-report' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
               >
-                Assign Scores
-              </button>
-              <button
-                onClick={() => setCurrentView('mock-report')}
-                className={`${sidebarButtonStyle} w-full text-left ${currentView === 'mock-report' ? 'bg-orange-50 text-orange-600' : 'text-gray-600'}`}
-              >
-                Mock Reports
+                Final Report Card
               </button>
             </div>
           )}
         </div>
+
       </div>
 
       {/* Main Content */}
@@ -2954,6 +2697,235 @@ function App() {
         <div className="h-full">
           {/* Content Area */}
           <div className="w-full">
+            {!(
+              currentView === 'students-view' ||
+              currentView === 'batches-add' ||
+              currentView === 'batches-view' ||
+              currentView === 'students-attendance' ||
+              currentView === 'attendance-report' ||
+              currentView === 'mock-create' ||
+              currentView === 'mock-report-attendence' ||
+              currentView === 'mock-assign' ||
+              currentView === 'view-mocks' ||
+              currentView === 'mock-report-score' ||
+              currentView === 'final-report'
+            ) && (
+                <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
+                  {/* Form Header */}
+                  <div className="mb-8 border-b border-gray-100 pb-6">
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">
+                      {editingStudent ? 'Edit Student Details' : 'Add New Student'}
+                    </h2>
+                    <p className="text-sm">
+                      {editingStudent
+                        ? 'Update the information for existing student'
+                        : 'Fill in the information to register a new student'}
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-8">
+                    {/* Image Upload Section */}
+                    <div className="flex justify-center mb-8">
+                      <div className="w-40 h-40 relative group">
+                        <div className={`
+                        w-full h-40 rounded-full border-3 border-dashed
+                        flex items-center justify-center overflow-hidden
+                        transition-all duration-300 shadow-sm
+                        ${newStudent.imageUrl
+                            ? 'border-transparent'
+                            : 'border-gray-300 group-hover:border-orange-300 bg-gray-50'}
+                      `}>
+                          {newStudent.imageUrl ? (
+                            <img
+                              src={newStudent.imageUrl}
+                              alt="Student"
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          ) : (
+                            <div className="text-center p-4">
+                              <svg className="w-12 h-12 text-gray-400 mx-auto mb-2 group-hover:text-orange-400 transition-colors duration-300"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              <p className="text-sm text-gray-500 group-hover:text-orange-500 transition-colors duration-300">
+                                Upload Photo
+                              </p>
+                              <p className="text-xs text-gray-400 mt-1">Click to browse</p>
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          title="Upload student image"
+                        />
+                        {newStudent.imageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setNewStudent({ ...newStudent, image: null, imageUrl: '' })}
+                            className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-2
+                            hover:bg-red-200 transition-colors duration-300 shadow-sm hover:shadow-md"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Form Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {/* Left Column */}
+                      <div className="bg-gray-50 p-6 rounded-xl space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Student Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudent.name}
+                            onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter student's full name"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Roll Number <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={newStudent.rollNumber}
+                            onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter roll number"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Gender <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={newStudent.gender}
+                            onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200 bg-white"
+                            required
+                          >
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Right Column */}
+                      <div className="bg-gray-50 p-6 rounded-xl space-y-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Batch <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={newStudent.batch || ''}
+                            onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200 bg-white"
+                            required
+                          >
+                            <option value="">Select a batch</option>
+                            {batches.map(batch => (
+                              <option key={batch.id} value={batch.name}>
+                                Batch {batch.name} ({formatTime(batch.startTime)} - {formatTime(batch.endTime)})
+                              </option>
+                            ))}
+                          </select>
+                          {batches.length === 0 && (
+                            <p className="mt-2 text-sm text-orange-600">
+                              No batches available. Please create a batch first.
+                            </p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Contact Number <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            value={newStudent.contactNumber || ''}
+                            onChange={(e) => setNewStudent({ ...newStudent, contactNumber: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter contact number"
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            value={newStudent.email || ''}
+                            onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
+                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
+                            focus:border-orange-400 transition-colors duration-200"
+                            placeholder="Enter email address"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Form Actions */}
+                    <div className="flex gap-4 pt-8 border-t border-gray-100">
+                      <button
+                        type="submit"
+                        className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-3 rounded-lg
+                        font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
+                      >
+                        {editingStudent ? 'Update Student' : 'Add Student'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCurrentView('students-view')
+                          setShowForm(false)
+                          setEditingStudent(null)
+                          setNewStudent({
+                            name: '',
+                            rollNumber: '',
+                            batch: '',
+                            gender: '',
+                            contactNumber: '',
+                            email: '',
+                            image: null,
+                            imageUrl: '',
+                            attendance: { scrum: [], class: [] }
+                          })
+                        }}
+                        className="px-6 py-3 rounded-lg border border-gray-200 font-medium text-gray-600
+                        hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
             {currentView === 'students-view' && (
               <div className="p-6 space-y-6">
                 {/* Header */}
@@ -3010,17 +2982,18 @@ function App() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Batch</label>
                       <select
                         value={selectedBatch}
-                        onChange={(e) => setSelectedBatch(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                          focus:ring-2 focus:ring-blue-200 focus:border-blue-400
-                          transition-all duration-200"
+                        onChange={handleBatchChange}
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm
+                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                       >
                         <option value="">All Batches</option>
-                        {batches.map(batch => (
-                          <option key={batch.id} value={batch.name}>
-                            Batch {batch.name}
-                          </option>
-                        ))}
+                        {Array.from(new Set(students.map(s => s.batch)))
+                          .sort((a, b) => a - b)
+                          .map(batch => (
+                            <option key={batch} value={batch.toString()}>
+                              Batch {batch}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     <div>
@@ -3058,7 +3031,8 @@ function App() {
                         student.name?.toLowerCase().includes(searchLower) ||
                         student.rollNumber?.toLowerCase().includes(searchLower);
                       const matchesBatch = !selectedBatch ||
-                        student.batch?.toString() === selectedBatch?.toString();
+                        student.batch?.toString() === selectedBatch?.toString() ||
+                        student.batchId?.toString() === selectedBatch?.toString();
                       return matchesSearch && matchesBatch;
                     })
                     .map(student => (
@@ -3132,7 +3106,8 @@ function App() {
                     student.name?.toLowerCase().includes(searchLower) ||
                     student.rollNumber?.toLowerCase().includes(searchLower);
                   const matchesBatch = !selectedBatch ||
-                    student.batch?.toString() === selectedBatch?.toString();
+                    student.batch?.toString() === selectedBatch?.toString() ||
+                    student.batchId?.toString() === selectedBatch?.toString();
                   return matchesSearch && matchesBatch;
                 }).length === 0 && (
                     <div className="text-center py-12">
@@ -3156,226 +3131,6 @@ function App() {
                   )}
               </div>
             )}
-
-            {/* Add/Edit Student Form */}
-            {currentView === 'students-add' && (
-              <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
-                {/* Form Header */}
-                <div className="mb-8 border-b border-gray-100 pb-6">
-                  <h2 className="text-xl font-bold text-gray-800 mb-2">
-                    {editingStudent ? 'Edit Student Details' : 'Add New Student'}
-                  </h2>
-                  <p className="text-sm">
-                    {editingStudent
-                      ? 'Update the information for existing student'
-                      : 'Fill in the information to register a new student'}
-                  </p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  {/* Image Upload Section */}
-                  <div className="flex justify-center mb-8">
-                    <div className="w-40 h-40 relative group">
-                      <div className={`
-                        w-full h-40 rounded-full border-3 border-dashed
-                        flex items-center justify-center overflow-hidden
-                        transition-all duration-300 shadow-sm
-                        ${newStudent.imageUrl
-                          ? 'border-transparent'
-                          : 'border-gray-300 group-hover:border-orange-300 bg-gray-50'}
-                      `}>
-                        {newStudent.imageUrl ? (
-                          <img
-                            src={newStudent.imageUrl}
-                            alt="Student"
-                            className="w-full h-full object-cover rounded-full"
-                          />
-                        ) : (
-                          <div className="text-center p-4">
-                            <svg className="w-12 h-12 text-gray-400 mx-auto mb-2 group-hover:text-orange-400 transition-colors duration-300"
-                              fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                            <p className="text-sm text-gray-500 group-hover:text-orange-500 transition-colors duration-300">
-                              Upload Photo
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">Click to browse</p>
-                          </div>
-                        )}
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        title="Upload student image"
-                      />
-                      {newStudent.imageUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setNewStudent({ ...newStudent, image: null, imageUrl: '' })}
-                          className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-2
-                            hover:bg-red-200 transition-colors duration-300 shadow-sm hover:shadow-md"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Form Fields */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Left Column */}
-                    <div className="bg-gray-50 p-6 rounded-xl space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Student Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={newStudent.name}
-                          onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter student's full name"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Roll Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={newStudent.rollNumber}
-                          onChange={(e) => setNewStudent({ ...newStudent, rollNumber: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter roll number"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Gender <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={newStudent.gender}
-                          onChange={(e) => setNewStudent({ ...newStudent, gender: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200 bg-white"
-                          required
-                        >
-                          <option value="">Select Gender</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Right Column */}
-                    <div className="bg-gray-50 p-6 rounded-xl space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Select Batch <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={newStudent.batch || ''}
-                          onChange={(e) => setNewStudent({ ...newStudent, batch: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200 bg-white"
-                          required
-                        >
-                          <option value="">Select a batch</option>
-                          {batches.map(batch => (
-                            <option key={batch.id} value={batch.name}>
-                              Batch {batch.name} ({formatTime(batch.startTime)} - {formatTime(batch.endTime)})
-                            </option>
-                          ))}
-                        </select>
-                        {batches.length === 0 && (
-                          <p className="mt-2 text-sm text-orange-600">
-                            No batches available. Please create a batch first.
-                          </p>
-                        )}
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Contact Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          value={newStudent.contactNumber || ''}
-                          onChange={(e) => setNewStudent({ ...newStudent, contactNumber: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter contact number"
-                          required
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          value={newStudent.email || ''}
-                          onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
-                          className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-orange-200 
-                            focus:border-orange-400 transition-colors duration-200"
-                          placeholder="Enter email address"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Form Actions */}
-                  <div className="flex gap-4 pt-8 border-t border-gray-100">
-                    <button
-                      type="submit"
-                      className="flex-1 bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-3 rounded-lg
-                        font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                      {editingStudent ? 'Update Student' : 'Add Student'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCurrentView('students-view')
-                        setShowForm(false)
-                        setEditingStudent(null)
-                        setNewStudent({
-                          name: '',
-                          rollNumber: '',
-                          batch: '',
-                          gender: '',
-                          contactNumber: '',
-                          email: '',
-                          image: null,
-                          imageUrl: '',
-                          attendance: { scrum: [], class: [] }
-                        })
-                      }}
-                      className="px-6 py-3 rounded-lg border border-gray-200 font-medium text-gray-600
-                        hover:bg-gray-50 shadow-sm hover:shadow-md transition-all duration-300"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* Add/Edit Batch Form */}
 
             {currentView === 'batches-add' && (
               <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100">
@@ -3541,7 +3296,6 @@ function App() {
               </div>
             )}
 
-            {/* Batches View */}
             {currentView === 'batches-view' && (
               <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
                 {/* Header */}
@@ -3831,17 +3585,18 @@ function App() {
                       <label className="block text-sm font-medium text-gray-700">Select Batch</label>
                       <select
                         value={selectedBatch}
-                        onChange={(e) => setSelectedBatch(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300
-                        focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
-                        transition-all duration-200 bg-white"
+                        onChange={handleBatchChange}
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm
+                          focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                       >
-                        <option value="">Select a batch</option>
-                        {batches.map(batch => (
-                          <option key={batch.id} value={batch.name}>
-                            Batch {batch.name}
-                          </option>
-                        ))}
+                        <option value="">All Batches</option>
+                        {Array.from(new Set(students.map(s => s.batch)))
+                          .sort((a, b) => a - b)
+                          .map(batch => (
+                            <option key={batch} value={batch.toString()}>
+                              Batch {batch}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -4027,7 +3782,7 @@ function App() {
                         <div className="px-6 py-3 bg-white rounded-xl shadow-sm border border-blue-100">
                           <p className="text-sm font-medium text-gray-600">Total Students</p>
                           <p className="text-2xl font-bold text-blue-600 mt-1">
-                            {students.filter(student => !selectedBatch || student.batch?.toString() === selectedBatch).length}
+                            {students.filter(student => !selectedBatch || student.batch?.toString() === selectedBatch || student.batchId?.toString() === selectedBatch).length}
                           </p>
                         </div>
                         <div className="px-6 py-3 bg-white rounded-xl shadow-sm border border-blue-100">
@@ -4046,26 +3801,18 @@ function App() {
                           <label className="block text-sm font-medium text-gray-700 mb-2">Select Batch</label>
                           <select
                             value={selectedBatch}
-                            onChange={(e) => {
-                              const batch = batches.find(b => b.name === e.target.value);
-                              setSelectedBatch(e.target.value);
-                              // Set the start date to batch creation date when batch is selected
-                              if (batch) {
-                                setDateRange({
-                                  ...dateRange,
-                                  start: batch.startDate || getTodayDate()
-                                });
-                              }
-                            }}
-                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-200 
-                              focus:border-blue-400 text-base bg-white shadow-sm"
+                            onChange={handleBatchChange}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm
+                              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                           >
                             <option value="">All Batches</option>
-                            {batches.map(batch => (
-                              <option key={batch.id} value={batch.name}>
-                                Batch {batch.name} ({students.filter(s => s.batch?.toString() === batch.name?.toString()).length})
-                              </option>
-                            ))}
+                            {Array.from(new Set(students.map(s => s.batch)))
+                              .sort((a, b) => a - b)
+                              .map(batch => (
+                                <option key={batch} value={batch.toString()}>
+                                  Batch {batch}
+                                </option>
+                              ))}
                           </select>
                         </div>
 
@@ -4183,7 +3930,7 @@ function App() {
                           </thead>
                           <tbody className="bg-white divide-y divide-gray-200">
                             {students
-                              .filter(student => !selectedBatch || student.batch?.toString() === selectedBatch)
+                              .filter(student => !selectedBatch || student.batch?.toString() === selectedBatch || student.batchId?.toString() === selectedBatch)
                               .map((student) => {
                                 const attendanceRecords = student.attendance?.class || [];
                                 const recordsInRange = filterType === 'range'
@@ -4195,7 +3942,6 @@ function App() {
                                 const totalDays = recordsInRange.length;
                                 const presentDays = recordsInRange.filter(record => record.present).length;
                                 const attendancePercentage = totalDays > 0 ? (presentDays / totalDays) * 100 : 0;
-                                { console.log(student, "1234567890"); }
                                 return (
                                   <tr key={student.id} className="hover:bg-gray-50 transition-colors duration-200">
                                     <td className="px-6 py-4 whitespace-nowrap">
@@ -4278,7 +4024,7 @@ function App() {
                       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                         <div className="flex items-center justify-between text-sm text-gray-600">
                           <div>
-                            Total Students: {students.filter(s => s.batch?.toString() === selectedBatch).length}
+                            Total Students: {students.filter(s => s.batch?.toString() === selectedBatch || s.batchId?.toString() === selectedBatch).length}
                           </div>
                           <div>
                             Average Attendance: {calculateAverageAttendance()}%
@@ -4305,7 +4051,6 @@ function App() {
               </div>
             )}
 
-            {/* Mock Create View */}
             {currentView === 'mock-create' && (
               <div className="p-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
@@ -4479,8 +4224,752 @@ function App() {
               </div>
             )}
 
-            {/* Mock Report View */}
-            {currentView === 'mock-report' && (
+            {currentView === 'mock-report-attendence' && (
+              <div className="p-6">
+                {/* Header Card - Keep existing */}
+                <div className={`${cardStyle} mb-6`}>
+                  <div className="p-6 border-b border-gray-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900">Mock Attendence Reports</h2>
+                        <p className="text-gray-600 mt-1">Comprehensive analysis of mock attendence</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-4">
+                        {/* Keep existing batch filter */}
+                        <div className="min-w-[200px]">
+                          <select
+                            value={selectedBatch}
+                            onChange={handleBatchChange}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm
+                              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                          >
+                            <option value="">All Batches</option>
+                            {Array.from(new Set(students.map(s => s.batch)))
+                              .sort((a, b) => a - b)
+                              .map(batch => (
+                                <option key={batch} value={batch.toString()}>
+                                  Batch {batch}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                        <div className="min-w-[200px]">
+                          <select
+                            value={selectedMock || ''}
+                            onChange={handleMockChange}
+                            className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm
+                              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                          >
+                            <option value="">Select Mock Tests</option>
+                            {/* Default Level Mocks (1-10) */}
+                            <optgroup label="Default Level Tests">
+                              {Array.from({ length: 10 }, (_, i) => i + 1).map(level => {
+                                // Use consistent ID format that matches student records
+                                const mockId = `level-${level}`;
+
+                                // Find if this test exists in mockTests
+                                const defaultTest = mockTests.find(
+                                  test => test.isDefaultLevel && test.level === level
+                                );
+
+                                return (
+                                  <option
+                                    key={mockId}
+                                    value={mockId} // Always use level-X format
+                                    disabled={defaultTest}
+                                  >
+                                    Level {level} Mock Test
+                                  </option>
+                                );
+                              })}
+                            </optgroup>
+                            {/* Custom Created Mocks */}
+                            {mockTests.filter(test => !test.isDefaultLevel).length > 0 && (
+                              <optgroup label="Custom Mock Tests">
+                                {mockTests
+                                  .filter(test => !test.isDefaultLevel)
+                                  .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                  .map(test => (
+                                    <option key={test.id} value={test.id}>
+                                      {test.name} ({formatDate(test.date)})
+                                    </option>
+                                  ))}
+                              </optgroup>
+                            )}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mock Test Attendance Summary */}
+                <div className={`${cardStyle} mb-6`}>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Mock Test Attendance Summary</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-green-50 p-4 rounded-lg">
+                        <p className="text-sm text-green-600">Present Students</p>
+                        <p className="text-2xl font-bold text-green-700">
+                          {selectedMock ? (() => {
+                            // Filter students by batch if a batch is selected
+                            const filteredStudents = students.filter(student =>
+                              !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch
+                            );
+
+                            // Count students who have a score > 0 for this mock
+                            return filteredStudents.filter(student => {
+                              const mockRecord = student.mockScores?.find(score =>
+                                score.mockId === selectedMock
+                              );
+                              return mockRecord && mockRecord.score > 0;
+                            }).length;
+                          })() : 0}
+                        </p>
+                      </div>
+                      <div className="bg-red-50 p-4 rounded-lg">
+                        <p className="text-sm text-red-600">Absent Students</p>
+                        <p className="text-2xl font-bold text-red-700">
+                          {selectedMock ? (() => {
+                            // Filter students by batch if a batch is selected
+                            const filteredStudents = students.filter(student =>
+                              !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch
+                            );
+
+                            // Count students who have a record but score is 0 or absent is true
+                            return filteredStudents.filter(student => {
+                              const mockRecord = student.mockScores?.find(score =>
+                                score.mockId === selectedMock
+                              );
+                              return mockRecord && (mockRecord.score === 0 || mockRecord.absent === true);
+                            }).length;
+                          })() : 0}
+                        </p>
+                      </div>
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-sm text-blue-600">Attendance Rate</p>
+                        <p className="text-2xl font-bold text-blue-700">
+                          {selectedMock ? (() => {
+                            // Filter students by batch if a batch is selected
+                            const filteredStudents = students.filter(student =>
+                              !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch
+                            );
+
+                            // Count total students with any record for this mock
+                            const totalStudents = filteredStudents.filter(student =>
+                              student.mockScores?.some(score => score.mockId === selectedMock)
+                            ).length;
+
+                            // Count present students (score > 0)
+                            const presentStudents = filteredStudents.filter(student => {
+                              const mockRecord = student.mockScores?.find(score =>
+                                score.mockId === selectedMock
+                              );
+                              return mockRecord && mockRecord.score > 0;
+                            }).length;
+
+                            return totalStudents > 0
+                              ? `${((presentStudents / totalStudents) * 100).toFixed(1)}%`
+                              : '0%';
+                          })() : '0%'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detailed Report Table */}
+                <div className={`${cardStyle}`}>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Student-wise Report</h3>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr>
+                            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Student Name
+                            </th>
+                            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Mock Status
+                            </th>
+                            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Attendance Status
+                            </th>
+                            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Score
+                            </th>
+                            <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {/* Make sure we're using the filtered students list */}
+                          {students
+                            .filter(student => !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch)
+                            .map(student => {
+                              // Find the mock test record for this student
+                              const mockRecord = student.mockScores?.find(score =>
+                                score.mockId === selectedMock
+                              );
+
+                              // Determine attendance status based on score
+                              const isPresent = mockRecord && mockRecord.score > 0;
+                              const isAbsent = mockRecord && (mockRecord.score === 0 || mockRecord.absent === true);
+                              const noRecord = !mockRecord;
+
+                              // Get the score
+                              const score = mockRecord?.score || 0;
+
+                              return (
+                                <tr key={student.id} className="hover:bg-gray-50">
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center">
+                                      {student.imageUrl ? (
+                                        <img
+                                          src={student.imageUrl}
+                                          alt={student.name}
+                                          className="h-8 w-8 rounded-full mr-2"
+                                        />
+                                      ) : (
+                                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
+                                          <span className="text-gray-500 text-sm">
+                                            {student.name.charAt(0)}
+                                          </span>
+                                        </div>
+                                      )}
+                                      <div>
+                                        <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                                        <div className="text-xs text-gray-500">Batch {student.batch}</div>
+                                      </div>
+                                    </div>
+                                  </td>
+
+                                  {/* Mock Status cell */}
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    {noRecord ? (
+                                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Not Assigned
+                                      </span>
+                                    ) : (
+                                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        Assigned
+                                      </span>
+                                    )}
+                                  </td>
+
+                                  {/* Attendance Status cell */}
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    {isPresent ? (
+                                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Present
+                                      </span>
+                                    ) : isAbsent ? (
+                                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Absent
+                                      </span>
+                                    ) : (
+                                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        No Record
+                                      </span>
+                                    )}
+                                  </td>
+
+                                  {/* Score cell */}
+                                  <td className="px-6 py-4 whitespace-nowrap">
+                                    {score > 0 ? (
+                                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${score >= 8 ? 'bg-green-100 text-green-800' :
+                                        score >= 5 ? 'bg-blue-100 text-blue-800' :
+                                          'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                        {score}/10
+                                      </span>
+                                    ) : (
+                                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        Not Scored
+                                      </span>
+                                    )}
+                                  </td>
+
+                                  {/* Actions cell */}
+                                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button
+                                      onClick={() => {
+                                        // Create a modified student object with mock-specific attendance info
+                                        const studentWithMockDetails = {
+                                          ...student,
+                                          // Add mock-specific details
+                                          mockDetails: {
+                                            mockId: selectedMock,
+                                            mockName: mockTests.find(m => m.id === selectedMock)?.name ||
+                                              (selectedMock?.startsWith('level-') ?
+                                                `Level ${selectedMock.replace('level-', '')} Mock Test` :
+                                                selectedMock),
+                                            score: score,
+                                            isPresent: isPresent,
+                                            isAbsent: isAbsent,
+                                            submittedAt: mockRecord?.submittedAt || null,
+                                            submittedBy: mockRecord?.submittedBy || null,
+                                            date: mockRecord?.date || null
+                                          }
+                                        };
+
+                                        // View the student report with mock-specific details
+                                        viewStudentReport(studentWithMockDetails);
+                                      }}
+                                      className="text-indigo-600 hover:text-indigo-900"
+                                    >
+                                      View Details
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Keep existing content after this */}
+                {/* ... rest of your existing mock report view ... */}
+              </div>
+            )}
+
+            {currentView === 'mock-assign' && (
+              <div className="p-6">
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
+                  <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
+                    <h2 className="text-xl font-bold text-gray-900">Assign Mock Test</h2>
+                    <p className="text-sm text-gray-600 mt-1">Assign scores to students for mock tests</p>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Filter Section */}
+                    <div className="mb-6">
+                      <div className="flex gap-4 items-end">
+                        {/* Batch Filter */}
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Filter by Batch
+                          </label>
+                          <select
+                            value={mockAssignmentFilter.batch || ''}
+                            onChange={(e) => {
+                              setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }));
+                              setShowFilteredStudents(false); // Hide students list when batch changes
+                            }}
+                            className={`${inputStyle} pr-10`}
+                          >
+                            <option value="">All Batches</option>
+                            {Array.from(new Set(students.map(s => s.batch))).sort().map(batch => (
+                              <option key={batch} value={batch}>Batch {batch}</option>
+                            ))}
+                          </select>
+                        </div>
+                        {/* Add Filter Button */}
+                        <button
+                          onClick={() => setShowFilteredStudents(true)}
+                          className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                            transition-colors duration-200 flex items-center gap-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                          </svg>
+                          Show Students
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Students List with Close Button */}
+                    {showFilteredStudents && (
+                      <div className="mt-6">
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 className="text-lg font-semibold text-gray-900">Filtered Students</h3>
+                            <button
+                              onClick={() => setShowFilteredStudents(false)}
+                              className="text-gray-500 hover:text-gray-700 p-1"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                          <div className="p-4">
+                            <div className="space-y-4">
+                              {students
+                                .filter(student => !mockAssignmentFilter.batch ||
+                                  student.batch?.toString() === mockAssignmentFilter.batch)
+                                .map(student => (
+                                  <div
+                                    key={student.id}
+                                    className="flex items-center justify-between p-4 bg-gray-50 
+                                      rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span className="text-blue-600 font-medium">{student.name.charAt(0)}</span>
+                                      </div>
+                                      <div>
+                                        <h4 className="font-medium text-gray-900">{student.name}</h4>
+                                        <p className="text-sm text-gray-600">Roll Number: {student.rollNumber}</p>
+                                      </div>
+                                    </div>
+                                    {/* Mock Test Selection */}
+                                    <div className="flex items-center gap-3">
+                                      {renderMockTestOptions(student)}
+                                      {student.selectedMockId && (
+                                        <div className="flex items-center gap-2">
+                                          <input
+                                            type="number"
+                                            placeholder="Score"
+                                            min="0"
+                                            max="10" // Set max to 10
+                                            value={student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score || ''}
+                                            onChange={(e) => {
+                                              const value = e.target.value;
+                                              if (value === '') {
+                                                // Allow clearing the input
+                                                setStudents(prevStudents =>
+                                                  prevStudents.map(s =>
+                                                    s.id === student.id
+                                                      ? {
+                                                        ...s,
+                                                        mockScores: [
+                                                          ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId)
+                                                        ]
+                                                      }
+                                                      : s
+                                                  )
+                                                );
+                                                return;
+                                              }
+
+                                              const score = parseInt(value);
+
+                                              if (isNaN(score) || score < 0 || score > 10) {
+                                                setAlert({
+                                                  type: 'warning',
+                                                  message: 'Please enter a valid score between 0 and 10'
+                                                });
+                                                return;
+                                              }
+
+                                              setStudents(prevStudents =>
+                                                prevStudents.map(s =>
+                                                  s.id === student.id
+                                                    ? {
+                                                      ...s,
+                                                      mockScores: [
+                                                        ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                                        {
+                                                          mockId: student.selectedMockId,
+                                                          score,
+                                                          date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                                          absent: false
+                                                        }
+                                                      ]
+                                                    }
+                                                    : s
+                                                )
+                                              );
+                                            }}
+                                            className="w-20 px-3 py-2 rounded-lg border border-gray-300 
+                                              focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
+                                              text-sm bg-white shadow-sm"
+                                          />
+                                          <button
+                                            onClick={() => handleSaveScore(student)}
+                                            className="px-4 py-2 bg-green-600 text-white rounded-lg 
+                                              hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+                                          >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                            Save Score
+                                          </button>
+                                          <button
+                                            onClick={async () => {
+                                              try {
+                                                // Mark student as absent for this mock test
+                                                await updateDoc(doc(db, 'students', student.id), {
+                                                  mockScores: [
+                                                    ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
+                                                    {
+                                                      mockId: student.selectedMockId,
+                                                      score: 0,
+                                                      date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
+                                                      absent: true
+                                                    }
+                                                  ]
+                                                });
+                                              } catch (error) {
+                                                console.error('Error marking student absent:', error);
+                                              }
+                                            }}
+                                            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                          >
+                                            Mark Absent
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+
+                              {/* Empty State */}
+                              {students.filter(student => !mockAssignmentFilter.batch ||
+                                student.batch?.toString() === mockAssignmentFilter.batch).length === 0 && (
+                                  <div className="text-center py-8">
+                                    <div className="bg-gray-50 rounded-full p-4 w-16 h-16 mx-auto mb-4 
+                                    flex items-center justify-center">
+                                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                      </svg>
+                                    </div>
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
+                                    <p className="text-gray-600">
+                                      {mockAssignmentFilter.batch
+                                        ? `No students found in Batch ${mockAssignmentFilter.batch}`
+                                        : 'No students available'}
+                                    </p>
+                                  </div>
+                                )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentView === 'view-mocks' && (
+              <div className="space-y-6 p-6">
+                {/* Header */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Mock Tests</h2>
+                      <p className="text-gray-600 mt-1">View and manage all mock tests</p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex gap-2">
+                        <div className="px-4 py-3 bg-blue-50 rounded-lg border border-blue-100">
+                          <p className="text-sm text-gray-600">Total Tests</p>
+                          <p className="text-2xl font-bold text-blue-600">{mockTests.filter(test => !test.isDefaultLevel).length}</p>
+                        </div>
+                        <div className="px-4 py-3 bg-green-50 rounded-lg border border-green-100">
+                          <p className="text-sm text-gray-600">Completed</p>
+                          <p className="text-2xl font-bold text-green-600">
+                            {mockTests.filter(test => test.status === 'completed').length}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setCurrentView('mock-create')}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                          transition-colors duration-200 flex items-center gap-2 text-sm"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Create New Test
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Filters and Search */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
+                  <div className="flex flex-wrap gap-4 items-center justify-between">
+                    <div className="flex gap-4 items-center">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Search mock tests..."
+                          value={mockSearchTerm}
+                          onChange={(e) => setMockSearchTerm(e.target.value)}
+                          className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 
+                            focus:ring-blue-500 focus:border-blue-500 w-64"
+                        />
+                        <svg
+                          className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </div>
+                      <select
+                        value={mockBatchFilter}
+                        onChange={(e) => setMockBatchFilter(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
+                          focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="all">All Batches</option>
+                        {Array.from(new Set(mockTests.flatMap(test => test.batches || []))).map(batch => (
+                          <option key={batch} value={batch}>Batch {batch}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-gray-600">Sort by:</label>
+                      <select
+                        value={mockSortBy}
+                        onChange={(e) => setMockSortBy(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
+                          focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        <option value="date-desc">Date (Newest)</option>
+                        <option value="date-asc">Date (Oldest)</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mock Tests Table */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Test Name
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Batches
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {console.log(getFilteredMockTests(), "12345678901234567890")}
+                        {getFilteredMockTests()
+                          .filter(test =>
+                            test.name.toLowerCase().includes(mockSearchTerm.toLowerCase()) ||
+                            test.description?.toLowerCase().includes(mockSearchTerm.toLowerCase())
+                          )
+                          .sort((a, b) => {
+                            switch (mockSortBy) {
+                              case 'date-desc':
+                                return new Date(b.date) - new Date(a.date);
+                              case 'date-asc':
+                                return new Date(a.date) - new Date(b.date);
+                              case 'name-asc':
+                                return a.name.localeCompare(b.name);
+                              case 'name-desc':
+                                return b.name.localeCompare(a.name);
+                              default:
+                                return 0;
+                            }
+                          })
+                          .map((test) => (
+                            <tr key={test.id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-blue-50">
+                                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                  </div>
+                                  <div className="ml-4">
+                                    <div className="text-sm font-medium text-gray-900">{test.name}</div>
+                                    {test.description && (
+                                      <div className="text-sm text-gray-500">{test.description}</div>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{new Date(test.date).toLocaleDateString()}</div>
+                                {test.duration && (
+                                  <div className="text-sm text-gray-500">Duration: {test.duration} mins</div>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex flex-wrap gap-1">
+                                  {test.batches?.map(batch => (
+                                    <span
+                                      key={batch}
+                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                    >
+                                      Batch {batch}
+                                    </span>
+                                  ))}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                  ${test.isDefaultLevel
+                                    ? 'bg-purple-100 text-purple-800'
+                                    : 'bg-green-100 text-green-800'
+                                  }`}
+                                >
+                                  {test.isDefaultLevel ? 'Default Level' : 'Custom'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                  ${test.status === 'completed'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-yellow-100 text-yellow-800'
+                                  }`}
+                                >
+                                  {test.status === 'completed' ? 'Completed' : 'Pending'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div className="flex items-center gap-3">
+                                  <button
+                                    onClick={() => handleEditMock(test)}
+                                    className="text-indigo-600 hover:text-indigo-900"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteMock(test.id)}
+                                    className="text-red-600 hover:text-red-900"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {currentView === 'mock-report-score' && (
               <div className="p-6">
                 {/* Header Card */}
                 <div className={`${cardStyle} mb-6`}>
@@ -4520,9 +5009,10 @@ function App() {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900">Student Level Progress</h3>
-                        <p className="text-sm text-gray-600 mt-1">Track student progress through different levels</p>
+                        <p className="text-sm text-gray-600 mt-1">Track student progress through different levels and custom tests</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
+                        {/* Keep existing legend items */}
                         <div className="flex items-center gap-2">
                           <span className="w-3 h-3 rounded-full bg-green-500"></span>
                           <span className="text-xs text-gray-600">Completed</span>
@@ -4535,6 +5025,11 @@ function App() {
                           <span className="w-3 h-3 rounded-full bg-gray-300"></span>
                           <span className="text-xs text-gray-600">Locked</span>
                         </div>
+                        {/* Add new legend item for custom tests */}
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full bg-purple-500"></span>
+                          <span className="text-xs text-gray-600">Custom Tests</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -4542,19 +5037,19 @@ function App() {
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                             Student Info
                           </th>
                           <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
                             Level Status
                           </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                             Progress Overview
                           </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
-                            Latest Score
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
+                            Latest Scores
                           </th>
-                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/6">
+                          <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/5">
                             Next Steps
                           </th>
                         </tr>
@@ -4563,55 +5058,56 @@ function App() {
                         {students
                           .filter(student => !selectedBatch || student.batch?.toString() === selectedBatch)
                           .map((student) => {
-                            // Calculate current level and progress
                             let currentLevel = 1;
                             const levelScores = {};
 
-                            // First, collect all level test scores
+                            // Collect highest scores per level
                             student.mockScores?.forEach(score => {
-                              // Check if the mockId follows the pattern 'level-X'
                               const levelMatch = score.mockId?.match(/^level-(\d+)$/);
                               if (levelMatch) {
                                 const level = parseInt(levelMatch[1]);
-                                // Keep the highest score if multiple attempts exist
                                 if (!levelScores[level] || score.score > levelScores[level]) {
                                   levelScores[level] = score.score;
                                 }
                               }
                             });
 
-                            // Then calculate the highest consecutive level completed
+                            // Determine the highest consecutive cleared level
                             for (let i = 1; i <= 10; i++) {
-                              if (levelScores[i] !== undefined && levelScores[i] >= 6) {
+                              if (levelScores[i] !== undefined) {
                                 currentLevel = i + 1;
                               } else {
                                 break;
                               }
                             }
-                            currentLevel = Math.min(currentLevel, 10);
+                            currentLevel = Math.min(currentLevel, 10); // Limit to max 10
 
-                            // Get latest mock test score for current level
+                            // Find the latest attempt for the last completed level
                             const latestScore = student.mockScores
                               ?.filter(score => {
                                 const levelMatch = score.mockId?.match(/^level-(\d+)$/);
                                 return levelMatch && parseInt(levelMatch[1]) === currentLevel - 1;
                               })
-                              .sort((a, b) => {
-                                const dateA = new Date(a.date);
-                                const dateB = new Date(b.date);
-                                return dateB - dateA;
-                              })[0];
+                              .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
 
-                            // Calculate number of levels completed
+                            // If the latest attempt was a failure (<6), do NOT increment currentLevel
+                            if (latestScore && latestScore.score < 6) {
+                              currentLevel -= 1;
+                            }
+                            currentLevel = Math.max(currentLevel, 1); // Ensure minimum level is 1
+
+                            // Calculate number of levels completed 
                             const completedLevels = Object.entries(levelScores)
                               .filter(([_, score]) => score >= 6)
                               .length;
 
-                            // Debug logging
-                            console.log('Student:', student.name);
-                            console.log('Level Scores:', levelScores);
-                            console.log('Current Level:', currentLevel);
-                            console.log('Completed Levels:', completedLevels);
+                            // Get custom mock tests (non-level tests)
+                            const customMockScores = student.mockScores
+                              ?.filter(score => !score.mockId?.match(/^level-(\d+)$/))
+                              .sort((a, b) => new Date(b.date) - new Date(a.date)) || [];
+
+                            // Get the latest custom mock score
+                            const latestCustomScore = customMockScores[0];
 
                             return (
                               <tr key={student.id} className="hover:bg-gray-50">
@@ -4641,6 +5137,13 @@ function App() {
                                         {currentLevel === 10 ? 'Max Level' : 'In Progress'}
                                       </span>
                                     </div>
+                                    {customMockScores.length > 0 && (
+                                      <div className="mt-1">
+                                        <span className="px-2 py-0.5 inline-flex text-xs leading-4 font-medium rounded-full bg-purple-100 text-purple-800">
+                                          {customMockScores.length} Custom Tests
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
                                 </td>
                                 <td className="px-4 py-4">
@@ -4649,11 +5152,12 @@ function App() {
                                       {[...Array(10)].map((_, index) => (
                                         <div
                                           key={index}
-                                          className={`h-2 w-4 first:rounded-l-full last:rounded-r-full ${index + 1 <= completedLevels
-                                            ? 'bg-green-500'
-                                            : index + 1 === currentLevel
-                                              ? 'bg-blue-500'
-                                              : 'bg-gray-200'
+                                          className={`h-2 w-4 first:rounded-l-full last:rounded-r-full 
+                          ${index + 1 <= completedLevels
+                                              ? 'bg-green-500'
+                                              : index + 1 === currentLevel
+                                                ? latestScore?.score < 6 ? 'bg-red-500' : 'bg-blue-500' // Red if failed
+                                                : 'bg-gray-200'
                                             }`}
                                         />
                                       ))}
@@ -4666,38 +5170,89 @@ function App() {
                                         {((completedLevels / 10) * 100).toFixed(0)}%
                                       </span>
                                     </div>
+
+                                    {/* Custom tests progress bar */}
+                                    {customMockScores.length > 0 && (
+                                      <div className="mt-1">
+                                        <div className="flex items-center gap-0.5 mt-2">
+                                          {customMockScores.slice(0, 10).map((score, index) => (
+                                            <div
+                                              key={index}
+                                              className={`h-2 w-4 first:rounded-l-full last:rounded-r-full 
+                              ${score.score >= 6 ? 'bg-purple-500' : 'bg-red-400'}`}
+                                              title={`${score.mockName || 'Custom Test'}: ${score.score}/10`}
+                                            />
+                                          ))}
+                                        </div>
+                                        <div className="flex justify-between items-center mt-1">
+                                          <span className="text-xs font-medium text-gray-900">
+                                            Custom Tests
+                                          </span>
+                                          <span className="text-xs text-gray-500">
+                                            {customMockScores.filter(s => s.score >= 6).length}/{customMockScores.length}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
                                 </td>
                                 <td className="px-4 py-4">
-                                  {latestScore ? (
-                                    <div className="flex flex-col">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className={`text-sm font-bold ${latestScore.score >= 8 ? 'text-green-600' :
-                                          latestScore.score >= 6 ? 'text-blue-600' :
-                                            'text-yellow-600'
-                                          }`}>
-                                          {latestScore.score}/10
-                                        </span>
-                                        <span className={`px-1.5 py-0.5 text-xs rounded-full ${latestScore.score >= 8 ? 'bg-green-100 text-green-800' :
-                                          latestScore.score >= 6 ? 'bg-blue-100 text-blue-800' :
-                                            'bg-yellow-100 text-yellow-800'
-                                          }`}>
-                                          {latestScore.score >= 8 ? 'Excellent' :
-                                            latestScore.score >= 6 ? 'Good' : 'Practice'}
-                                        </span>
+                                  <div className="flex flex-col gap-2">
+                                    {/* Level test score */}
+                                    {latestScore ? (
+                                      <div className="flex flex-col">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className={`text-sm font-bold ${latestScore.score >= 8 ? 'text-green-600' :
+                                            latestScore.score >= 6 ? 'text-blue-600' :
+                                              'text-red-600' // Marks in red if not cleared
+                                            }`}>
+                                            {latestScore.score}/10
+                                          </span>
+                                          <span className={`px-1.5 py-0.5 text-xs rounded-full ${latestScore.score >= 8 ? 'bg-green-100 text-green-800' :
+                                            latestScore.score >= 6 ? 'bg-blue-100 text-blue-800' :
+                                              'bg-red-100 text-red-800' // Badge turns red if failed
+                                            }`}>
+                                            {latestScore.score >= 8 ? 'Excellent' :
+                                              latestScore.score >= 6 ? 'Good' : 'Failed'}
+                                          </span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1 truncate">
+                                          L{currentLevel - 1} • {new Date(latestScore.date).toLocaleDateString()}
+                                        </div>
                                       </div>
-                                      <div className="text-xs text-gray-500 mt-1 truncate">
-                                        L{currentLevel - 1} • {new Date(latestScore.date).toLocaleDateString()}
+                                    ) : (
+                                      <div className="text-sm text-gray-500">No level attempts</div>
+                                    )}
+
+                                    {/* Custom test score */}
+                                    {latestCustomScore && (
+                                      <div className="flex flex-col mt-2 pt-2 border-t border-gray-100">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className={`text-sm font-bold ${latestCustomScore.score >= 8 ? 'text-green-600' :
+                                            latestCustomScore.score >= 6 ? 'text-purple-600' :
+                                              'text-red-600'
+                                            }`}>
+                                            {latestCustomScore.score}/10
+                                          </span>
+                                          <span className={`px-1.5 py-0.5 text-xs rounded-full ${latestCustomScore.score >= 8 ? 'bg-green-100 text-green-800' :
+                                            latestCustomScore.score >= 6 ? 'bg-purple-100 text-purple-800' :
+                                              'bg-red-100 text-red-800'
+                                            }`}>
+                                            {latestCustomScore.mockName || 'Custom Test'}
+                                          </span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 mt-1 truncate">
+                                          {new Date(latestCustomScore.date).toLocaleDateString()}
+                                        </div>
                                       </div>
-                                    </div>
-                                  ) : (
-                                    <div className="text-sm text-gray-500">No attempts</div>
-                                  )}
+                                    )}
+                                  </div>
                                 </td>
+
                                 <td className="px-4 py-4">
                                   <div className="flex flex-col gap-1">
                                     <span className={`px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full 
-                                      ${currentLevel === 10
+                      ${currentLevel === 10
                                         ? 'bg-green-100 text-green-800'
                                         : latestScore?.score >= 6
                                           ? 'bg-blue-100 text-blue-800'
@@ -4717,6 +5272,28 @@ function App() {
                                           : `Master L${currentLevel - 1}`
                                         }
                                       </span>
+                                    )}
+
+                                    {/* Custom test recommendation */}
+                                    {customMockScores.length > 0 && (
+                                      <div className="mt-2 pt-2 border-t border-gray-100">
+                                        <span className={`px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full 
+                          ${latestCustomScore?.score >= 6
+                                            ? 'bg-purple-100 text-purple-800'
+                                            : 'bg-yellow-100 text-yellow-800'
+                                          }`}>
+                                          {latestCustomScore?.score >= 6
+                                            ? '🌟 Well Done'
+                                            : '🔄 Retry Test'
+                                          }
+                                        </span>
+                                        <span className="text-xs text-gray-500 truncate block mt-1">
+                                          {latestCustomScore?.score >= 6
+                                            ? 'Ready for more tests'
+                                            : 'Practice custom tests'
+                                          }
+                                        </span>
+                                      </div>
                                     )}
                                   </div>
                                 </td>
@@ -4970,451 +5547,79 @@ function App() {
                 </div>
               </div>
             )}
-            {/* Assign Mock View */}
-            {currentView === 'mock-assign' && (
-              <div className="p-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80">
-                  <div className="p-6 bg-gradient-to-r from-orange-50 to-white border-b border-gray-200">
-                    <h2 className="text-xl font-bold text-gray-900">Assign Mock Test</h2>
-                    <p className="text-sm text-gray-600 mt-1">Assign scores to students for mock tests</p>
-                  </div>
 
-                  <div className="p-6">
-                    {/* Filter Section */}
-                    <div className="mb-6">
-                      <div className="flex gap-4 items-end">
-                        {/* Batch Filter */}
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Filter by Batch
-                          </label>
-                          <select
-                            value={mockAssignmentFilter.batch || ''}
-                            onChange={(e) => {
-                              setMockAssignmentFilter(prev => ({ ...prev, batch: e.target.value }));
-                              setShowFilteredStudents(false); // Hide students list when batch changes
-                            }}
-                            className={`${inputStyle} pr-10`}
-                          >
-                            <option value="">All Batches</option>
-                            {Array.from(new Set(students.map(s => s.batch))).sort().map(batch => (
-                              <option key={batch} value={batch}>Batch {batch}</option>
-                            ))}
-                          </select>
-                        </div>
-                        {/* Add Filter Button */}
-                        <button
-                          onClick={() => setShowFilteredStudents(true)}
-                          className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
-                            transition-colors duration-200 flex items-center gap-2"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                          </svg>
-                          Show Students
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Students List with Close Button */}
-                    {showFilteredStudents && (
-                      <div className="mt-6">
-                        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                          <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h3 className="text-lg font-semibold text-gray-900">Filtered Students</h3>
-                            <button
-                              onClick={() => setShowFilteredStudents(false)}
-                              className="text-gray-500 hover:text-gray-700 p-1"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          </div>
-                          <div className="p-4">
-                            <div className="space-y-4">
-                              {students
-                                .filter(student => !mockAssignmentFilter.batch ||
-                                  student.batch?.toString() === mockAssignmentFilter.batch)
-                                .map(student => (
-                                  <div
-                                    key={student.id}
-                                    className="flex items-center justify-between p-4 bg-gray-50 
-                                      rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                                  >
-                                    <div className="flex items-center gap-4">
-                                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600 font-medium">{student.name.charAt(0)}</span>
-                                      </div>
-                                      <div>
-                                        <h4 className="font-medium text-gray-900">{student.name}</h4>
-                                        <p className="text-sm text-gray-600">Roll Number: {student.rollNumber}</p>
-                                      </div>
-                                    </div>
-                                    {/* Mock Test Selection */}
-                                    <div className="flex items-center gap-3">
-                                      {renderMockTestOptions(student)}
-                                      {student.selectedMockId && (
-                                        <div className="flex items-center gap-2">
-                                          <input
-                                            type="number"
-                                            placeholder="Score"
-                                            min="0"
-                                            max="10" // Set max to 10
-                                            value={student.mockScores?.find(s => s.mockId === student.selectedMockId)?.score || ''}
-                                            onChange={(e) => {
-                                              const value = e.target.value;
-                                              if (value === '') {
-                                                // Allow clearing the input
-                                                setStudents(prevStudents =>
-                                                  prevStudents.map(s =>
-                                                    s.id === student.id
-                                                      ? {
-                                                        ...s,
-                                                        mockScores: [
-                                                          ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId)
-                                                        ]
-                                                      }
-                                                      : s
-                                                  )
-                                                );
-                                                return;
-                                              }
-
-                                              const score = parseInt(value);
-
-                                              if (isNaN(score) || score < 0 || score > 10) {
-                                                setAlert({
-                                                  type: 'warning',
-                                                  message: 'Please enter a valid score between 0 and 10'
-                                                });
-                                                return;
-                                              }
-
-                                              setStudents(prevStudents =>
-                                                prevStudents.map(s =>
-                                                  s.id === student.id
-                                                    ? {
-                                                      ...s,
-                                                      mockScores: [
-                                                        ...(s.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
-                                                        {
-                                                          mockId: student.selectedMockId,
-                                                          score,
-                                                          date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
-                                                          absent: false
-                                                        }
-                                                      ]
-                                                    }
-                                                    : s
-                                                )
-                                              );
-                                            }}
-                                            className="w-20 px-3 py-2 rounded-lg border border-gray-300 
-                                              focus:ring-2 focus:ring-blue-200 focus:border-blue-400 
-                                              text-sm bg-white shadow-sm"
-                                          />
-                                          <button
-                                            onClick={() => handleSaveScore(student)}
-                                            className="px-4 py-2 bg-green-600 text-white rounded-lg 
-                                              hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
-                                          >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            Save Score
-                                          </button>
-                                          <button
-                                            onClick={async () => {
-                                              try {
-                                                // Update in Firestore
-                                                await updateDoc(doc(db, 'students', student.id), {
-                                                  mockScores: [
-                                                    ...(student.mockScores || []).filter(ms => ms.mockId !== student.selectedMockId),
-                                                    {
-                                                      mockId: student.selectedMockId,
-                                                      score: 0,
-                                                      date: mockTests.find(t => t.id === student.selectedMockId)?.date || new Date().toISOString(),
-                                                      absent: true
-                                                    }
-                                                  ]
-                                                });
-
-                                                // setAlertMessage(`${student.name} marked as absent`);
-                                                // setAlertType('success');
-                                                // setShowAlert(true);
-
-                                                // Clear the selection after successful save
-                                                setStudents(prevStudents =>
-                                                  prevStudents.map(s =>
-                                                    s.id === student.id
-                                                      ? { ...s, selectedMockId: '' }
-                                                      : s
-                                                  )
-                                                );
-                                              } catch (error) {
-                                                console.error('Error marking absent:', error);
-                                                // setAlertMessage('Failed to mark as absent');
-                                                // setAlertType('error');
-                                                // setShowAlert(true);
-                                              }
-                                            }}
-                                            className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg 
-                                              hover:bg-gray-200 transition-colors duration-200"
-                                          >
-                                            Mark Absent
-                                          </button>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))}
-
-                              {/* Empty State */}
-                              {students.filter(student => !mockAssignmentFilter.batch ||
-                                student.batch?.toString() === mockAssignmentFilter.batch).length === 0 && (
-                                  <div className="text-center py-8">
-                                    <div className="bg-gray-50 rounded-full p-4 w-16 h-16 mx-auto mb-4 
-                                    flex items-center justify-center">
-                                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                      </svg>
-                                    </div>
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
-                                    <p className="text-gray-600">
-                                      {mockAssignmentFilter.batch
-                                        ? `No students found in Batch ${mockAssignmentFilter.batch}`
-                                        : 'No students available'}
-                                    </p>
-                                  </div>
-                                )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {currentView === 'view-mocks' && (
-              <div className="space-y-6 p-6">
-                {/* Header */}
+            {currentView === 'final-report' && (
+              <div className="p-6 space-y-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mb-6">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">Mock Tests</h2>
-                      <p className="text-gray-600 mt-1">View and manage all mock tests</p>
+                      <h2 className="text-2xl font-bold text-gray-900">Final Report Card</h2>
+                      <p className="text-gray-600 mt-1">Comprehensive student performance report</p>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex gap-2">
-                        <div className="px-4 py-3 bg-blue-50 rounded-lg border border-blue-100">
-                          <p className="text-sm text-gray-600">Total Tests</p>
-                          <p className="text-2xl font-bold text-blue-600">{mockTests.filter(test => !test.isDefaultLevel).length}</p>
-                        </div>
-                        <div className="px-4 py-3 bg-green-50 rounded-lg border border-green-100">
-                          <p className="text-sm text-gray-600">Completed</p>
-                          <p className="text-2xl font-bold text-green-600">
-                            {mockTests.filter(test => test.status === 'completed').length}
-                          </p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setCurrentView('mock-create')}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
-                          transition-colors duration-200 flex items-center gap-2 text-sm"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Create New Test
-                      </button>
-                    </div>
-                  </div>
-                </div>
 
-                {/* Filters and Search */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 p-6">
-                  <div className="flex flex-wrap gap-4 items-center justify-between">
-                    <div className="flex gap-4 items-center">
-                      <div className="relative">
-                        <input
-                          type="text"
-                          placeholder="Search mock tests..."
-                          value={mockSearchTerm}
-                          onChange={(e) => setMockSearchTerm(e.target.value)}
-                          className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 
-                            focus:ring-blue-500 focus:border-blue-500 w-64"
-                        />
-                        <svg
-                          className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                          />
-                        </svg>
-                      </div>
+                    <div className="flex gap-4">
                       <select
-                        value={mockBatchFilter}
-                        onChange={(e) => setMockBatchFilter(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
-                          focus:ring-blue-500 focus:border-blue-500"
+                        value={selectedBatch || ''}
+                        onChange={handleBatchChange}
+                        className="rounded-lg border border-gray-300 px-4 py-2"
                       >
-                        <option value="all">All Batches</option>
-                        {Array.from(new Set(mockTests.flatMap(test => test.batches || []))).map(batch => (
-                          <option key={batch} value={batch}>Batch {batch}</option>
+                        <option value="">All Batches</option>
+                        {batches.map(batch => (
+                          <option key={batch.id} value={batch.id}>{batch.name}</option>
                         ))}
                       </select>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm text-gray-600">Sort by:</label>
-                      <select
-                        value={mockSortBy}
-                        onChange={(e) => setMockSortBy(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 
-                          focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="date-desc">Date (Newest)</option>
-                        <option value="date-asc">Date (Oldest)</option>
-                        <option value="name-asc">Name (A-Z)</option>
-                        <option value="name-desc">Name (Z-A)</option>
-                      </select>
-                    </div>
                   </div>
-                </div>
 
-                {/* Mock Tests Table */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200/80 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Test Name
-                          </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date
-                          </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Batches
-                          </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Type
-                          </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status
-                          </th>
-                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {getFilteredMockTests()
-                          .filter(test =>
-                            test.name.toLowerCase().includes(mockSearchTerm.toLowerCase()) ||
-                            test.description?.toLowerCase().includes(mockSearchTerm.toLowerCase())
-                          )
-                          .sort((a, b) => {
-                            switch (mockSortBy) {
-                              case 'date-desc':
-                                return new Date(b.date) - new Date(a.date);
-                              case 'date-asc':
-                                return new Date(a.date) - new Date(b.date);
-                              case 'name-asc':
-                                return a.name.localeCompare(b.name);
-                              case 'name-desc':
-                                return b.name.localeCompare(a.name);
-                              default:
-                                return 0;
-                            }
-                          })
-                          .map((test) => (
-                            <tr key={test.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-blue-50">
-                                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
+                  {/* Student Cards Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {students
+                      .filter(student => !selectedBatch || student.batchId?.toString() === selectedBatch)
+                      .map(student => {
+                        const regularAttendance = calculateAttendancePercentage(student.attendance || [], 'regular');
+                        const mockAttendance = getMockAttendance(student).toFixed(1);
+                        const overallAttendance = ((regularAttendance + mockAttendance) / 2).toFixed(1);
+                        const averageMockScore = calculateAverageScore(
+                          student.mockScores?.filter(score => score.score !== undefined) || []
+                        );
+
+                        return (
+                          <div key={student.id} className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 p-6">
+                            {/* Card Header */}
+                            <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900">{student.name}</h3>
+                                <p className="text-sm text-gray-500">{student.email}</p>
+                              </div>
+                              <span className="text-xs px-3 py-1 bg-blue-100 text-blue-700 font-medium rounded-full">Student</span>
+                            </div>
+
+                            {/* Card Body */}
+                            <div className="mt-4 space-y-4">
+                              {/* Attendance Stats */}
+                              <div className="grid grid-cols-3 text-center gap-4">
+                                {[['Regular', regularAttendance], ['Mock', mockAttendance], ['Overall', overallAttendance]].map(([label, value], index) => (
+                                  <div key={index} className="bg-gray-50 rounded-lg p-3">
+                                    <div className="text-xs text-gray-500 mb-1">{label}</div>
+                                    <div className={`text-base font-semibold ${value >= 75 ? 'text-green-600' : 'text-red-600'}`}>{value}%</div>
                                   </div>
-                                  <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">{test.name}</div>
-                                    {test.description && (
-                                      <div className="text-sm text-gray-500">{test.description}</div>
-                                    )}
-                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Mock Score */}
+                              <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm text-gray-600 font-medium">Avg Mock Score</span>
+                                  <span className={`text-base font-semibold ${averageMockScore >= 5 ? 'text-green-600' : 'text-red-600'}`}>{averageMockScore}/10</span>
                                 </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-900">{new Date(test.date).toLocaleDateString()}</div>
-                                {test.duration && (
-                                  <div className="text-sm text-gray-500">Duration: {test.duration} mins</div>
-                                )}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex flex-wrap gap-1">
-                                  {test.batches?.map(batch => (
-                                    <span
-                                      key={batch}
-                                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                                    >
-                                      Batch {batch}
-                                    </span>
-                                  ))}
+                                <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div className={`h-full rounded-full ${averageMockScore >= 7 ? 'bg-green-500' : averageMockScore >= 5 ? 'bg-yellow-500' : 'bg-red-500'}`} style={{ width: `${(averageMockScore / 10) * 100}%` }}></div>
                                 </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                                  ${test.isDefaultLevel
-                                    ? 'bg-purple-100 text-purple-800'
-                                    : 'bg-green-100 text-green-800'
-                                  }`}
-                                >
-                                  {test.isDefaultLevel ? 'Default Level' : 'Custom'}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                                  ${test.status === 'completed'
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                                  }`}
-                                >
-                                  {test.status === 'completed' ? 'Completed' : 'Pending'}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div className="flex items-center gap-3">
-                                  <button
-                                    onClick={() => handleEditMock(test)}
-                                    className="text-indigo-600 hover:text-indigo-900"
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteMock(test.id)}
-                                    className="text-red-600 hover:text-red-900"
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               </div>
@@ -5422,6 +5627,7 @@ function App() {
           </div>
         </div>
       </div>
+
 
       {/* Student Details Modal */}
       {
@@ -5521,7 +5727,6 @@ function App() {
           </div>
         )
       }
-
       {/* Simplified Batch Students Modal */}
       {
         selectedBatchForStudents && (
@@ -5626,27 +5831,10 @@ function App() {
                   </div>
 
                   {/* Students Grid/List */}
+
                   <div className={studentListView === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
-                    {console.log("Total students:", students.length, "Selected batch:", selectedBatchForStudents)}
                     {students
-                      // Skip batch filtering if no batch is selected
-                      .filter(student => {
-                        if (!selectedBatchForStudents) return true;
-
-                        // Print student info for debugging
-                        console.log("Student:", student.id, student.name,
-                          "batch:", student.batch,
-                          "batchId:", student.batchId,
-                          "batchName:", student.batchName);
-
-                        // Try multiple properties that might contain batch info
-                        return (
-                          (student.batch && student.batch.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchId && student.batchId.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchName && student.batchName.toString() === selectedBatchForStudents.toString())
-                        );
-                      })
-                      // Then filter by search term if provided
+                      .filter(student => !selectedBatchForStudents.name || student.batch === selectedBatchForStudents.name)
                       .filter(student => {
                         if (!searchTerm) return true;
                         const searchLower = searchTerm.toLowerCase();
@@ -5763,16 +5951,7 @@ function App() {
 
                     {/* No Results Message */}
                     {students
-                      // Filter for batch
-                      .filter(student => {
-                        if (!selectedBatchForStudents) return true;
-                        return (
-                          (student.batch && student.batch.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchId && student.batchId.toString() === selectedBatchForStudents.toString()) ||
-                          (student.batchName && student.batchName.toString() === selectedBatchForStudents.toString())
-                        );
-                      })
-                      // Filter for search
+                      .filter(student => !selectedBatch || student.batch === selectedBatch || student.batchId === selectedBatch)
                       .filter(student => {
                         if (!searchTerm) return true;
                         const searchLower = searchTerm.toLowerCase();
@@ -5808,7 +5987,6 @@ function App() {
           </div>
         )
       }
-
       {/* Alert Component */}
       {showAlert && (
         <div className="fixed top-4 right-4 z-50 animate-fade-in">
@@ -5854,13 +6032,43 @@ function App() {
       )}
 
       {showAttendanceDetails && selectedStudent && (
-        <AttendanceDetailsModal
-          student={selectedStudent}
-          onClose={() => {
-            setShowAttendanceDetails(false);
-            setSelectedStudent(null);
-          }}
-        />
+        selectedStudent.mockDetails ? (
+          <MockAttendanceDetailsModal
+            student={selectedStudent}
+            onClose={() => {
+              setShowAttendanceDetails(false);
+              setSelectedStudent(null);
+            }}
+          />
+        ) : (
+          <AttendanceDetailsModal
+            student={selectedStudent}
+            onClose={() => {
+              setShowAttendanceDetails(false);
+              setSelectedStudent(null);
+            }}
+          />
+        )
+      )}
+      {/* Student Report Modal */}
+      {showAttendanceDetails && selectedStudent && (
+        selectedStudent.mockDetails ? (
+          <MockAttendanceDetailsModal
+            student={selectedStudent}
+            onClose={() => {
+              setShowAttendanceDetails(false);
+              setSelectedStudent(null);
+            }}
+          />
+        ) : (
+          <AttendanceDetailsModal
+            student={selectedStudent}
+            onClose={() => {
+              setShowAttendanceDetails(false);
+              setSelectedStudent(null);
+            }}
+          />
+        )
       )}
     </div>
   )
