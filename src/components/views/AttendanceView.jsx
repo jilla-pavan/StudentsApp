@@ -2,52 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { FiCalendar, FiChevronLeft, FiChevronRight, FiCheck, FiX } from 'react-icons/fi';
 import PropTypes from 'prop-types';
 import { toast } from 'react-hot-toast';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 
 const AttendanceView = ({ students, batches, onMarkAttendance }) => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedBatch, setSelectedBatch] = useState('');
   const [loading, setLoading] = useState(false);
-  const [attendanceData, setAttendanceData] = useState({});
+  const [studentsData, setStudentsData] = useState([]);
 
   // Get the batch start date - moved to top level
   const selectedBatchStartDate = selectedBatch ? 
     batches.find(b => b.id === selectedBatch)?.startDate : 
     null;
 
-  // Subscribe to attendance updates for the selected date
+  // Subscribe to students updates
   useEffect(() => {
-    const q = query(
-      collection(db, 'attendance'),
-      where('date', '==', selectedDate)
-    );
+    const q = selectedBatch ? 
+      query(
+        collection(db, 'students'),
+        where('batchId', '==', selectedBatch)
+      ) :
+      query(collection(db, 'students')); // Remove the filter when no batch is selected
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newAttendanceData = {};
-      snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        newAttendanceData[data.studentId] = {
-          id: doc.id,
-          ...data
-        };
-      });
-      setAttendanceData(newAttendanceData);
+      const newStudentsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setStudentsData(newStudentsData);
     }, (error) => {
-      console.error('Error fetching attendance:', error);
-      toast.error('Failed to fetch attendance data');
+      console.error('Error fetching students:', error);
+      toast.error('Failed to fetch student data');
     });
 
     return () => unsubscribe();
-  }, [selectedDate]);
+  }, [selectedBatch]);
 
-  const filteredStudents = students.filter(student => 
-    !selectedBatch || student.batchId === selectedBatch
-  );
+  const filteredStudents = studentsData;
 
   const getAttendanceStatus = (student) => {
-    const record = attendanceData[student.id];
-    return record?.present;
+    return student.attendance?.[selectedDate]?.present;
   };
 
   // Verify student exists before marking attendance
@@ -61,8 +56,14 @@ const AttendanceView = ({ students, batches, onMarkAttendance }) => {
     setLoading(true);
     
     try {
-      await onMarkAttendance(student.id, selectedDate, present);
-      // Remove the toast here as the attendance update will trigger through the snapshot listener
+      const studentRef = doc(db, 'students', student.id);
+      await updateDoc(studentRef, {
+        [`attendance.${selectedDate}`]: {
+          present,
+          timestamp: new Date().toISOString()
+        }
+      });
+      // The snapshot listener will automatically update the UI
     } catch (error) {
       console.error('Error marking attendance:', error);
       toast.error(error.message || 'Failed to mark attendance');
@@ -124,8 +125,8 @@ const AttendanceView = ({ students, batches, onMarkAttendance }) => {
         {selectedBatch && (
           <div className="bg-blue-50 px-3 py-2 rounded-md border border-blue-100">
             <p className="text-xs font-medium text-blue-700">
-              Total Present: {Object.values(attendanceData)
-                .filter(record => record.batchId === selectedBatch && record.present)
+              Total Present: {studentsData
+                .filter(student => student.batchId === selectedBatch && student.attendance?.[selectedDate]?.present)
                 .length
               } / {filteredStudents.length}
             </p>

@@ -109,10 +109,17 @@ export const useStudents = () => {
 
   const getFilteredStudents = (filters) => {
     return students.filter(student => {
+      // If batch is 'all' or not set, show all students
       const matchesBatch = !filters.batch || filters.batch === 'all' || student.batchId === filters.batch;
       const matchesSearch = !filters.search || 
-        student.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+        (student.firstName + ' ' + student.lastName).toLowerCase().includes(filters.search.toLowerCase()) ||
         student.email.toLowerCase().includes(filters.search.toLowerCase());
+      
+      // For 'all' batches, we want to show all students
+      if (filters.batch === 'all') {
+        return matchesSearch; // Only apply search filter
+      }
+      
       return matchesBatch && matchesSearch;
     });
   };

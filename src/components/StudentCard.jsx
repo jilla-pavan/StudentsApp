@@ -2,12 +2,31 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FiEdit2, FiTrash2, FiUser, FiMail, FiPhone, FiHash } from 'react-icons/fi';
 import { BiMale, BiFemale } from 'react-icons/bi';
+import { useNavigate } from 'react-router-dom';
 
 const StudentCard = ({ student, onEdit, onDelete }) => {
+  const navigate = useNavigate();
   const fullName = student.name || 'No Name';
   
+  const handleCardClick = (e) => {
+    // Don't navigate if clicking on action buttons
+    if (e.target.closest('button')) return;
+    navigate(`/student/${student.id}`);
+  };
+  
   return (
-    <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-purple-100">
+    <div 
+      className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-purple-100 cursor-pointer"
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleCardClick(e);
+        }
+      }}
+    >
       <div className="p-4 space-y-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">

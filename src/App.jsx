@@ -24,9 +24,10 @@ import { Toaster, toast } from 'react-hot-toast';
 import AttendanceView from './components/views/AttendanceView';
 import BatchStudentsView from './components/views/BatchStudentsView';
 import AssignScoresModal from './components/AssignScoresModal';
+import StudentProgressReport from './components/views/StudentProgressReport';
 
 // Separate components for each route
-const StudentsView = ({ renderFilters, renderStudentList, onAddStudent }) => (
+const StudentsView = ({ renderFilters, renderStudentList, onAddStudent, onFilterChange }) => (
   <div className="space-y-6">
     <div className="flex justify-between items-center mb-8">
       <div>
@@ -43,7 +44,7 @@ const StudentsView = ({ renderFilters, renderStudentList, onAddStudent }) => (
         Add New Student
       </button>
     </div>
-    {renderFilters()}
+    {renderFilters(onFilterChange)}
     {renderStudentList()}
   </div>
 );
@@ -262,128 +263,128 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
       </div>
 
       {/* Students List */}
-      {filters.batch && filters.batch !== 'all' && (
-        <div className="mt-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Students in {batches.find(b => b.id === filters.batch)?.name}
-                  </h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''} found
-                  </p>
-                </div>
+      <div className="mt-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {filters.batch && filters.batch !== 'all' 
+                    ? `Students in ${batches.find(b => b.id === filters.batch)?.name}`
+                    : 'All Students'}
+                </h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''} found
+                </p>
               </div>
             </div>
+          </div>
 
-            <div className="divide-y divide-gray-200">
-              {filteredStudents.map(student => {
-                const selectedMockLevel = studentMockLevels[student.id];
-                const mockScore = selectedMockLevel ? 
-                  student.mockScores?.find(s => s.testId === `mock_${selectedMockLevel}`) : 
-                  null;
-                
-                // Get all passed levels for this student
-                const passedLevels = student.mockScores
-                  ?.filter(s => s.score >= 6)
-                  .map(s => parseInt(s.testId.split('_')[1]))
-                  .sort((a, b) => a - b) || [];
+          <div className="divide-y divide-gray-200">
+            {filteredStudents.map(student => {
+              const selectedMockLevel = studentMockLevels[student.id];
+              const mockScore = selectedMockLevel ? 
+                student.mockScores?.find(s => s.testId === `mock_${selectedMockLevel}`) : 
+                null;
+              
+              // Get all passed levels for this student
+              const passedLevels = student.mockScores
+                ?.filter(s => s.score >= 6)
+                .map(s => parseInt(s.testId.split('_')[1]))
+                .sort((a, b) => a - b) || [];
 
-                // Get attendance status for current level
-                const currentAttendance = mockAttendance[student.id]?.[`mock_${selectedMockLevel}`];
-                
-                return (
-                  <div key={student.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-900">{student.firstName}</h3>
-                      <p className="text-sm text-gray-500">{student.email}</p>
-                      <div className="mt-1">
-                        <span className="text-xs text-gray-500">
-                          Passed Levels: {passedLevels.length > 0 ? passedLevels.join(', ') : 'None'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-4">
-                      {/* Mock Level Display */}
-                      <div className="flex-1 min-w-[150px]">
-                        <select
-                          value={studentMockLevels[student.id] || '1'}
-                          onChange={(e) => handleMockLevelChange(student.id, e.target.value)}
-                          className="w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        >
-                          {mockLevels.map((level) => (
-                            <option 
-                              key={level.id} 
-                              value={level.id}
-                              disabled={level.id > (Math.max(...passedLevels, 0) + 1)}
-                            >
-                              {level.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Attendance Buttons */}
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => handleAttendanceChange(student.id, selectedMockLevel, true)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium ${
-                            currentAttendance?.status === 'present'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                          }`}
-                        >
-                          Present
-                        </button>
-                        <button
-                          onClick={() => handleAttendanceChange(student.id, selectedMockLevel, false)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium ${
-                            currentAttendance?.status === 'absent'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                          }`}
-                        >
-                          Absent
-                        </button>
-                      </div>
-
-                      {/* Score Input */}
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="text"
-                          value={scores[student.id] || ''}
-                          onChange={(e) => handleScoreChange(student.id, e.target.value)}
-                          placeholder={mockScore ? `Current: ${mockScore.score}` : "Enter score"}
-                          className="w-16 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          disabled={!currentAttendance}
-                        />
-                        <span className="text-sm text-gray-500">/10</span>
-                        
-                        <button
-                          onClick={() => handleSaveScore(student.id)}
-                          disabled={!scores[student.id] || !currentAttendance}
-                          className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                        >
-                          Save
-                        </button>
-                      </div>
-
-                      {/* Current Score Display */}
-                      {mockScore && (
-                        <span className={`text-sm ${mockScore.score >= 6 ? 'text-green-600' : 'text-red-600'}`}>
-                          Current: {mockScore.score}/10
-                        </span>
-                      )}
+              // Get attendance status for current level
+              const currentAttendance = mockAttendance[student.id]?.[`mock_${selectedMockLevel}`];
+              
+              return (
+                <div key={student.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900">{student.firstName}</h3>
+                    <p className="text-sm text-gray-500">{student.email}</p>
+                    <div className="mt-1">
+                      <span className="text-xs text-gray-500">
+                        Passed Levels: {passedLevels.length > 0 ? passedLevels.join(', ') : 'None'}
+                      </span>
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="flex items-center space-x-4">
+                    {/* Mock Level Display */}
+                    <div className="flex-1 min-w-[150px]">
+                      <select
+                        value={studentMockLevels[student.id] || '1'}
+                        onChange={(e) => handleMockLevelChange(student.id, e.target.value)}
+                        className="w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      >
+                        {mockLevels.map((level) => (
+                          <option 
+                            key={level.id} 
+                            value={level.id}
+                            disabled={level.id > (Math.max(...passedLevels, 0) + 1)}
+                          >
+                            {level.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Attendance Buttons */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleAttendanceChange(student.id, selectedMockLevel, true)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                          currentAttendance?.status === 'present'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        }`}
+                      >
+                        Present
+                      </button>
+                      <button
+                        onClick={() => handleAttendanceChange(student.id, selectedMockLevel, false)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                          currentAttendance?.status === 'absent'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        }`}
+                      >
+                        Absent
+                      </button>
+                    </div>
+
+                    {/* Score Input */}
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={scores[student.id] || ''}
+                        onChange={(e) => handleScoreChange(student.id, e.target.value)}
+                        placeholder={mockScore ? `Current: ${mockScore.score}` : "Enter score"}
+                        className="w-16 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        disabled={!currentAttendance}
+                      />
+                      <span className="text-sm text-gray-500">/10</span>
+                      
+                      <button
+                        onClick={() => handleSaveScore(student.id)}
+                        disabled={!scores[student.id] || !currentAttendance}
+                        className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                      >
+                        Save
+                      </button>
+                    </div>
+
+                    {/* Current Score Display */}
+                    {mockScore && (
+                      <span className={`text-sm ${mockScore.score >= 6 ? 'text-green-600' : 'text-red-600'}`}>
+                        Current: {mockScore.score}/10
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Mock Tests List */}
       {renderMockTestList()}
@@ -631,8 +632,7 @@ function AppContent() {
   // Filter states
   const [filters, setFilters] = useState({
     batch: 'all',
-    search: '',
-    mockStatus: 'all' // 'all', 'upcoming', 'completed'
+    search: ''
   });
 
   // Date state
@@ -827,7 +827,11 @@ function AppContent() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No students found</h3>
-            <p className="mt-1 text-sm text-gray-500">Get started by creating a new student.</p>
+            <p className="mt-1 text-sm text-gray-500">
+              {filters.batch && filters.batch !== 'all'
+                ? 'No students found in the selected batch'
+                : 'Get started by creating a new student.'}
+            </p>
             <div className="mt-6">
               <button
                 onClick={() => setShowStudentForm(true)}
@@ -840,7 +844,35 @@ function AppContent() {
               </button>
             </div>
           </div>
-        ) : <> </>}
+        ) : (
+          <div>
+            {filters.batch && filters.batch !== 'all' && (
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Students in {batches.find(b => b.id === filters.batch)?.name}
+                </h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''} found
+                </p>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredStudents.map((student) => (
+                <StudentCard
+                  key={student.id}
+                  student={student}
+                  batch={batches.find(b => b.id === student.batchId)}
+                  onEdit={() => handleEditStudent(student)}
+                  onDelete={() => handleDeleteStudent(student.id)}
+                  onViewAttendance={() => {
+                    setSelectedStudent(student);
+                    setShowAttendanceDetails(true);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -905,7 +937,7 @@ function AppContent() {
     );
   };
 
-  const renderFilters = () => {
+  const renderFilters = (onFilterChange) => {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
         <div className="flex flex-wrap gap-6">
@@ -915,9 +947,9 @@ function AppContent() {
             </label>
             <div className="relative">
               <select
-                value={filters.batch}
-                onChange={(e) => onFilterChange({ ...filters, batch: e.target.value })}
-                className="w-full pl-3 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg"
+                value={filters.batch || 'all'}
+                onChange={(e) => onFilterChange({ batch: e.target.value })}
+                className="w-full pl-3 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 <option value="all">All Batches</option>
                 {batches.map((batch) => (
@@ -926,11 +958,6 @@ function AppContent() {
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                </svg>
-              </div>
             </div>
           </div>
         </div>
@@ -938,71 +965,69 @@ function AppContent() {
     );
   };
 
-  // Update renderSidebar to use navigation
-  const renderSidebar = () => {
+  // Update renderSidebar to renderNavbar
+  const renderNavbar = () => {
     return (
-      <div className="w-64 bg-[#f8f2ff] h-screen fixed left-0 top-0 border-r border-purple-100 flex flex-col">
-        <div className="p-6">
-          <h1 className="text-xl font-bold text-purple-900">
-            Career Sure Academy
-          </h1>
-        </div>
+      <nav className="bg-white border-b border-purple-100 fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo/Brand */}
+            <div className="flex items-center">
+              <h1 className="text-xl font-bold text-purple-900">
+                Career Sure Academy
+              </h1>
+            </div>
 
-        <nav className="flex-1 p-4">
-          <div className="space-y-2">
-            <button
-              onClick={() => navigate('/students')}
-              className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-md ${location.pathname === '/students'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-700 hover:bg-purple-50'
+            {/* Navigation Links */}
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate('/students')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === '/students'
+                    ? 'bg-purple-100 text-purple-900'
+                    : 'text-gray-700 hover:bg-purple-50'
                 }`}
-            >
-              <FiUsers className="text-xl" />
-              Students
-            </button>
-            <button
-              onClick={() => navigate('/batches')}
-              className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-md ${location.pathname === '/batches'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-700 hover:bg-purple-50'
+              >
+                <FiUsers className="text-lg" />
+                Students
+              </button>
+              <button
+                onClick={() => navigate('/batches')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === '/batches'
+                    ? 'bg-purple-100 text-purple-900'
+                    : 'text-gray-700 hover:bg-purple-50'
                 }`}
-            >
-              <BsBook className="text-xl" />
-              Batches
-            </button>
-            <button
-              onClick={() => navigate('/attendance')}
-              className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-md ${location.pathname === '/attendance'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-700 hover:bg-purple-50'
+              >
+                <BsBook className="text-lg" />
+                Batches
+              </button>
+              <button
+                onClick={() => navigate('/attendance')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === '/attendance'
+                    ? 'bg-purple-100 text-purple-900'
+                    : 'text-gray-700 hover:bg-purple-50'
                 }`}
-            >
-              <RiFileListLine className="text-xl" />
-              Attendance
-            </button>
-            <button
-              onClick={() => navigate('/mock-tests')}
-              className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-md ${location.pathname === '/mock-tests'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-700 hover:bg-purple-50'
+              >
+                <RiFileListLine className="text-lg" />
+                Attendance
+              </button>
+              <button
+                onClick={() => navigate('/mock-tests')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname === '/mock-tests'
+                    ? 'bg-purple-100 text-purple-900'
+                    : 'text-gray-700 hover:bg-purple-50'
                 }`}
-            >
-              <AiOutlineClockCircle className="text-xl" />
-              Mock Tests
-            </button>
-            <button
-              onClick={() => navigate('/final-report')}
-              className={`w-full flex items-center gap-3 text-left px-4 py-3 rounded-md ${location.pathname === '/final-report'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-700 hover:bg-purple-50'
-                }`}
-            >
-              <BiBarChart className="text-xl" />
-              Final Report
-            </button>
+              >
+                <AiOutlineClockCircle className="text-lg" />
+                Mock Tests
+              </button>
+            </div>
           </div>
-        </nav>
-      </div>
+        </div>
+      </nav>
     );
   };
 
@@ -1035,19 +1060,20 @@ function AppContent() {
         </Modal>
       )}
       
-      <div className="flex min-h-screen bg-white">
-        {renderSidebar()}
+      <div className="min-h-screen bg-gray-50">
+        {renderNavbar()}
 
-        <main className="flex-1 ml-64 p-8">
-          <div className="max-w-7xl mx-auto">
+        <main className="pt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <Routes>
               <Route
                 path="/"
                 element={
                   <StudentsView 
-                    renderFilters={renderFilters} 
+                    renderFilters={() => renderFilters(setFilters)}
                     renderStudentList={renderStudentList}
                     onAddStudent={() => setShowStudentForm(true)}
+                    onFilterChange={setFilters}
                   />
                 }
               />
@@ -1055,9 +1081,10 @@ function AppContent() {
                 path="/students"
                 element={
                   <StudentsView 
-                    renderFilters={renderFilters} 
+                    renderFilters={() => renderFilters(setFilters)}
                     renderStudentList={renderStudentList}
                     onAddStudent={() => setShowStudentForm(true)}
+                    onFilterChange={setFilters}
                   />
                 }
               />
@@ -1105,10 +1132,12 @@ function AppContent() {
                   />
                 }
               />
-              <Route
-                path="/final-report"
-                element={<FinalReportView renderFilters={renderFilters} students={students} batches={batches} filters={filters} onFilterChange={setFilters} />}
-              />
+              <Route path="/student/:studentId" element={
+                <StudentProgressReport 
+                  students={students}
+                  batches={batches}
+                />
+              } />
             </Routes>
           </div>
 
