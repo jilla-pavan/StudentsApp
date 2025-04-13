@@ -24,6 +24,7 @@ const StudentProgressReport = ({ students, batches }) => {
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
+            console.log(studentId);
             try {
                 const foundStudent = students.find(s => s.id === studentId);
                 if (foundStudent) {
@@ -685,7 +686,7 @@ const StudentProgressReport = ({ students, batches }) => {
     };
 
     const calculateMockTestPerformance = () => {
-        if (!student.mockScores || !Array.isArray(student.mockScores)) {
+        if (!student.mockScores || !Array.isArray(student.mockScores) || student.mockScores.length === 0) {
             return {
                 averageScore: 0,
                 totalTests: 0,
@@ -699,7 +700,9 @@ const StudentProgressReport = ({ students, batches }) => {
         const totalTests = scores.length;
         const passedTests = scores.filter(score => score.score >= 6).length;
         const highestScore = Math.max(...scores.map(score => score.score));
-        const averageScore = Math.round(scores.reduce((acc, curr) => acc + curr.score, 0) / totalTests);
+        const averageScore = totalTests > 0 ? 
+            scores.reduce((acc, curr) => acc + curr.score, 0) / totalTests : 
+            0;
 
         // Prepare data for progress chart
         const progressData = scores.map(score => ({
@@ -729,15 +732,15 @@ const StudentProgressReport = ({ students, batches }) => {
     const mockPerformance = calculateMockTestPerformance();
     const calculateOverallPerformance = () => {
         // Convert mock test score to percentage (out of 100)
-        const mockTestPercentage = mockPerformance.averageScore * 10; // Convert from /10 to percentage
+        const mockTestPercentage = mockPerformance.averageScore * 10 || 0; // Add fallback to 0
         
-        // Get attendance percentage
-        const attendancePercent = attendancePercentage;
+        // Get attendance percentage with fallback to 0
+        const attendancePercent = attendancePercentage || 0;
         
         // Calculate cumulative average
         const overall = (mockTestPercentage + attendancePercent) / 2;
         
-        return Math.round(overall);
+        return Math.round(overall) || 0; // Add fallback to 0 if NaN
     };
 
     const overallPerformance = calculateOverallPerformance();
@@ -773,8 +776,11 @@ const StudentProgressReport = ({ students, batches }) => {
     };
 
     const calculateMockTestPercentage = () => {
+        if (!mockPerformance || typeof mockPerformance.averageScore !== 'number') {
+            return 0;
+        }
         // Convert mock test score to percentage (out of 100)
-        return mockPerformance.averageScore * 10;
+        return Math.round(mockPerformance.averageScore * 10);
     };
 
     return (

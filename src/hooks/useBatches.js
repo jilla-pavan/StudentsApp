@@ -53,12 +53,16 @@ export const useBatches = () => {
 
   const deleteBatch = async (id) => {
     try {
+      setLoading(true);
       await batchService.deleteBatch(id);
       setBatches(prev => prev.filter(batch => batch.id !== id));
+      setError(null);
     } catch (err) {
       setError('Failed to delete batch');
       console.error('Error deleting batch:', err);
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 

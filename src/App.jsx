@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useStudents } from './hooks/useStudents';
 import { useBatches } from './hooks/useBatches';
 import { useMockTests } from './hooks/useMockTests';
@@ -14,7 +14,7 @@ import Modal from './components/common/Modal';
 import { getTodayDate, formatDateForInput } from './utils/dateUtils';
 import { getAttendanceForDate, markAttendance } from './services/attendanceService';
 import { updateStudent } from './services/studentService';
-import { FiUsers } from 'react-icons/fi';
+import { FiUsers, FiLogOut } from 'react-icons/fi';
 import { BsBook } from 'react-icons/bs';
 import { RiFileListLine } from 'react-icons/ri';
 import { AiOutlineClockCircle } from 'react-icons/ai';
@@ -25,6 +25,8 @@ import AttendanceView from './components/views/AttendanceView';
 import BatchStudentsView from './components/views/BatchStudentsView';
 import AssignScoresModal from './components/AssignScoresModal';
 import StudentProgressReport from './components/views/StudentProgressReport';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Login from './pages/Login';
 
 // Separate components for each route
 const StudentsView = ({ renderFilters, renderStudentList, onAddStudent, onFilterChange }) => (
@@ -574,9 +576,42 @@ const FinalReportView = ({ renderFilters, students, batches, filters, onFilterCh
   );
 };
 
+// Protected Route Component
+const ProtectedRoute = ({ children, requireAdmin }) => {
+  const { currentUser, userType } = useAuth();
+  const location = useLocation();
+
+  if (!currentUser) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Admin can access all routes
+  if (userType === 'admin') {
+    return children;
+  }
+
+  // For students
+  if (userType === 'student') {
+    const studentRoute = `/student/${currentUser.id}`;
+    
+    // If trying to access any route other than their specific student route
+    if (location.pathname !== studentRoute) {
+      return <Navigate to={studentRoute} replace />;
+    }
+    
+    // Allow access to their specific route
+    return children;
+  }
+
+  // Fallback - shouldn't reach here
+  return <Navigate to="/login" replace />;
+};
+
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser, userType, logout } = useAuth();
+  const [loading, setLoading] = useState(false);  // Add loading state
 
   // Custom hooks
   const {
@@ -689,16 +724,34 @@ function AppContent() {
   };
 
   const handleBatchSubmit = async (formData) => {
-    if (editingBatch) {
-      await updateBatch(editingBatch.id, formData);
-    } else {
-      await addBatch({
-        id: Date.now().toString(),
-        ...formData
-      });
+    try {
+      if (editingBatch) {
+        await updateBatch(editingBatch.id, {
+          name: formData.name,
+          schedule: formData.schedule,
+          startDate: formData.startDate,
+          timing: formData.timing,
+          trainer: formData.trainer
+        });
+        toast.success('Batch updated successfully');
+      } else {
+        // Create new batch without manually setting the ID
+        const newBatchData = {
+          name: formData.name,
+          schedule: formData.schedule,
+          startDate: formData.startDate,
+          timing: formData.timing,
+          trainer: formData.trainer
+        };
+        await addBatch(newBatchData);
+        toast.success('Batch created successfully');
+      }
+      setShowBatchForm(false);
+      setEditingBatch(null);
+    } catch (error) {
+      console.error('Error handling batch submission:', error);
+      toast.error(error.message || 'Failed to save batch');
     }
-    setShowBatchForm(false);
-    setEditingBatch(null);
   };
 
   const handleMockSubmit = async (formData) => {
@@ -743,8 +796,21 @@ function AppContent() {
   };
 
   const handleDeleteBatch = async (batchId, batchName) => {
-    if (window.confirm(`Are you sure you want to delete batch "${batchName}"?`)) {
-      await deleteBatch(batchId);
+    try {
+      // Check if there are any students in this batch
+      const studentsInBatch = students.filter(s => s.batchId === batchId);
+      if (studentsInBatch.length > 0) {
+        toast.error(`Cannot delete batch "${batchName}" because it has ${studentsInBatch.length} student(s). Please remove or reassign the students first.`);
+        return;
+      }
+
+      if (window.confirm(`Are you sure you want to delete batch "${batchName}"?`)) {
+        await deleteBatch(batchId);
+        toast.success(`Batch "${batchName}" deleted successfully`);
+      }
+    } catch (error) {
+      console.error('Error deleting batch:', error);
+      toast.error(error.message || 'Failed to delete batch');
     }
   };
 
@@ -812,6 +878,20 @@ function AppContent() {
     } catch (error) {
       console.error('Error saving scores:', error);
       toast.error('Failed to save scores');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      if (result.success) {
+        toast.success('Logged out successfully');
+        navigate('/login');
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error('Failed to log out');
     }
   };
 
@@ -965,11 +1045,11 @@ function AppContent() {
     );
   };
 
-  // Update renderSidebar to renderNavbar
+  // Update renderNavbar to renderNavbar
   const renderNavbar = () => {
     return (
-      <nav className="bg-white border-b border-purple-100 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-center h-16">
             {/* Logo/Brand */}
             <div className="flex items-center">
@@ -979,51 +1059,72 @@ function AppContent() {
             </div>
 
             {/* Navigation Links */}
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => navigate('/students')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
-                  location.pathname === '/students'
-                    ? 'bg-purple-100 text-purple-900'
-                    : 'text-gray-700 hover:bg-purple-50'
-                }`}
-              >
-                <FiUsers className="text-lg" />
-                Students
-              </button>
-              <button
-                onClick={() => navigate('/batches')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
-                  location.pathname === '/batches'
-                    ? 'bg-purple-100 text-purple-900'
-                    : 'text-gray-700 hover:bg-purple-50'
-                }`}
-              >
-                <BsBook className="text-lg" />
-                Batches
-              </button>
-              <button
-                onClick={() => navigate('/attendance')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
-                  location.pathname === '/attendance'
-                    ? 'bg-purple-100 text-purple-900'
-                    : 'text-gray-700 hover:bg-purple-50'
-                }`}
-              >
-                <RiFileListLine className="text-lg" />
-                Attendance
-              </button>
-              <button
-                onClick={() => navigate('/mock-tests')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium ${
-                  location.pathname === '/mock-tests'
-                    ? 'bg-purple-100 text-purple-900'
-                    : 'text-gray-700 hover:bg-purple-50'
-                }`}
-              >
-                <AiOutlineClockCircle className="text-lg" />
-                Mock Tests
-              </button>
+            <div className="flex items-center space-x-6">
+              {userType === 'admin' && (
+                <>
+                  <button
+                    onClick={() => navigate('/')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <FiUsers className="text-lg" />
+                    Students
+                  </button>
+                  <button
+                    onClick={() => navigate('/batches')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/batches'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <BsBook className="text-lg" />
+                    Batches
+                  </button>
+                  <button
+                    onClick={() => navigate('/attendance')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/attendance'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <RiFileListLine className="text-lg" />
+                    Attendance
+                  </button>
+                  <button
+                    onClick={() => navigate('/mock-tests')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/mock-tests'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    <AiOutlineClockCircle className="text-lg" />
+                    Mock Tests
+                  </button>
+                </>
+              )}
+
+              {/* User Menu & Logout */}
+              <div className="flex items-center pl-6 ml-6 border-l border-gray-200">
+                <div className="mr-4">
+                  <p className="text-sm font-medium text-gray-700">
+                    {userType === 'admin' ? 'Admin' : `Student ID: ${currentUser?.id}`}
+                  </p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                  title="Logout"
+                >
+                  <FiLogOut className="text-lg" />
+                  <span>Logout</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1031,8 +1132,12 @@ function AppContent() {
     );
   };
 
+  // Don't show navbar on login page
+  const showNavbar = location.pathname !== '/login';
+
   return (
-    <>
+    <div className="min-h-screen bg-gray-50">
+      {showNavbar && currentUser && renderNavbar()}
       <Toaster 
         position="top-right"
         toastOptions={{
@@ -1043,65 +1148,44 @@ function AppContent() {
           },
         }}
       />
-
-      {/* Modals */}
-      {showAssignScores && selectedTest && (
-        <Modal 
-          isOpen={showAssignScores}
-          onClose={() => setShowAssignScores(false)}
-          title="Assign Mock Test Scores"
-        >
-          <AssignScoresModal
-            test={selectedTest}
-            students={students}
-            onClose={() => setShowAssignScores(false)}
-            onSave={handleAssignScores}
-          />
-        </Modal>
-      )}
-      
-      <div className="min-h-screen bg-gray-50">
-        {renderNavbar()}
-
-        <main className="pt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <StudentsView 
-                    renderFilters={() => renderFilters(setFilters)}
+      <main className={`${showNavbar ? 'pt-20' : ''} max-w-7xl mx-auto px-6 py-8`}>
+        <div className="w-full">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            
+            {/* Protected Admin Routes */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <StudentsView
+                    renderFilters={renderFilters}
                     renderStudentList={renderStudentList}
                     onAddStudent={() => setShowStudentForm(true)}
                     onFilterChange={setFilters}
                   />
-                }
-              />
-              <Route
-                path="/students"
-                element={
-                  <StudentsView 
-                    renderFilters={() => renderFilters(setFilters)}
-                    renderStudentList={renderStudentList}
-                    onAddStudent={() => setShowStudentForm(true)}
-                    onFilterChange={setFilters}
-                  />
-                }
-              />
-              <Route
-                path="/batches"
-                element={
-                  <BatchesView 
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/batches"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <BatchesView
                     renderBatchList={renderBatchList}
                     onAddBatch={() => setShowBatchForm(true)}
                     totalBatches={batches.length}
                   />
-                }
-              />
-              <Route
-                path="/mock-tests"
-                element={
-                  <MockTestsView 
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/mock-tests"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <MockTestsView
                     renderMockTestList={renderMockTestList}
                     students={students}
                     filters={filters}
@@ -1109,37 +1193,64 @@ function AppContent() {
                     onFilterChange={setFilters}
                     onAssignScores={handleAssignScores}
                   />
-                }
-              />
-              <Route
-                path="/attendance"
-                element={
-                  <AttendanceView 
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/attendance"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AttendanceView
                     students={students}
                     batches={batches}
+                    filters={filters}
+                    onFilterChange={setFilters}
                     onMarkAttendance={handleMarkAttendance}
                   />
-                }
-              />
-              <Route
-                path="/batch/:batchId/students"
-                element={
-                  <BatchStudentsView 
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/batch/:batchId/students"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <BatchStudentsView
                     students={students}
                     batches={batches}
                     onEditStudent={handleEditStudent}
                     onDeleteStudent={handleDeleteStudent}
                   />
-                }
-              />
-              <Route path="/student/:studentId" element={
-                <StudentProgressReport 
-                  students={students}
-                  batches={batches}
-                />
-              } />
-            </Routes>
-          </div>
+                </ProtectedRoute>
+              }
+            />
+            
+            <Route
+              path="/final-report"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <FinalReportView
+                    renderFilters={renderFilters}
+                    students={students}
+                    batches={batches}
+                    filters={filters}
+                    onFilterChange={setFilters}
+                  />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Student Route - Accessible by both admin and students */}
+            <Route
+              path="/student/:studentId"
+              element={
+                <ProtectedRoute requireAdmin={false}>
+                  <StudentProgressReport students={students} batches={batches} />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
 
           {/* Modals */}
           <Modal
@@ -1217,18 +1328,19 @@ function AppContent() {
               />
             </Modal>
           )}
-        </main>
-      </div>
-    </>
+        </div>
+      </main>
+    </div>
   );
 }
 
-// Wrap the app with Router
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </AuthProvider>
   );
 }
 
