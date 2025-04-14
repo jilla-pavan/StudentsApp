@@ -9,7 +9,7 @@ const BatchForm = ({ batch, onSubmit, onCancel }) => {
     timing: batch?.timing || '',
     schedule: batch?.schedule || [],
     trainer: batch?.trainer || '',
-    ...batch
+    editingBatch: batch || null
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});

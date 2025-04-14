@@ -25,11 +25,12 @@ const AppHandlers = ({
   setEditingMock,
   setSelectedStudent,
   setSelectedTest,
-  setFilters
+  setFilters,
+  navigate,
+  logout
 }) => {
   const handleMarkAttendance = async (studentId, date, present) => {
     try {
-      // Verify student exists in our local state first
       const student = students.find(s => s.id === studentId);
       if (!student) {
         toast.error('Student not found in current data. Please refresh the page.');
@@ -37,15 +38,12 @@ const AppHandlers = ({
       }
 
       await markAttendance(studentId, date, present);
-      // The real-time listener will update the UI
       toast.success(`Attendance marked as ${present ? 'present' : 'absent'} for ${student.firstName}`);
     } catch (error) {
       console.error('Error marking attendance:', error);
       toast.error(error.message || 'Failed to mark attendance');
       
-      // If student not found, refresh the students list
       if (error.message.includes('not found')) {
-        // Trigger a refresh of the students data
         window.location.reload();
       }
     }
@@ -67,36 +65,44 @@ const AppHandlers = ({
       setShowStudentForm(false);
       setEditingStudent(null);
     } catch (error) {
-      console.error('Error handling student submission:', error);
       toast.error(error.message || 'Failed to save student');
     }
   };
 
   const handleBatchSubmit = async (formData) => {
-    if (formData.editingBatch) {
-      await updateBatch(formData.editingBatch.id, formData);
-    } else {
-      await addBatch({
-        id: Date.now().toString(),
-        ...formData
-      });
+    try {
+      if (formData.editingBatch) {
+        await updateBatch(formData.editingBatch.id, {
+          ...formData,
+          id: formData.editingBatch.id
+        });
+        toast.success('Batch updated successfully');
+      } else {
+        await addBatch(formData);
+        toast.success('Batch created successfully');
+      }
+      setShowBatchForm(false);
+      setEditingBatch(null);
+    } catch (error) {
+      toast.error(error.message || 'Failed to save batch');
     }
-    setShowBatchForm(false);
-    setEditingBatch(null);
   };
 
   const handleMockSubmit = async (formData) => {
-    if (formData.editingMock) {
-      await updateMockTest(formData.editingMock.id, formData);
-    } else {
-      await addMockTest({
-        id: Date.now().toString(),
-        ...formData,
-        scores: {}
-      });
+    try {
+      if (formData.editingMock) {
+        await updateMockTest(formData.editingMock.id, formData);
+      } else {
+        await addMockTest({
+          ...formData,
+          scores: {}
+        });
+      }
+      setShowMockForm(false);
+      setEditingMock(null);
+    } catch (error) {
+      toast.error('Failed to save mock test');
     }
-    setShowMockForm(false);
-    setEditingMock(null);
   };
 
   const handleEditStudent = (student) => {
@@ -121,14 +127,24 @@ const AppHandlers = ({
         toast.success('Student deleted successfully');
       }
     } catch (error) {
-      console.error('Error deleting student:', error);
       toast.error(error.message || 'Failed to delete student');
     }
   };
 
   const handleDeleteBatch = async (batchId, batchName) => {
-    if (window.confirm(`Are you sure you want to delete batch "${batchName}"?`)) {
-      await deleteBatch(batchId);
+    try {
+      const studentsInBatch = students.filter(s => s.batchId === batchId);
+      if (studentsInBatch.length > 0) {
+        toast.error(`Cannot delete batch "${batchName}" because it has ${studentsInBatch.length} student(s). Please remove or reassign the students first.`);
+        return;
+      }
+
+      if (window.confirm(`Are you sure you want to delete batch "${batchName}"?`)) {
+        await deleteBatch(batchId);
+        toast.success(`Batch "${batchName}" deleted successfully`);
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete batch');
     }
   };
 
@@ -163,14 +179,12 @@ const AppHandlers = ({
           };
 
           if (existingScoreIndex >= 0) {
-            // Update existing score
             mockScores[existingScoreIndex] = {
               ...mockScores[existingScoreIndex],
               score: parseInt(scores[student.id]),
               updatedAt: new Date().toISOString()
             };
           } else {
-            // Add new score
             mockScores.push(newScore);
           }
           
@@ -182,7 +196,6 @@ const AppHandlers = ({
         return student;
       });
 
-      // Update all students with their new scores
       await Promise.all(
         updatedStudents
           .filter(student => scores[student.id] !== undefined)
@@ -193,8 +206,21 @@ const AppHandlers = ({
 
       toast.success('Scores saved successfully');
     } catch (error) {
-      console.error('Error saving scores:', error);
       toast.error('Failed to save scores');
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      if (result.success) {
+        toast.success('Logged out successfully');
+        navigate('/login');
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error('Failed to log out');
     }
   };
 
@@ -236,6 +262,7 @@ const AppHandlers = ({
     handleDeleteMock,
     handleBulkDeleteMocks,
     handleAssignScores,
+    handleLogout,
     onCloseStudentForm,
     onCloseBatchForm,
     onCloseMockForm,

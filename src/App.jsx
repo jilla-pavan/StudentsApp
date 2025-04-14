@@ -1,33 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import './App.css';
+import { Toaster, toast } from 'react-hot-toast';
+
+// Contexts
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+
+// Utilities
+import { getTodayDate } from './utils/dateUtils';
+
+// Services
+import { markAttendance } from './services/attendanceService';
+
+// Custom Hooks
 import { useStudents } from './hooks/useStudents';
 import { useBatches } from './hooks/useBatches';
 import { useMockTests } from './hooks/useMockTests';
-import StudentCard from './components/StudentCard';
-import BatchCard from './components/BatchCard';
-import MockTestCard from './components/MockTestCard';
-import StudentForm from './components/forms/StudentForm';
-import BatchForm from './components/forms/BatchForm';
-import MockTestForm from './components/forms/MockTestForm';
-import Modal from './components/common/Modal';
-import { getTodayDate, formatDateForInput } from './utils/dateUtils';
-import { getAttendanceForDate, markAttendance } from './services/attendanceService';
-import { updateStudent } from './services/studentService';
+
+// Icons
 import { FiUsers, FiLogOut } from 'react-icons/fi';
 import { BsBook } from 'react-icons/bs';
 import { RiFileListLine } from 'react-icons/ri';
 import { AiOutlineClockCircle } from 'react-icons/ai';
-import './App.css';
-import { Toaster, toast } from 'react-hot-toast';
+
+// Pages
+import Login from './pages/Login';
+
+// Components - Common
+import Modal from './components/common/Modal';
+
+// Components - Cards
+import StudentCard from './components/StudentCard';
+import BatchCard from './components/BatchCard';
+import MockTestCard from './components/MockTestCard';
+
+// Components - Forms
+import StudentForm from './components/forms/StudentForm';
+import BatchForm from './components/forms/BatchForm';
+import MockTestForm from './components/forms/MockTestForm';
+
+// Components - Views
+import StudentsView from './components/views/StudentView';
+import BatchesView from './components/views/BatchesView';
 import AttendanceView from './components/views/AttendanceView';
 import BatchStudentsView from './components/views/BatchStudentsView';
 import StudentProgressReport from './components/views/StudentProgressReport';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './pages/Login';
-import StudentsView from './components/views/StudentView';
-import BatchesView from './components/views/BatchesView';
 import FinalReportView from './components/views/FinalReportView';
 import MockTestsView from './components/views/MockTestsView';
+
+// Import AppHandlers at the top with other imports
+import AppHandlers from './components/handlers/AppHandlers';
 
 const ProtectedRoute = ({ children, requireAdmin }) => {
   const { currentUser, userType } = useAuth();
@@ -68,29 +90,17 @@ function AppContent() {
   const {
     students,
     selectedStudents,
-    selectedStudent,
-    setSelectedStudent,
     addStudent,
     updateStudent,
     deleteStudent,
-    toggleStudentSelection,
-    selectAllStudents,
-    deselectAllStudents,
     getFilteredStudents,
-    getStudentsByBatch
   } = useStudents([]);
 
   const {
     batches,
-    selectedBatch,
-    setSelectedBatch,
     addBatch,
     updateBatch,
     deleteBatch,
-    getBatchById,
-    getBatchProgress,
-    getBatchStatus,
-    getBatchStatusColor
   } = useBatches([]);
 
   const {
@@ -100,13 +110,10 @@ function AppContent() {
     updateMockTest,
     deleteMockTest,
     toggleMockTestSelection,
-    deselectAllMockTests,
     getFilteredMockTests,
-    getMockTestById,
-    getMockTestReport
   } = useMockTests([]);
 
-  // Modal states
+  // State management
   const [showAttendanceDetails, setShowAttendanceDetails] = useState(false);
   const [showStudentForm, setShowStudentForm] = useState(false);
   const [showBatchForm, setShowBatchForm] = useState(false);
@@ -114,237 +121,62 @@ function AppContent() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [editingBatch, setEditingBatch] = useState(null);
   const [editingMock, setEditingMock] = useState(null);
-
-  // Filter states
-  const [filters, setFilters] = useState({
-    batch: 'all',
-    search: ''
-  });
-
-  // Date state
+  const [filters, setFilters] = useState({ batch: 'all', search: '' });
   const [date, setDate] = useState(getTodayDate());
-
-  // Add this new state
   const [showAssignScores, setShowAssignScores] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
-  // Form handlers
-  const handleMarkAttendance = async (studentId, date, present) => {
-    try {
-      // Verify student exists in our local state first
-      const student = students.find(s => s.id === studentId);
-      if (!student) {
-        toast.error('Student not found in current data. Please refresh the page.');
-        return;
-      }
+  // Get handlers
+  const handlers = AppHandlers({
+    students,
+    batches,
+    selectedMockTests,
+    addStudent,
+    updateStudent,
+    deleteStudent,
+    addBatch,
+    updateBatch,
+    deleteBatch,
+    addMockTest,
+    updateMockTest,
+    deleteMockTest,
+    toggleMockTestSelection,
+    setShowStudentForm,
+    setShowBatchForm,
+    setShowMockForm,
+    setShowAttendanceDetails,
+    setShowAssignScores,
+    setEditingStudent,
+    setEditingBatch,
+    setEditingMock,
+    setSelectedStudent,
+    setSelectedTest,
+    setFilters,
+    navigate,
+    logout
+  });
 
-      await markAttendance(studentId, date, present);
-      // The real-time listener will update the UI
-      toast.success(`Attendance marked as ${present ? 'present' : 'absent'} for ${student.firstName}`);
-    } catch (error) {
-      console.error('Error marking attendance:', error);
-      toast.error(error.message || 'Failed to mark attendance');
-      
-      // If student not found, refresh the students list
-      if (error.message.includes('not found')) {
-        // Trigger a refresh of the students data
-        window.location.reload();
-      }
-    }
-  };
-
-  const handleStudentSubmit = async (formData) => {
-    try {
-      if (editingStudent) {
-        await updateStudent(editingStudent.id, formData);
-        toast.success('Student updated successfully');
-      } else {
-        await addStudent({
-          ...formData,
-          attendance: { class: [] },
-          mockScores: []
-        });
-        toast.success('Student added successfully');
-      }
-      setShowStudentForm(false);
-      setEditingStudent(null);
-    } catch (error) {
-      console.error('Error handling student submission:', error);
-      toast.error(error.message || 'Failed to save student');
-    }
-  };
-
-  const handleBatchSubmit = async (formData) => {
-    try {
-      if (editingBatch) {
-        await updateBatch(editingBatch.id, {
-          name: formData.name,
-          schedule: formData.schedule,
-          startDate: formData.startDate,
-          timing: formData.timing,
-          trainer: formData.trainer
-        });
-        toast.success('Batch updated successfully');
-      } else {
-        // Create new batch without manually setting the ID
-        const newBatchData = {
-          name: formData.name,
-          schedule: formData.schedule,
-          startDate: formData.startDate,
-          timing: formData.timing,
-          trainer: formData.trainer
-        };
-        await addBatch(newBatchData);
-        toast.success('Batch created successfully');
-      }
-      setShowBatchForm(false);
-      setEditingBatch(null);
-    } catch (error) {
-      console.error('Error handling batch submission:', error);
-      toast.error(error.message || 'Failed to save batch');
-    }
-  };
-
-  const handleMockSubmit = async (formData) => {
-    if (editingMock) {
-      await updateMockTest(editingMock.id, formData);
-    } else {
-      await addMockTest({
-        id: Date.now().toString(),
-        ...formData,
-        scores: {}
-      });
-    }
-    setShowMockForm(false);
-    setEditingMock(null);
-  };
-
-  const handleEditStudent = (student) => {
-    setEditingStudent(student);
-    setShowStudentForm(true);
-  };
-
-  const handleEditBatch = (batch) => {
-    setEditingBatch(batch);
-    setShowBatchForm(true);
-  };
-
-  const handleEditMock = (mock) => {
-    setEditingMock(mock);
-    setShowMockForm(true);
-  };
-
-  const handleDeleteStudent = async (studentId) => {
-    try {
-      if (window.confirm('Are you sure you want to delete this student?')) {
-        await deleteStudent(studentId);
-        toast.success('Student deleted successfully');
-      }
-    } catch (error) {
-      console.error('Error deleting student:', error);
-      toast.error(error.message || 'Failed to delete student');
-    }
-  };
-
-  const handleDeleteBatch = async (batchId, batchName) => {
-    try {
-      // Check if there are any students in this batch
-      const studentsInBatch = students.filter(s => s.batchId === batchId);
-      if (studentsInBatch.length > 0) {
-        toast.error(`Cannot delete batch "${batchName}" because it has ${studentsInBatch.length} student(s). Please remove or reassign the students first.`);
-        return;
-      }
-
-      if (window.confirm(`Are you sure you want to delete batch "${batchName}"?`)) {
-        await deleteBatch(batchId);
-        toast.success(`Batch "${batchName}" deleted successfully`);
-      }
-    } catch (error) {
-      console.error('Error deleting batch:', error);
-      toast.error(error.message || 'Failed to delete batch');
-    }
-  };
-
-  const handleDeleteMock = async (mockId) => {
-    if (window.confirm('Are you sure you want to delete this mock test?')) {
-      await deleteMockTest(mockId);
-    }
-  };
-
-  const handleBulkDeleteMocks = async () => {
-    if (window.confirm(`Are you sure you want to delete ${selectedMockTests.length} mock tests?`)) {
-      for (const mockId of selectedMockTests) {
-        await deleteMockTest(mockId);
-      }
-    }
-  };
-
-  // Add this new handler
-  const handleAssignScores = async (scores, mockTest) => {
-    try {
-      const updatedStudents = students.map(student => {
-        if (scores[student.id] !== undefined) {
-          const mockScores = Array.isArray(student.mockScores) ? student.mockScores : [];
-          const existingScoreIndex = mockScores.findIndex(s => s?.testId === mockTest.id);
-          
-          const newScore = {
-            testId: mockTest.id,
-            score: parseInt(scores[student.id]),
-            totalMarks: mockTest.totalMarks,
-            passingMarks: mockTest.passingMarks,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-
-          if (existingScoreIndex >= 0) {
-            // Update existing score
-            mockScores[existingScoreIndex] = {
-              ...mockScores[existingScoreIndex],
-              score: parseInt(scores[student.id]),
-              updatedAt: new Date().toISOString()
-            };
-          } else {
-            // Add new score
-            mockScores.push(newScore);
-          }
-          
-          return {
-            ...student,
-            mockScores
-          };
-        }
-        return student;
-      });
-
-      // Update all students with their new scores
-      await Promise.all(
-        updatedStudents
-          .filter(student => scores[student.id] !== undefined)
-          .map(student => updateStudent(student.id, {
-            mockScores: student.mockScores
-          }))
-      );
-
-      toast.success('Scores saved successfully');
-    } catch (error) {
-      console.error('Error saving scores:', error);
-      toast.error('Failed to save scores');
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      const result = await logout();
-      if (result.success) {
-        toast.success('Logged out successfully');
-        navigate('/login');
-      } else {
-        toast.error(result.error);
-      }
-    } catch (error) {
-      toast.error('Failed to log out');
-    }
-  };
+  const {
+    handleMarkAttendance,
+    handleStudentSubmit,
+    handleBatchSubmit,
+    handleMockSubmit,
+    handleEditStudent,
+    handleEditBatch,
+    handleEditMock,
+    handleDeleteStudent,
+    handleDeleteBatch,
+    handleDeleteMock,
+    handleBulkDeleteMocks,
+    handleAssignScores,
+    handleLogout,
+    onCloseStudentForm,
+    onCloseBatchForm,
+    onCloseMockForm,
+    onCloseAttendanceDetails,
+    onCloseAssignScores
+  } = handlers;
 
   // Render functions
   const renderStudentList = () => {
@@ -515,44 +347,40 @@ function AppContent() {
                 <>
                   <button
                     onClick={() => navigate('/')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      location.pathname === '/'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <FiUsers className="text-lg" />
                     Students
                   </button>
                   <button
                     onClick={() => navigate('/batches')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      location.pathname === '/batches'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/batches'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <BsBook className="text-lg" />
                     Batches
                   </button>
                   <button
                     onClick={() => navigate('/attendance')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      location.pathname === '/attendance'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/attendance'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <RiFileListLine className="text-lg" />
                     Attendance
                   </button>
                   <button
                     onClick={() => navigate('/mock-tests')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      location.pathname === '/mock-tests'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/mock-tests'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <AiOutlineClockCircle className="text-lg" />
                     Mock Tests
@@ -706,75 +534,51 @@ function AppContent() {
           {/* Modals */}
           <Modal
             isOpen={showStudentForm}
-            onClose={() => {
-              setShowStudentForm(false);
-              setEditingStudent(null);
-            }}
+            onClose={onCloseStudentForm}
             title={editingStudent ? "Edit Student" : "Add Student"}
           >
             <StudentForm
               student={editingStudent}
               batches={batches}
               onSubmit={handleStudentSubmit}
-              onCancel={() => {
-                setShowStudentForm(false);
-                setEditingStudent(null);
-              }}
+              onCancel={onCloseStudentForm}
             />
           </Modal>
 
           <Modal
             isOpen={showBatchForm}
-            onClose={() => {
-              setShowBatchForm(false);
-              setEditingBatch(null);
-            }}
+            onClose={onCloseBatchForm}
             title={editingBatch ? "Edit Batch" : "Add Batch"}
           >
             <BatchForm
               batch={editingBatch}
               onSubmit={handleBatchSubmit}
-              onCancel={() => {
-                setShowBatchForm(false);
-                setEditingBatch(null);
-              }}
+              onCancel={onCloseBatchForm}
             />
           </Modal>
 
           <Modal
             isOpen={showMockForm}
-            onClose={() => {
-              setShowMockForm(false);
-              setEditingMock(null);
-            }}
+            onClose={onCloseMockForm}
             title={editingMock ? "Edit Mock Test" : "Add Mock Test"}
           >
             <MockTestForm
               test={editingMock}
               batches={batches}
               onSubmit={handleMockSubmit}
-              onCancel={() => {
-                setShowMockForm(false);
-                setEditingMock(null);
-              }}
+              onCancel={onCloseMockForm}
             />
           </Modal>
 
           {selectedStudent && (
             <Modal
               isOpen={showAttendanceDetails}
-              onClose={() => {
-                setShowAttendanceDetails(false);
-                setSelectedStudent(null);
-              }}
+              onClose={onCloseAttendanceDetails}
               title="Attendance Details"
             >
               <AttendanceDetailsModal
                 student={selectedStudent}
-                onClose={() => {
-                  setShowAttendanceDetails(false);
-                  setSelectedStudent(null);
-                }}
+                onClose={onCloseAttendanceDetails}
                 onMarkAttendance={handleMarkAttendance}
               />
             </Modal>
