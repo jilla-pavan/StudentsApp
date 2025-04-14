@@ -27,7 +27,7 @@ const BatchesView = ({ renderBatchList, onAddBatch, totalBatches }) => (
           </button>
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow">
+      <div className="bg-white rounded-lg shadow p-8">
         <div className="overflow-hidden">
           {renderBatchList()}
         </div>

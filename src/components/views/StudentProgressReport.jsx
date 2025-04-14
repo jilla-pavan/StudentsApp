@@ -5,6 +5,7 @@ import { BiTime } from 'react-icons/bi';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
+import logo from '../../../public/images/CSA_Logo.png';
 
 const StudentProgressReport = ({ students, batches }) => {
     const { studentId } = useParams();
@@ -67,412 +68,543 @@ const StudentProgressReport = ({ students, batches }) => {
     }, [studentId, students]);
 
     const handlePrint = () => {
-        const printContent = `
-            <html>
-                <head>
-                    <title>Student Progress Report - ${student.firstName} ${student.lastName}</title>
-                    <style>
-                        @media print {
-                            @page {
-                                margin: 15mm;
-                                size: A4;
-                            }
-                        }
-                        body {
-                            font-family: Arial, sans-serif;
-                            line-height: 1.6;
-                            margin: 0;
-                            padding: 0;
-                            color: #1f2937;
-                            background-color: #ffffff;
-                        }
-                        .header {
-                            background: linear-gradient(135deg, #5521b5 0%, #7e3af2 100%);
-                            color: white;
-                            padding: 32px 24px;
-                            text-align: center;
-                            margin-bottom: 40px;
-                            border-bottom: 5px solid #4c1d95;
-                        }
-                        .header h1 {
-                            font-size: 32px;
-                            margin: 0;
-                            margin-bottom: 8px;
-                            font-weight: 800;
-                            letter-spacing: -0.5px;
-                        }
-                        .header h2 {
-                            font-size: 20px;
-                            margin: 0;
-                            font-weight: 500;
-                            opacity: 0.9;
-                        }
-                        .container {
-                            max-width: 1200px;
-                            margin: 0 auto;
-                            padding: 0 24px;
-                        }
-                        .student-info {
-                            background: #f8fafc;
-                            border: 1px solid #e2e8f0;
-                            border-radius: 16px;
-                            padding: 24px;
-                            margin-bottom: 32px;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                        }
-                        .section-title {
-                            color: #5521b5;
-                            font-size: 20px;
-                            font-weight: 700;
-                            margin-bottom: 20px;
-                            padding-bottom: 8px;
-                            border-bottom: 2px solid #5521b5;
-                        }
-                        .info-grid {
-                            display: grid;
-                            grid-template-columns: repeat(2, 1fr);
-                            gap: 24px;
-                        }
-                        .info-item {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 12px 16px;
-                            background: white;
-                            border-radius: 8px;
-                            border: 1px solid #e5e7eb;
-                        }
-                        .info-label {
-                            color: #6b7280;
-                            font-weight: 600;
-                            font-size: 14px;
-                        }
-                        .info-value {
-                            color: #1f2937;
-                            font-weight: 600;
-                            font-size: 15px;
-                        }
-                        .performance-grid {
-                            display: grid;
-                            grid-template-columns: repeat(2, 1fr);
-                            gap: 24px;
-                            margin-bottom: 32px;
-                        }
-                        .performance-card {
-                            background: white;
-                            border: 1px solid #e5e7eb;
-                            border-radius: 16px;
-                            padding: 24px;
-                            position: relative;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-                        }
-                        .card-header {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            margin-bottom: 20px;
-                        }
-                        .icon-container {
-                            width: 48px;
-                            height: 48px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            border-radius: 12px;
-                            font-size: 24px;
-                        }
-                        .grade-badge {
-                            padding: 6px 16px;
-                            border-radius: 9999px;
-                            font-size: 14px;
-                            font-weight: 600;
-                            background-color: #5521b5;
-                            color: white;
-                        }
-                        .score {
-                            font-size: 42px;
-                            font-weight: 800;
-                            color: #1f2937;
-                            margin-bottom: 8px;
-                            letter-spacing: -1px;
-                        }
-                        .label {
-                            font-size: 16px;
-                            color: #6b7280;
-                            font-weight: 500;
-                        }
-                        .footer {
-                            margin-top: 48px;
-                            text-align: center;
-                            color: #6b7280;
-                            font-size: 14px;
-                            border-top: 2px solid #e5e7eb;
-                            padding-top: 24px;
-                        }
-                        .footer-brand {
-                            color: #5521b5;
-                            font-weight: 700;
-                            font-size: 16px;
-                            margin-bottom: 8px;
-                        }
-                        .divider {
-                            height: 2px;
-                            background: linear-gradient(to right, transparent, #e5e7eb, transparent);
-                            margin: 32px 0;
-                        }
-                        /* Additional styles for tables */
-                        .table-section {
-                            margin-top: 32px;
-                            background: white;
-                            border-radius: 16px;
-                            border: 1px solid #fed7aa;
-                            overflow: hidden;
-                        }
-                        .table-title {
-                            padding: 16px 24px;
-                            background: #fff7ed;
-                            color: #ea580c;
-                            font-size: 18px;
-                            font-weight: 600;
-                            border-bottom: 1px solid #fed7aa;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-                        th {
-                            background: #fff7ed;
-                            color: #ea580c;
-                            font-weight: 600;
-                            font-size: 14px;
-                            text-align: left;
-                            padding: 12px 24px;
-                            border-bottom: 1px solid #fed7aa;
-                        }
-                        td {
-                            padding: 12px 24px;
-                            font-size: 14px;
-                            border-bottom: 1px solid #fed7aa;
-                        }
-                        tr:nth-child(even) {
-                            background: #fff7ed;
-                        }
-                        .status-badge {
-                            padding: 4px 12px;
-                            border-radius: 9999px;
-                            font-size: 12px;
-                            font-weight: 500;
-                        }
-                        .status-present {
-                            background: #f0fdf4;
-                            color: #166534;
-                        }
-                        .status-absent {
-                            background: #fef2f2;
-                            color: #991b1b;
-                        }
-                        .status-passed {
-                            background: #f0fdf4;
-                            color: #166534;
-                        }
-                        .status-failed {
-                            background: #fef2f2;
-                            color: #991b1b;
-                        }
-                        .score-badge {
-                            padding: 4px 12px;
-                            border-radius: 9999px;
-                            font-size: 12px;
-                            font-weight: 500;
-                            background: #fff7ed;
-                            color: #ea580c;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>Career Sure Academy</h1>
-                        <h2>Student Progress Report</h2>
-                    </div>
-
-                    <div class="container">
-                        <div class="student-info">
-                            <div class="section-title">Student Information</div>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <span class="info-label">Full Name</span>
-                                    <span class="info-value">${student.firstName} ${student.lastName}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Roll Number</span>
-                                    <span class="info-value">${student.rollNumber}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Batch</span>
-                                    <span class="info-value">${batch?.name || 'N/A'}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Email</span>
-                                    <span class="info-value">${student.email}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Contact</span>
-                                    <span class="info-value">${student.contactNumber || 'N/A'}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Join Date</span>
-                                    <span class="info-value">${batch?.startDate || 'N/A'}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="section-title">Performance Summary</div>
-                        <div class="performance-grid">
-                            <div class="performance-card">
-                                <div class="card-header">
-                                    <div class="icon-container" style="background-color: #ecfdf5;">
-                                        🏆
-                                    </div>
-                                    <span class="grade-badge">Grade ${getGradeLetter(overallPerformance)}</span>
-                                </div>
-                                <div class="score">${overallPerformance}%</div>
-                                <div class="label">Overall Performance</div>
-                            </div>
-
-                            <div class="performance-card">
-                                <div class="card-header">
-                                    <div class="icon-container" style="background-color: #eff6ff;">
-                                        📅
-                                    </div>
-                                    <span class="grade-badge">Grade ${getGradeLetter(attendancePercentage)}</span>
-                                </div>
-                                <div class="score">${attendancePercentage}%</div>
-                                <div class="label">Attendance Performance</div>
-                            </div>
-
-                            <div class="performance-card">
-                                <div class="card-header">
-                                    <div class="icon-container" style="background-color: #f3f0ff;">
-                                        📚
-                                    </div>
-                                    <span class="grade-badge">Grade ${getGradeLetter(mockPerformance.averageScore * 10)}</span>
-                                </div>
-                                <div class="score">${(mockPerformance.averageScore * 10).toFixed(1)}%</div>
-                                <div class="label">Mock Test Performance</div>
-                            </div>
-
-                            <div class="performance-card">
-                                <div class="card-header">
-                                    <div class="icon-container" style="background-color: #fef3c7;">
-                                        📝
-                                    </div>
-                                    <span class="grade-badge">${mockPerformance.averageScore}/10</span>
-                                </div>
-                                <div class="score">${mockPerformance.passedTests}/${mockPerformance.totalTests}</div>
-                                <div class="label">Mock Tests Passed</div>
-                            </div>
-                        </div>
-
-                        <!-- Recent Attendance List -->
-                        <div class="table-section">
-                            <div class="table-title">Recent Attendance History</div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Marked At</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${attendanceData.slice(0, 10).map(record => `
-                                        <tr>
-                                            <td>${new Date(record.date).toLocaleDateString('en-US', {
-                                                weekday: 'long',
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}</td>
-                                            <td>
-                                                <span class="status-badge ${record.present ? 'status-present' : 'status-absent'}">
-                                                    ${record.present ? '✓ Present' : '✗ Absent'}
-                                                </span>
-                                            </td>
-                                            <td>${new Date(record.timestamp).toLocaleTimeString()}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Mock Test List -->
-                        <div class="table-section">
-                            <div class="table-title">Mock Test History</div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Test ID</th>
-                                        <th>Date</th>
-                                        <th>Score</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${student.mockScores?.map(score => `
-                                        <tr>
-                                            <td>${score.testId}</td>
-                                            <td>${score.createdAt ? new Date(score.createdAt).toLocaleDateString('en-US', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            }) : 'N/A'}</td>
-                                            <td>
-                                                <span class="score-badge">
-                                                    ${score.score}/10
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span class="status-badge ${score.score >= 6 ? 'status-passed' : 'status-failed'}">
-                                                    ${score.score >= 6 ? '✓ Passed' : '✗ Failed'}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="footer">
-                            <div class="footer-brand">Career Sure Academy - Pathway To Career Success</div>
-                            <div>
-                                Generated on ${new Date().toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                </body>
-            </html>
-        `;
-
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(printContent);
-        printWindow.document.close();
-
-        printWindow.onload = function () {
-            printWindow.print();
-            printWindow.onafterprint = function () {
-                printWindow.close();
-            };
+        // Create a promise to load the image
+        const loadImage = (src) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = reject;
+                img.src = src;
+            });
         };
+
+        // Load and convert the logo to base64
+        loadImage(logo).then(logoBase64 => {
+            const printContent = `
+                <html>
+                    <head>
+                        <title>Student Progress Report - ${student.firstName} ${student.lastName}</title>
+                        <style>
+                            @media print {
+                                @page {
+                                    margin: 15mm;
+                                    size: A4;
+                                }
+                            }
+                            body {
+                                font-family: 'Segoe UI', Arial, sans-serif;
+                                line-height: 1.6;
+                                margin: 0;
+                                padding: 0;
+                                color: #1f2937;
+                                background-color: #ffffff;
+                            }
+                            .header {
+                                position: relative;
+                                background: linear-gradient(135deg, #e65c00 0%, #f47b00 100%);
+                                color: white;
+                                padding: 20px 16px;
+                                text-align: center;
+                                margin-bottom: 24px;
+                                border-bottom: 5px solid #cc5200;
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                            }
+                            .logo-container {
+                                position: absolute;
+                                left: 24px;
+                                top: 50%;
+                                transform: translateY(-50%);
+                                background: white;
+                                padding: 8px;
+                                border-radius: 8px;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            }
+                            .logo {
+                                width: 48px;
+                                height: 48px;
+                                object-fit: contain;
+                            }
+                            .header-content {
+                                flex-grow: 1;
+                                text-align: center;
+                            }
+                            .header h1 {
+                                font-size: 24px;
+                                margin: 0;
+                                margin-bottom: 4px;
+                                font-weight: 800;
+                                letter-spacing: -0.5px;
+                            }
+                            .header h2 {
+                                font-size: 16px;
+                                margin: 0;
+                                font-weight: 500;
+                                opacity: 0.9;
+                            }
+                            .watermark {
+                                position: fixed;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%) rotate(-45deg);
+                                font-size: 72px;
+                                color: rgba(230, 92, 0, 0.03);
+                                pointer-events: none;
+                                z-index: 0;
+                                white-space: nowrap;
+                            }
+                            .container {
+                                max-width: 1200px;
+                                margin: 0 auto;
+                                padding: 0 16px;
+                                position: relative;
+                                z-index: 1;
+                            }
+                            .student-info {
+                                background: #fff5eb;
+                                border: 1px solid #e2e8f0;
+                                border-radius: 16px;
+                                padding: 16px;
+                                margin-bottom: 24px;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                                position: relative;
+                                overflow: hidden;
+                            }
+                            .student-info::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 4px;
+                                background: linear-gradient(to right, #e65c00, #f47b00);
+                            }
+                            .section-title {
+                                color: #e65c00;
+                                font-size: 18px;
+                                font-weight: 700;
+                                margin-bottom: 16px;
+                                padding-bottom: 6px;
+                                border-bottom: 2px solid #e65c00;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                            }
+                            .section-title::before {
+                                content: '';
+                                display: inline-block;
+                                width: 4px;
+                                height: 20px;
+                                background: #e65c00;
+                                border-radius: 2px;
+                            }
+                            .info-grid {
+                                display: grid;
+                                grid-template-columns: repeat(2, 1fr);
+                                gap: 16px;
+                            }
+                            .info-item {
+                                display: flex;
+                                justify-content: flex-start;
+                                align-items: center;
+                                padding: 12px 16px;
+                                background: white;
+                                border-radius: 8px;
+                                border: 1px solid #e5e7eb;
+                                transition: transform 0.2s;
+                            }
+                            .info-item:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+                                border-color: #e65c00;
+                            }
+                            .info-label {
+                                color: #6b7280;
+                                font-weight: 600;
+                                font-size: 14px;
+                                width: 100px;
+                                flex-shrink: 0;
+                            }
+                            .info-value {
+                                color: #1f2937;
+                                font-weight: 600;
+                                font-size: 15px;
+                                margin-left: 8px;
+                            }
+                            .info-colon {
+                                color: #6b7280;
+                                margin: 0 8px;
+                            }
+                            .performance-grid {
+                                display: grid;
+                                grid-template-columns: repeat(2, 1fr);
+                                gap: 16px;
+                                margin-bottom: 24px;
+                            }
+                            .performance-card {
+                                background: white;
+                                border: 1px solid #e5e7eb;
+                                border-radius: 16px;
+                                padding: 16px;
+                                position: relative;
+                                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                                transition: transform 0.2s;
+                            }
+                            .performance-card:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+                            }
+                            .card-header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 20px;
+                            }
+                            .icon-container {
+                                width: 48px;
+                                height: 48px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                border-radius: 12px;
+                                font-size: 24px;
+                            }
+                            .grade-badge {
+                                padding: 6px 16px;
+                                border-radius: 9999px;
+                                font-size: 14px;
+                                font-weight: 600;
+                                background-color: #e65c00;
+                                color: white;
+                            }
+                            .score {
+                                font-size: 42px;
+                                font-weight: 800;
+                                color: #1f2937;
+                                margin-bottom: 8px;
+                                letter-spacing: -1px;
+                            }
+                            .label {
+                                font-size: 16px;
+                                color: #6b7280;
+                                font-weight: 500;
+                            }
+                            .footer {
+                                margin-top: 32px;
+                                text-align: center;
+                                color: #6b7280;
+                                font-size: 12px;
+                                border-top: 2px solid #e5e7eb;
+                                padding-top: 16px;
+                                position: relative;
+                            }
+                            .footer::before {
+                                content: '';
+                                position: absolute;
+                                top: -2px;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 100px;
+                                height: 2px;
+                                background: #e65c00;
+                            }
+                            .footer-brand {
+                                color: #e65c00;
+                                font-weight: 700;
+                                font-size: 14px;
+                                margin-bottom: 8px;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                gap: 8px;
+                            }
+                            .footer-brand img {
+                                width: 20px;
+                                height: 20px;
+                                object-fit: contain;
+                            }
+                            .qr-code {
+                                position: absolute;
+                                right: 24px;
+                                bottom: 24px;
+                                width: 64px;
+                                height: 64px;
+                                background: white;
+                                padding: 8px;
+                                border-radius: 8px;
+                                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            }
+                            .logo-container img {
+                                width: 60px;
+                                height: 60px;
+                                object-fit: contain;
+                            }
+                            .table-section {
+                                margin-top: 24px;
+                                background: white;
+                                border-radius: 16px;
+                                border: 1px solid #e2e8f0;
+                                overflow: hidden;
+                                page-break-inside: avoid;
+                            }
+                            .table-section .section-title {
+                                color: #e65c00;
+                                font-size: 20px;
+                                font-weight: 700;
+                                margin-bottom: 20px;
+                                padding: 12px 16px;
+                                border-bottom: 1px solid #e2e8f0;
+                                background: #fff8f3;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                            }
+                            th {
+                                background: #fff5eb;
+                                color: #1f2937;
+                                font-weight: 600;
+                                font-size: 14px;
+                                text-align: left;
+                                padding: 8px 16px;
+                                border-bottom: 1px solid #e2e8f0;
+                            }
+                            td {
+                                padding: 8px 16px;
+                                font-size: 12px;
+                                border-bottom: 1px solid #e2e8f0;
+                            }
+                            tr:nth-child(even) {
+                                background: #fff8f3;
+                            }
+                            .present-badge {
+                                background: #fff5eb !important;
+                                color: #e65c00 !important;
+                            }
+                            .score-badge {
+                                background: #fff5eb !important;
+                                color: #e65c00 !important;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="watermark">CAREER SURE ACADEMY</div>
+                        <div class="header">
+                            <div class="logo-container">
+                                <img src="${logoBase64}" alt="Career Sure Academy" class="logo">
+                            </div>
+                            <div class="header-content">
+                                <h1>Career Sure Academy</h1>
+                                <h2>Student Progress Report</h2>
+                            </div>
+                        </div>
+
+                        <div class="container">
+                            <div class="student-info">
+                                <div class="section-title">Student Information</div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">Full Name</span>
+                                        <span class="info-colon">:</span>
+                                        <span class="info-value">${student.firstName} ${student.lastName}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Roll Number</span>
+                                        <span class="info-colon">:</span>
+                                        <span class="info-value">${student.rollNumber}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Batch</span>
+                                        <span class="info-colon">:</span>
+                                        <span class="info-value">${batch?.name || 'N/A'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Email</span>
+                                        <span class="info-colon">:</span>
+                                        <span class="info-value">${student.email}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Contact</span>
+                                        <span class="info-colon">:</span>
+                                        <span class="info-value">${student.contactNumber || 'N/A'}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Join Date</span>
+                                        <span class="info-colon">:</span>
+                                        <span class="info-value">${batch?.startDate || 'N/A'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-title">Performance Summary</div>
+                            <div class="performance-grid">
+                                <div class="performance-card">
+                                    <div class="card-header">
+                                        <div class="icon-container">🏆</div>
+                                        <span class="grade-badge">Grade ${getGradeLetter(overallPerformance)}</span>
+                                    </div>
+                                    <div class="score">${overallPerformance}%</div>
+                                    <div class="label">Overall Performance</div>
+                                </div>
+
+                                <div class="performance-card">
+                                    <div class="card-header">
+                                        <div class="icon-container">📅</div>
+                                        <span class="grade-badge">Grade ${getGradeLetter(attendancePercentage)}</span>
+                                    </div>
+                                    <div class="score">${attendancePercentage}%</div>
+                                    <div class="label">Attendance Performance</div>
+                                </div>
+
+                                <div class="performance-card">
+                                    <div class="card-header">
+                                        <div class="icon-container">📚</div>
+                                        <span class="grade-badge">Grade ${getGradeLetter(mockPerformance.averageScore * 10)}</span>
+                                    </div>
+                                    <div class="score">${(mockPerformance.averageScore * 10).toFixed(1)}%</div>
+                                    <div class="label">Mock Test Performance</div>
+                                </div>
+
+                                <div class="performance-card">
+                                    <div class="card-header">
+                                        <div class="icon-container">📝</div>
+                                        <span class="grade-badge">${mockPerformance.averageScore}/10</span>
+                                    </div>
+                                    <div class="score">${mockPerformance.passedTests}/${mockPerformance.totalTests}</div>
+                                    <div class="label">Mock Tests Passed</div>
+                                </div>
+                            </div>
+
+                            <!-- Attendance History Table -->
+                            <div class="table-section">
+                                <div class="section-title">Recent Attendance History</div>
+                                <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
+                                    <thead>
+                                        <tr style="background: #fff8f3;">
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Date</th>
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Status</th>
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Marked At</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${attendanceData.slice(0, 10).map(record => `
+                                            <tr>
+                                                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                                                    ${new Date(record.date).toLocaleDateString('en-US', {
+                                                        weekday: 'long',
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    })}
+                                                </td>
+                                                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                                                    <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; 
+                                                        ${record.present ? 'background: #fff3e6; color: #ff6b00;' : 'background: #fef2f2; color: #991b1b;'}">
+                                                        ${record.present ? '✓ Present' : '✗ Absent'}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                                                    ${new Date(record.timestamp).toLocaleTimeString()}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Mock Test History Table -->
+                            <div class="table-section">
+                                <div class="section-title">Mock Test History</div>
+                                <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
+                                    <thead>
+                                        <tr style="background: #fff8f3;">
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Test ID</th>
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Date</th>
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Score</th>
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${student.mockScores?.map(score => `
+                                            <tr>
+                                                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${score.testId}</td>
+                                                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                                                    ${score.createdAt ? new Date(score.createdAt).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                    }) : 'N/A'}
+                                                </td>
+                                                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                                                    <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; 
+                                                        background: #fff5eb; color: #e65c00;">
+                                                        ${score.score}/10
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                                                    <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;
+                                                        ${score.score >= 6 
+                                                            ? 'background: #fff5eb; color: #e65c00;' 
+                                                            : 'background: #fef2f2; color: #991b1b;'}">
+                                                        ${score.score >= 6 ? '✓ Passed' : '✗ Failed'}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="footer">
+                                <div class="footer-brand">
+                                    <img src="${logoBase64}" alt="CSA Logo">
+                                    Career Sure Academy - Pathway To Career Success
+                                </div>
+                                <div>
+                                    Generated on ${new Date().toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </div>
+                                <img src="/qr-code.png" alt="Report QR Code" class="qr-code">
+                            </div>
+                        </div>
+                    </body>
+                </html>
+            `;
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+
+            // Wait for images to load before printing
+            printWindow.onload = function () {
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.onafterprint = function () {
+                        printWindow.close();
+                    };
+                }, 1000); // Increased delay to ensure images are loaded
+            };
+        }).catch(error => {
+            console.error('Error loading logo:', error);
+            // Fallback to print without logo if image loading fails
+            // ... implement fallback print logic here if needed
+        });
     };
 
     const handleDownloadPDF = () => {
-        // Initialize PDF with better quality settings
         const doc = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
@@ -488,9 +620,8 @@ const StudentProgressReport = ({ students, batches }) => {
         doc.setFillColor(255, 255, 255);
         doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-        // Header with academy name
-        doc.setFillColor(79, 70, 229); // indigo-600
-        doc.rect(0, 0, pageWidth, 25, 'F');
+        // Header with darker orange
+        doc.setFillColor(230, 92, 0); // #e65c00 - darker orange
         
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
@@ -501,68 +632,83 @@ const StudentProgressReport = ({ students, batches }) => {
 
         // Student Information Section
         const infoStartY = 35;
-        doc.setFillColor(249, 250, 251); // bg-gray-50
-        doc.setDrawColor(229, 231, 235); // border-gray-200
+        doc.setFillColor(255, 245, 235); // #fff5eb - lighter orange background
+        doc.setDrawColor(230, 92, 0); // #e65c00 - darker orange border
         doc.roundedRect(margin, infoStartY, pageWidth - (2 * margin), 45, 2, 2, 'FD');
 
         // Student Information Title
-        doc.setTextColor(79, 70, 229); // indigo-600
+        doc.setTextColor(230, 92, 0); // #e65c00 - darker orange text
         doc.setFontSize(14);
         doc.text("Student Information", margin + 5, infoStartY + 10);
 
-        // Student Information Grid (2x3)
+        // Student Information Grid
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
         const colWidth = (pageWidth - (2 * margin) - 10) / 2;
-        const rowHeight = 12;
+        const labelWidth = 25; // Width for labels
+        const colonPosition = labelWidth + 2; // Position for colons
+        const valuePosition = colonPosition + 5; // Position for values
 
-        // Labels (left column)
-        doc.setTextColor(107, 114, 128); // text-gray-500
-        doc.text("Full Name:", margin + 5, infoStartY + 20);
-        doc.text("Batch:", margin + 5, infoStartY + 32);
-        doc.text("Contact:", margin + 5, infoStartY + 44);
+        // Left column
+        const leftLabels = ["Full Name", "Batch", "Contact"];
+        const leftValues = [
+            `${student.firstName} ${student.lastName}`,
+            `${batch?.name || 'N/A'}`,
+            `${student.contactNumber || 'N/A'}`
+        ];
 
-        // Values (left column)
-        doc.setTextColor(31, 41, 55); // text-gray-900
-        doc.text(`: ${student.firstName} ${student.lastName}`, margin + 25, infoStartY + 20);
-        doc.text(`: ${batch?.name || '78'}`, margin + 25, infoStartY + 32);
-        doc.text(`: ${student.contactNumber || '1234567890'}`, margin + 25, infoStartY + 44);
+        // Right column
+        const rightLabels = ["Roll Number", "Email", "Join Date"];
+        const rightValues = [
+            `${student.rollNumber}`,
+            `${student.email}`,
+            `${batch?.startDate || 'N/A'}`
+        ];
 
-        // Labels (right column)
-        doc.setTextColor(107, 114, 128);
-        doc.text("Roll Number:", margin + colWidth + 5, infoStartY + 20);
-        doc.text("Email:", margin + colWidth + 5, infoStartY + 32);
-        doc.text("Join Date:", margin + colWidth + 5, infoStartY + 44);
+        // Function to draw a row with proper spacing
+        const drawInfoRow = (label, value, x, y) => {
+            doc.setTextColor(107, 114, 128); // Gray for label
+            doc.text(label, x, y);
+            doc.text(":", x + colonPosition, y);
+            doc.setTextColor(31, 41, 55); // Dark for value
+            doc.text(value, x + valuePosition, y);
+        };
 
-        // Values (right column)
-        doc.setTextColor(31, 41, 55);
-        doc.text(`: ${student.rollNumber || '1'}`, margin + colWidth + 30, infoStartY + 20);
-        doc.text(`: ${student.email || 'karna@gmail.com'}`, margin + colWidth + 30, infoStartY + 32);
-        doc.text(`: ${batch?.startDate || '2025-04-13'}`, margin + colWidth + 30, infoStartY + 44);
+        // Draw left column
+        leftLabels.forEach((label, index) => {
+            const y = infoStartY + 20 + (index * 12);
+            drawInfoRow(label, leftValues[index], margin + 5, y);
+        });
+
+        // Draw right column
+        rightLabels.forEach((label, index) => {
+            const y = infoStartY + 20 + (index * 12);
+            drawInfoRow(label, rightValues[index], margin + colWidth + 5, y);
+        });
 
         // Performance Summary Section
         const perfStartY = infoStartY + 60;
-        doc.setTextColor(79, 70, 229);
+        doc.setTextColor(230, 92, 0); // #e65c00 - darker orange text
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
         doc.text("Performance Summary", margin + 5, perfStartY);
 
-        // Performance Cards (2x2 grid)
+        // Performance Cards
         const cardStartY = perfStartY + 10;
         const cardWidth = (pageWidth - (2 * margin) - 10) / 2;
         const cardHeight = 40;
         const cardGap = 10;
 
         // Helper function to draw performance cards
-        function drawPerformanceCard({ x, y, icon, grade, value, label, bgColor }) {
+        function drawPerformanceCard({ x, y, grade, value, label }) {
             // Card background
-            doc.setFillColor(...bgColor);
-            doc.setDrawColor(229, 231, 235);
+            doc.setFillColor(255, 245, 235); // Lighter orange background
+            doc.setDrawColor(230, 92, 0); // Darker orange border
             doc.roundedRect(x, y, cardWidth, cardHeight, 3, 3, 'FD');
 
             // Grade badge
-            doc.setFillColor(255, 255, 255);
-            doc.setTextColor(79, 70, 229);
+            doc.setFillColor(230, 92, 0); // Darker orange background for badge
+            doc.setTextColor(255, 255, 255);
             doc.setFontSize(10);
             doc.roundedRect(x + cardWidth - 35, y + 5, 30, 7, 2, 2, 'F');
             doc.text(grade, x + cardWidth - 32, y + 10);
@@ -580,51 +726,47 @@ const StudentProgressReport = ({ students, batches }) => {
             doc.text(label, x + 10, y + 35);
         }
 
-        // Draw performance cards with subtle background colors
+        // Draw performance cards
         drawPerformanceCard({
             x: margin,
             y: cardStartY,
-            grade: 'Grade A+',
-            value: '95%',
-            label: 'Overall Performance',
-            bgColor: [236, 253, 245] // bg-green-50
+            grade: `Grade ${getGradeLetter(overallPerformance)}`,
+            value: `${overallPerformance}%`,
+            label: 'Overall Performance'
         });
 
         drawPerformanceCard({
             x: margin + cardWidth + cardGap,
             y: cardStartY,
-            grade: 'Grade A+',
-            value: '100%',
-            label: 'Attendance Performance',
-            bgColor: [239, 246, 255] // bg-blue-50
+            grade: `Grade ${getGradeLetter(attendancePercentage)}`,
+            value: `${attendancePercentage}%`,
+            label: 'Attendance Performance'
         });
 
         drawPerformanceCard({
             x: margin,
             y: cardStartY + cardHeight + cardGap,
-            grade: 'Grade A+',
-            value: '90.0%',
-            label: 'Mock Test Performance',
-            bgColor: [243, 232, 255] // bg-purple-50
+            grade: `Grade ${getGradeLetter(mockPerformance.averageScore * 10)}`,
+            value: `${(mockPerformance.averageScore * 10).toFixed(1)}%`,
+            label: 'Mock Test Performance'
         });
 
         drawPerformanceCard({
             x: margin + cardWidth + cardGap,
             y: cardStartY + cardHeight + cardGap,
-            grade: '9/10',
-            value: '3/3',
-            label: 'Mock Tests Passed',
-            bgColor: [254, 243, 199] // bg-yellow-50
+            grade: `${mockPerformance.averageScore}/10`,
+            value: `${mockPerformance.passedTests}/${mockPerformance.totalTests}`,
+            label: 'Mock Tests Passed'
         });
 
         // Footer
         const footerY = pageHeight - 15;
-        doc.setDrawColor(229, 231, 235);
+        doc.setDrawColor(230, 92, 0); // Darker orange line
         doc.setLineWidth(0.5);
         doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
 
         doc.setFontSize(8);
-        doc.setTextColor(107, 114, 128);
+        doc.setTextColor(230, 92, 0); // Darker orange text for brand name
         doc.text(
             'Career Sure Academy - Pathway To Career Success',
             pageWidth / 2,
@@ -634,6 +776,7 @@ const StudentProgressReport = ({ students, batches }) => {
 
         // Add page number
         doc.setFontSize(8);
+        doc.setTextColor(107, 114, 128); // Gray text
         doc.text(`Page 1 of 1`, pageWidth - margin, footerY, { align: 'right' });
 
         // Add generation timestamp

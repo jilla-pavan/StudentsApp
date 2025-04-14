@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import PropTypes from 'prop-types';
 
-const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilterChange, onAssignScores }) => {
+const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilterChange, onAssignScores, updateStudent }) => {
     const [scores, setScores] = useState({});
     const [studentMockLevels, setStudentMockLevels] = useState({});
     const [mockAttendance, setMockAttendance] = useState({});
@@ -313,6 +314,33 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
         {renderMockTestList()}
       </div>
     );
+  };
+
+  MockTestsView.propTypes = {
+    renderMockTestList: PropTypes.func.isRequired,
+    students: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      firstName: PropTypes.string.isRequired,
+      lastName: PropTypes.string,
+      email: PropTypes.string,
+      contactNumber: PropTypes.string,
+      batchId: PropTypes.string,
+      rollNumber: PropTypes.string,
+      gender: PropTypes.string,
+      mockScores: PropTypes.array,
+      mockAttendance: PropTypes.object
+    })).isRequired,
+    filters: PropTypes.shape({
+      batch: PropTypes.string,
+      search: PropTypes.string
+    }).isRequired,
+    batches: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired
+    })).isRequired,
+    onFilterChange: PropTypes.func.isRequired,
+    onAssignScores: PropTypes.func.isRequired,
+    updateStudent: PropTypes.func.isRequired
   };
 
   export default MockTestsView;

@@ -595,6 +595,7 @@ function AppContent() {
                     batches={batches}
                     onFilterChange={setFilters}
                     onAssignScores={handleAssignScores}
+                    updateStudent={updateStudent}
                   />
                 </ProtectedRoute>
               }
