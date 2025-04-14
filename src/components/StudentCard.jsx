@@ -13,6 +13,53 @@ const StudentCard = ({ student, onEdit, onDelete }) => {
     if (e.target.closest('button')) return;
     navigate(`/student/${student.id}`);
   };
+
+  // Calculate attendance percentage
+  const calculateAttendancePercentage = () => {
+    if (!student.attendance || Object.keys(student.attendance).length === 0) return 0;
+    const records = Object.values(student.attendance).filter(record => typeof record === 'object');
+    const presentDays = records.filter(record => record.present).length;
+    return Math.round((presentDays / records.length) * 100) || 0;
+  };
+
+  // Calculate mock attendance percentage
+  const calculateMockAttendancePercentage = () => {
+    if (!student.mockAttendance) return 0;
+    let totalMockDays = 0;
+    let presentMockDays = 0;
+
+    Object.values(student.mockAttendance).forEach(levelAttendance => {
+      if (Array.isArray(levelAttendance)) {
+        levelAttendance.forEach(record => {
+          totalMockDays++;
+          if (record.status === 'present') {
+            presentMockDays++;
+          }
+        });
+      }
+    });
+
+    return totalMockDays > 0 ? Math.round((presentMockDays / totalMockDays) * 100) : 0;
+  };
+
+  // Calculate mock test score percentage
+  const calculateMockTestPercentage = () => {
+    if (!student.mockScores || !Array.isArray(student.mockScores) || student.mockScores.length === 0) {
+      return 0;
+    }
+    const totalScore = student.mockScores.reduce((sum, score) => sum + score.score, 0);
+    return Math.round((totalScore / (student.mockScores.length * 10)) * 100);
+  };
+
+  const getProgressColor = (percentage) => {
+    if (percentage >= 75) return 'bg-green-500';
+    if (percentage >= 60) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const regularAttendance = calculateAttendancePercentage();
+  const mockAttendance = calculateMockAttendancePercentage();
+  const mockTestScore = calculateMockTestPercentage();
   
   return (
     <div 
@@ -77,6 +124,45 @@ const StudentCard = ({ student, onEdit, onDelete }) => {
                   <p className="text-xs text-gray-800">{student.contactNumber || 'N/A'}</p>
                 </div>
               </div>
+
+              {/* Progress Bars Section */}
+              <div className="space-y-2 mt-2">
+                {/* Regular Attendance Progress */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Regular Attendance</span>
+                  <span className="text-xs font-medium text-gray-700">{regularAttendance}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div
+                    className={`h-1.5 rounded-full ${getProgressColor(regularAttendance)} transition-all duration-300`}
+                    style={{ width: `${regularAttendance}%` }}
+                  />
+                </div>
+
+                {/* Mock Attendance Progress */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Mock Attendance</span>
+                  <span className="text-xs font-medium text-gray-700">{mockAttendance}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div
+                    className={`h-1.5 rounded-full ${getProgressColor(mockAttendance)} transition-all duration-300`}
+                    style={{ width: `${mockAttendance}%` }}
+                  />
+                </div>
+
+                {/* Mock Test Score Progress */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">Mock Test Score</span>
+                  <span className="text-xs font-medium text-gray-700">{mockTestScore}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-1.5">
+                  <div
+                    className={`h-1.5 rounded-full ${getProgressColor(mockTestScore)} transition-all duration-300`}
+                    style={{ width: `${mockTestScore}%` }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -112,7 +198,10 @@ StudentCard.propTypes = {
     rollNumber: PropTypes.string.isRequired,
     batchId: PropTypes.string.isRequired,
     gender: PropTypes.string.isRequired,
-    image: PropTypes.string
+    image: PropTypes.string,
+    attendance: PropTypes.object,
+    mockAttendance: PropTypes.object,
+    mockScores: PropTypes.array
   }).isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired
