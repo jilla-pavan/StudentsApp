@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import { Toaster, toast } from 'react-hot-toast';
+import { IoMdClose } from 'react-icons/io';
+import { HiMenuAlt3 } from 'react-icons/hi';
 
 // Contexts
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -126,6 +128,7 @@ function AppContent() {
   const [showAssignScores, setShowAssignScores] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Get handlers
   const handlers = AppHandlers({
@@ -183,10 +186,10 @@ function AppContent() {
     const filteredStudents = getFilteredStudents(filters);
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {filteredStudents.length === 0 ? (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center py-8">
+            <svg className="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">No students found</h3>
@@ -195,12 +198,12 @@ function AppContent() {
                 ? 'No students found in the selected batch'
                 : 'Get started by creating a new student.'}
             </p>
-            <div className="mt-6">
+            <div className="mt-4">
               <button
                 onClick={() => setShowStudentForm(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                className="inline-flex items-center px-3 py-1.5 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
               >
-                <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 Add Student
@@ -210,8 +213,8 @@ function AppContent() {
         ) : (
           <div>
             {filters.batch && filters.batch !== 'all' && (
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">
+              <div className="mb-4">
+                <h2 className="text-base font-semibold text-gray-900">
                   Students in {batches.find(b => b.id === filters.batch)?.name}
                 </h2>
                 <p className="mt-1 text-sm text-gray-500">
@@ -219,7 +222,7 @@ function AppContent() {
                 </p>
               </div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredStudents.map((student) => (
                 <StudentCard
                   key={student.id}
@@ -263,9 +266,9 @@ function AppContent() {
     });
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {selectedMockTests.length > 0 && (
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 flex items-center justify-between">
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium text-purple-700">
                 {selectedMockTests.length} test{selectedMockTests.length !== 1 ? 's' : ''} selected
@@ -280,7 +283,7 @@ function AppContent() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTests.map((test) => (
             <MockTestCard
               key={test.id}
@@ -302,7 +305,7 @@ function AppContent() {
 
   const renderFilters = (onFilterChange) => {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex flex-wrap gap-6">
           <div className="flex-1 min-w-[200px]">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -332,64 +335,84 @@ function AppContent() {
   const renderNavbar = () => {
     return (
       <nav className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center h-16">
             {/* Logo/Brand */}
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-purple-900">
-                Career Sure Academy
-              </h1>
+              <img 
+                src="/images/CSA_Logo.png" 
+                alt="Career Sure Academy Logo" 
+                className="h-8 w-auto"
+              />
             </div>
 
-            {/* Navigation Links */}
-            <div className="flex items-center space-x-6">
+            {/* Mobile menu button */}
+            <div className="flex md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+              >
+                {isMobileMenuOpen ? (
+                  <IoMdClose className="block h-6 w-6" />
+                ) : (
+                  <HiMenuAlt3 className="block h-6 w-6" />
+                )}
+              </button>
+            </div>
+
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:flex items-center space-x-6">
               {userType === 'admin' && (
-                <>
+                <div className="flex items-center space-x-4">
                   <button
                     onClick={() => navigate('/')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    }`}
                   >
                     <FiUsers className="text-lg" />
                     Students
                   </button>
                   <button
                     onClick={() => navigate('/batches')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/batches'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/batches'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    }`}
                   >
                     <BsBook className="text-lg" />
                     Batches
                   </button>
                   <button
                     onClick={() => navigate('/attendance')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/attendance'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/attendance'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    }`}
                   >
                     <RiFileListLine className="text-lg" />
                     Attendance
                   </button>
                   <button
                     onClick={() => navigate('/mock-tests')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${location.pathname === '/mock-tests'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      location.pathname === '/mock-tests'
                         ? 'bg-purple-100 text-purple-900'
                         : 'text-gray-700 hover:bg-gray-50'
-                      }`}
+                    }`}
                   >
                     <AiOutlineClockCircle className="text-lg" />
                     Mock Tests
                   </button>
-                </>
+                </div>
               )}
 
-              {/* User Menu & Logout */}
-              <div className="flex items-center pl-6 ml-6 border-l border-gray-200">
+              {/* User Menu & Logout - Desktop */}
+              <div className="flex items-center pl-6 border-l border-gray-200">
                 <div className="mr-4">
                   <p className="text-sm font-medium text-gray-700">
                     {userType === 'admin' ? 'Admin' : `Student ID: ${currentUser?.id}`}
@@ -402,6 +425,107 @@ function AppContent() {
                 >
                   <FiLogOut className="text-lg" />
                   <span>Logout</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile menu - Simplified vertical layout */}
+          <div 
+            className={`${
+              isMobileMenuOpen ? 'block' : 'hidden'
+            } fixed inset-0 z-40 md:hidden bg-white`}
+          >
+            <div className="flex justify-end p-4">
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <IoMdClose className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="px-4 py-2 space-y-1">
+              {userType === 'admin' && (
+                <>
+                  <button
+                    onClick={() => {
+                      navigate('/');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center px-4 py-3 text-base font-medium ${
+                      location.pathname === '/'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    <FiUsers className="mr-3 text-xl" />
+                    Students
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      navigate('/batches');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center px-4 py-3 text-base font-medium ${
+                      location.pathname === '/batches'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    <BsBook className="mr-3 text-xl" />
+                    Batches
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      navigate('/attendance');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center px-4 py-3 text-base font-medium ${
+                      location.pathname === '/attendance'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    <RiFileListLine className="mr-3 text-xl" />
+                    Attendance
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      navigate('/mock-tests');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full flex items-center px-4 py-3 text-base font-medium ${
+                      location.pathname === '/mock-tests'
+                        ? 'bg-purple-100 text-purple-900'
+                        : 'text-gray-700'
+                    }`}
+                  >
+                    <AiOutlineClockCircle className="mr-3 text-xl" />
+                    Mock Tests
+                  </button>
+                </>
+              )}
+
+              {/* User Info & Logout */}
+              <div className="mt-8 pt-4 border-t border-gray-200">
+                <div className="px-4 mb-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    {userType === 'admin' ? 'Admin' : `Student ID: ${currentUser?.id}`}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center px-4 py-3 text-base font-medium text-red-600"
+                >
+                  <FiLogOut className="mr-3 text-xl" />
+                  Logout
                 </button>
               </div>
             </div>

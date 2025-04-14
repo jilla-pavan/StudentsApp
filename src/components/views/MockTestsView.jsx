@@ -147,26 +147,26 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
     };
   
     return (
-      <div className="space-y-6">
-        <div className="flex justify-between items-center mb-8">
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Mock Tests</h1>
+            <h1 className="text-xl font-bold text-gray-900">Mock Tests</h1>
             <p className="mt-1 text-sm text-gray-500">Manage and track student mock test performance</p>
           </div>
         </div>
   
         {/* Batch Filter */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex flex-wrap gap-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Filter by Batch
               </label>
               <div className="relative">
                 <select
                   value={filters.batch}
                   onChange={(e) => onFilterChange({ ...filters, batch: e.target.value })}
-                  className="w-full pl-3 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none bg-white"
+                  className="w-full pl-3 pr-10 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none bg-white"
                 >
                   <option value="all">All Batches</option>
                   {batches.map((batch) => (
@@ -186,12 +186,12 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
         </div>
   
         {/* Students List */}
-        <div className="mt-8">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
+        <div>
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-4 border-b border-gray-200">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-base font-semibold text-gray-900">
                     {filters.batch && filters.batch !== 'all' 
                       ? `Students in ${batches.find(b => b.id === filters.batch)?.name}`
                       : 'All Students'}
@@ -220,8 +220,8 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                 const currentAttendance = mockAttendance[student.id]?.[`mock_${selectedMockLevel}`];
                 
                 return (
-                  <div key={student.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
-                    <div>
+                  <div key={student.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-gray-50">
+                    <div className="flex-1">
                       <h3 className="text-sm font-medium text-gray-900">{student.firstName}</h3>
                       <p className="text-sm text-gray-500">{student.email}</p>
                       <div className="mt-1">
@@ -230,9 +230,9 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:space-x-3 w-full md:w-auto">
                       {/* Mock Level Display */}
-                      <div className="flex-1 min-w-[150px]">
+                      <div className="w-full md:flex-1 md:min-w-[150px]">
                         <select
                           value={studentMockLevels[student.id] || '1'}
                           onChange={(e) => handleMockLevelChange(student.id, e.target.value)}
@@ -251,10 +251,10 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                       </div>
   
                       {/* Attendance Buttons */}
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 w-full md:w-auto">
                         <button
                           onClick={() => handleAttendanceChange(student.id, selectedMockLevel, true)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                          className={`flex-1 md:flex-none px-3 py-1.5 rounded-lg text-sm font-medium ${
                             currentAttendance?.status === 'present'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -264,7 +264,7 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                         </button>
                         <button
                           onClick={() => handleAttendanceChange(student.id, selectedMockLevel, false)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                          className={`flex-1 md:flex-none px-3 py-1.5 rounded-lg text-sm font-medium ${
                             currentAttendance?.status === 'absent'
                               ? 'bg-red-100 text-red-800'
                               : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -275,13 +275,13 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                       </div>
   
                       {/* Score Input */}
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 w-full md:w-auto">
                         <input
                           type="text"
                           value={scores[student.id] || ''}
                           onChange={(e) => handleScoreChange(student.id, e.target.value)}
                           placeholder={mockScore ? `Current: ${mockScore.score}` : "Enter score"}
-                          className="w-16 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-16 px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           disabled={!currentAttendance}
                         />
                         <span className="text-sm text-gray-500">/10</span>
@@ -289,7 +289,7 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                         <button
                           onClick={() => handleSaveScore(student.id)}
                           disabled={!scores[student.id] || !currentAttendance}
-                          className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
                           Save
                         </button>

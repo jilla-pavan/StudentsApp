@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
         setUserType('student');
         return { success: true, studentId }; // Return studentId for redirect
       }
-      return { success: false, error: 'Student ID not found' };
+      return { success: false, error: 'Student ID Not Found, Check Your ID' };
     } catch (error) {
       console.error("Student Login Error:", error);
       return { success: false, error: 'Failed to verify student ID' };

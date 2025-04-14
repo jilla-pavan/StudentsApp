@@ -1,25 +1,44 @@
 import React from 'react';
+import { FiUsers, FiPlus } from 'react-icons/fi';
 
 const StudentsView = ({ renderFilters, renderStudentList, onAddStudent, onFilterChange }) => (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Students</h1>
-          <p className="mt-1 text-sm text-gray-500">Manage your students and their information</p>
+  <div className="min-h-screen bg-gray-50">
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-4">
+      {/* Header Card */}
+      <div className="bg-white rounded-lg shadow-sm p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+              <FiUsers className="w-5 h-5 text-indigo-600" />
+              Students
+            </h1>
+            <p className="mt-1 text-sm text-gray-600">
+              Manage your students and their information
+            </p>
+          </div>
+          <button
+            onClick={onAddStudent}
+            className="inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors shadow-sm"
+          >
+            <FiPlus className="w-4 h-4 mr-2" />
+            Add New Student
+          </button>
         </div>
-        <button
-          onClick={onAddStudent}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
-        >
-          <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Add New Student
-        </button>
       </div>
-      {renderFilters(onFilterChange)}
-      {renderStudentList()}
-    </div>
-  );
 
-  export default StudentsView;
+      {/* Main Content Card */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        {/* Filters Section */}
+        <div className="p-4 border-b border-gray-100">
+          {renderFilters(onFilterChange)}
+        </div>
+      </div>
+      {/* Students List Section */}
+      <div className="divide-y divide-gray-100 py-4">
+        {renderStudentList()}
+      </div>
+    </div>
+  </div>
+);
+
+export default StudentsView;

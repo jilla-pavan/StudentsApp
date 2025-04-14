@@ -784,120 +784,121 @@ const StudentProgressReport = ({ students, batches }) => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
             {/* Header */}
-            <div className="mb-8">
-                <div className="flex items-center gap-4 mb-6">
+            <div className="mb-4 sm:mb-6">
+                <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                        className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
                     >
-                        <FiArrowLeft className="w-6 h-6" />
+                        <FiArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
-                    <h1 className="text-3xl font-bold text-gray-900">Student Progress Report</h1>
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Student Progress Report</h1>
                 </div>
 
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                        <div className="h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center text-xl font-bold text-purple-600">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-purple-100 flex items-center justify-center text-lg sm:text-xl font-bold text-purple-600">
                             {student.firstName[0]}{student.lastName[0]}
                         </div>
                         <div>
-                            <h2 className="text-2xl font-semibold text-gray-900">
+                            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
                                 {student.firstName} {student.lastName}
                             </h2>
-                            <p className="text-gray-500">{student.email}</p>
+                            <p className="text-sm sm:text-base text-gray-500">{student.email}</p>
                         </div>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
                         <button
                             onClick={handlePrint}
-                            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                            className="flex-1 sm:flex-none inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                         >
-                            <FiPrinter className="w-4 h-4 mr-2" />
-                            Print Full Report
+                            <FiPrinter className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                            Print Report
                         </button>
                         <button
                             onClick={handleDownloadPDF}
-                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-700"
+                            className="flex-1 sm:flex-none inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent rounded-lg text-xs sm:text-sm font-medium text-white bg-purple-600 hover:bg-purple-700"
                         >
-                            <FiDownload className="w-4 h-4 mr-2" />
-                            Final Report
+                            <FiDownload className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                            Download PDF
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {/* Overall Performance Card - First */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="p-2 bg-green-50 rounded-lg">
-                            <FiAward className="w-6 h-6 text-green-600" />
+            {/* Quick Stats - Make cards stack on mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+                {/* Overall Performance Card */}
+                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                        <div className="p-1.5 sm:p-2 bg-green-50 rounded-lg">
+                            <FiAward className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getGradeColor(overallPerformance)}`}>
+                        <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getGradeColor(overallPerformance)}`}>
                             Grade {getGradeLetter(overallPerformance)}
                         </span>
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-900 mb-1">{overallPerformance}%</h3>
-                    <p className="text-gray-500 text-sm">Overall Performance</p>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">{overallPerformance}%</h3>
+                    <p className="text-xs sm:text-sm text-gray-500">Overall Performance</p>
                 </div>
 
-                {/* Attendance Performance Card - Second */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <FiCalendar className="w-6 h-6 text-blue-600" />
+                {/* Attendance Card */}
+                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                        <div className="p-1.5 sm:p-2 bg-blue-50 rounded-lg">
+                            <FiCalendar className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getGradeColor(attendancePercentage)}`}>
+                        <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getGradeColor(attendancePercentage)}`}>
                             Grade {getGradeLetter(attendancePercentage)}
                         </span>
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-900 mb-1">{attendancePercentage}%</h3>
-                    <p className="text-gray-500 text-sm">Attendance Performance</p>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">{attendancePercentage}%</h3>
+                    <p className="text-xs sm:text-sm text-gray-500">Attendance Rate</p>
                 </div>
 
-                {/* Mock Test Performance Card - Third */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="p-2 bg-purple-50 rounded-lg">
-                            <FiBook className="w-6 h-6 text-purple-600" />
+                {/* Mock Test Performance Card */}
+                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                        <div className="p-1.5 sm:p-2 bg-purple-50 rounded-lg">
+                            <FiBook className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getGradeColor(mockPerformance.averageScore * 10)}`}>
-                            Grade {getGradeLetter(mockPerformance.averageScore * 10)}
+                        <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getGradeColor(calculateMockTestPercentage())}`}>
+                            Grade {getGradeLetter(calculateMockTestPercentage())}
                         </span>
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-900 mb-1">{(mockPerformance.averageScore * 10).toFixed(1)}%</h3>
-                    <p className="text-gray-500 text-sm">Mock Test Performance</p>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">{(mockPerformance.averageScore * 10).toFixed(1)}%</h3>
+                    <p className="text-xs sm:text-sm text-gray-500">Mock Test Average</p>
                 </div>
 
-                {/* Tests Passed Card - Fourth */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="p-2 bg-yellow-50 rounded-lg">
-                            <FiBook className="w-6 h-6 text-yellow-600" />
+                {/* Tests Passed Card */}
+                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                        <div className="p-1.5 sm:p-2 bg-yellow-50 rounded-lg">
+                            <FiCheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-600" />
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getGradeColor(mockPerformance.averageScore * 10)}`}>
-                            {mockPerformance.averageScore}/10
+                        <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-yellow-50 text-yellow-600">
+                            {mockPerformance.averageScore.toFixed(1)}/10
                         </span>
                     </div>
-                    <h3 className="text-3xl font-bold text-gray-900 mb-1">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
                         {mockPerformance.passedTests}/{mockPerformance.totalTests}
                     </h3>
-                    <p className="text-gray-500 text-sm">Mock Tests Passed</p>
+                    <p className="text-xs sm:text-sm text-gray-500">Tests Passed</p>
                 </div>
             </div>
 
-            {/* Detailed Progress */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
-                <div className="border-b border-gray-200">
-                    <nav className="flex -mb-px">
+            {/* Detailed Progress - Make tabs scrollable on mobile */}
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 sm:mb-8">
+                <div className="border-b border-gray-200 overflow-x-auto">
+                    <nav className="flex -mb-px min-w-full">
                         {['overview', 'attendance', 'mock-tests', 'analytics'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`py-4 px-6 text-sm font-medium border-b-2 ${activeTab === tab
+                                className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${
+                                    activeTab === tab
                                     ? 'border-purple-500 text-purple-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -908,14 +909,15 @@ const StudentProgressReport = ({ students, batches }) => {
                     </nav>
                 </div>
 
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
+                    {/* Update content sections */}
                     {activeTab === 'overview' && (
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="space-y-4 sm:space-y-6">
+                            <div className="grid grid-cols-1 gap-4 sm:gap-6">
                                 {/* Student Details */}
-                                <div className="bg-gray-50 rounded-lg p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Student Information</h3>
-                                    <div className="space-y-4">
+                                <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Student Information</h3>
+                                    <div className="space-y-3 sm:space-y-4">
                                         <div className="flex justify-between">
                                             <span className="text-gray-500">Batch</span>
                                             <span className="text-gray-900 font-medium">{batch?.name || 'N/A'}</span>
@@ -940,182 +942,13 @@ const StudentProgressReport = ({ students, batches }) => {
                         </div>
                     )}
 
-                    {activeTab === 'attendance' && (
-                        <div className="space-y-6">
-                            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                <div className="mb-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Attendance Summary</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="bg-gray-50 p-4 rounded-lg">
-                                            <p className="text-sm text-gray-500">Total Classes</p>
-                                            <p className="text-2xl font-bold text-gray-900">
-                                                {attendanceData.length || 0}
-                                            </p>
-                                        </div>
-                                        <div className="bg-green-50 p-4 rounded-lg">
-                                            <p className="text-sm text-green-600">Present Days</p>
-                                            <p className="text-2xl font-bold text-green-700">
-                                                {attendanceData.filter(record => record.present).length || 0}
-                                            </p>
-                                        </div>
-                                        <div className="bg-red-50 p-4 rounded-lg">
-                                            <p className="text-sm text-red-600">Absent Days</p>
-                                            <p className="text-2xl font-bold text-red-700">
-                                                {attendanceData.filter(record => !record.present).length || 0}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {attendanceData.length > 0 ? (
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marked At</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {attendanceData.map((record, index) => (
-                                                    <tr key={index} className={record.present ? 'bg-green-50' : 'bg-red-50'}>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                            {new Date(record.date).toLocaleDateString('en-US', {
-                                                                weekday: 'long',
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric'
-                                                            })}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                                record.present ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                            }`}>
-                                                                {record.present ? (
-                                                                    <>
-                                                                        <FiCheckCircle className="w-4 h-4 mr-1" />
-                                                                        Present
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <FiXCircle className="w-4 h-4 mr-1" />
-                                                                        Absent
-                                                                    </>
-                                                                )}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            {new Date(record.timestamp).toLocaleTimeString()}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-8">
-                                        <p className="text-gray-500">No attendance records available</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'mock-tests' && (
-                        <div className="space-y-6">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {student.mockScores?.map((score, index) => (
-                                            <tr key={index}>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                    {score.testId}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    {score.createdAt ? new Date(score.createdAt).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                    }) : 'N/A'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getGradeColor(score.score * 10)}`}>
-                                                        {score.score}/10
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${score.score >= 6 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                        }`}>
-                                                        {score.score >= 6 ? (
-                                                            <>
-                                                                <FiCheckCircle className="w-4 h-4 mr-1" />
-                                                                Passed
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <FiXCircle className="w-4 h-4 mr-1" />
-                                                                Failed
-                                                            </>
-                                                        )}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
-
+                    {/* Update charts for better mobile responsiveness */}
                     {activeTab === 'analytics' && (
-                        <div className="space-y-6">
-                            {/* Performance Overview Card */}
-                            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Overview</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Mock Test Performance */}
-                                    <div className="bg-purple-50 p-4 rounded-lg">
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-sm text-purple-600">Mock Test Performance</p>
-                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getGradeColor(mockPerformance.averageScore * 10)}`}>
-                                                {getGradeLetter(mockPerformance.averageScore * 10)}
-                                            </span>
-                                        </div>
-                                        <p className="text-2xl font-bold text-purple-700 mt-2">{(mockPerformance.averageScore * 10).toFixed(1)}%</p>
-                                        <p className="text-sm text-purple-600 mt-1">
-                                            Average Score: {mockPerformance.averageScore}/10
-                                        </p>
-                                    </div>
-
-                                    {/* Attendance Performance */}
-                                    <div className="bg-blue-50 p-4 rounded-lg">
-                                        <div className="flex items-center justify-between">
-                                            <p className="text-sm text-blue-600">Attendance Performance</p>
-                                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getGradeColor(attendancePercentage)}`}>
-                                                {getGradeLetter(attendancePercentage)}
-                                            </span>
-                                        </div>
-                                        <p className="text-2xl font-bold text-blue-700 mt-2">{attendancePercentage}%</p>
-                                        <p className="text-sm text-blue-600 mt-1">
-                                            {attendanceData.filter(record => record.present).length} of {attendanceData.length} days
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Mock Test Progress Chart */}
-                            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Mock Test Progress</h3>
-                                <div className="h-80">
+                        <div className="space-y-4 sm:space-y-6">
+                            {/* Make charts responsive */}
+                            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Mock Test Progress</h3>
+                                <div className="h-60 sm:h-80">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <LineChart
                                             data={mockPerformance.progressData}
@@ -1149,12 +982,12 @@ const StudentProgressReport = ({ students, batches }) => {
                                 </div>
                             </div>
 
-                            {/* Attendance Analysis */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Attendance Distribution Pie Chart */}
-                                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Attendance Distribution</h3>
-                                    <div className="h-64">
+                            {/* Make grid layout stack on mobile */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                {/* Attendance Distribution */}
+                                <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Attendance Distribution</h3>
+                                    <div className="h-48 sm:h-64">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <PieChart>
                                                 <Pie
@@ -1185,10 +1018,10 @@ const StudentProgressReport = ({ students, batches }) => {
                                     </div>
                                 </div>
 
-                                {/* Monthly Attendance Bar Chart */}
-                                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Attendance</h3>
-                                    <div className="h-64">
+                                {/* Monthly Attendance */}
+                                <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Monthly Attendance</h3>
+                                    <div className="h-48 sm:h-64">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <BarChart
                                                 data={getMonthlyAttendance(attendanceData)}
@@ -1203,43 +1036,6 @@ const StudentProgressReport = ({ students, batches }) => {
                                                 <Bar name="Absent Days" dataKey="absent" fill="#ef4444" />
                                             </BarChart>
                                         </ResponsiveContainer>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Performance Insights */}
-                            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Insights</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-center text-sm">
-                                        <FiTrendingUp className={`w-4 h-4 mr-2 ${mockPerformance.averageScore >= 7 ? 'text-green-500' : 'text-yellow-500'
-                                            }`} />
-                                        <span>
-                                            Average mock test score is{' '}
-                                            <span className="font-medium">
-                                                {mockPerformance.averageScore}/10
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center text-sm">
-                                        <FiCalendar className={`w-4 h-4 mr-2 ${attendancePercentage >= 80 ? 'text-green-500' : 'text-yellow-500'
-                                            }`} />
-                                        <span>
-                                            Attendance rate is{' '}
-                                            <span className="font-medium">
-                                                {attendancePercentage}%
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center text-sm">
-                                        <FiAward className={`w-4 h-4 mr-2 ${overallPerformance >= 80 ? 'text-green-500' : 'text-yellow-500'
-                                            }`} />
-                                        <span>
-                                            Overall performance grade is{' '}
-                                            <span className="font-medium">
-                                                {getGradeLetter(overallPerformance)}
-                                            </span>
-                                        </span>
                                     </div>
                                 </div>
                             </div>
