@@ -26,7 +26,17 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
           initialLevels[student.id] = nextLevel.toString();
   
           // Initialize attendance from existing data
-          initialAttendance[student.id] = student.mockAttendance || {};
+          initialAttendance[student.id] = {};
+          if (student.mockAttendance) {
+            // Convert old format to new array format if needed
+            Object.entries(student.mockAttendance).forEach(([key, value]) => {
+              if (Array.isArray(value)) {
+                initialAttendance[student.id][key] = value;
+              } else {
+                initialAttendance[student.id][key] = [value];
+              }
+            });
+          }
         } else {
           // Start at level 1 if no scores
           initialLevels[student.id] = "1";
@@ -66,26 +76,33 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
   
     const handleAttendanceChange = async (studentId, mockLevel, isPresent) => {
       try {
+        const currentDate = new Date().toISOString();
+        const newAttendanceRecord = {
+          status: isPresent ? 'present' : 'absent',
+          date: currentDate
+        };
+
+        // Get existing attendance records for this mock level
+        const existingAttendance = mockAttendance[studentId]?.[`mock_${mockLevel}`] || [];
+        
+        // Add new record to the array
         const updatedAttendance = {
           ...mockAttendance[studentId],
-          [`mock_${mockLevel}`]: {
-            status: isPresent ? 'present' : 'absent',
-            date: new Date().toISOString()
-          }
+          [`mock_${mockLevel}`]: [...existingAttendance, newAttendanceRecord]
         };
-  
+
         // Update local state
         setMockAttendance(prev => ({
           ...prev,
           [studentId]: updatedAttendance
         }));
-  
+
         // Update student in database
         await updateStudent(studentId, {
           mockAttendance: updatedAttendance
         });
-  
-        toast.success(`Attendance marked as ${isPresent ? 'present' : 'absent'}`);
+
+        toast.success(`Attendance marked as ${isPresent ? 'present' : 'absent'} for Level ${mockLevel}`);
       } catch (error) {
         console.error('Error marking attendance:', error);
         toast.error('Failed to mark attendance');
@@ -274,6 +291,29 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                           Absent
                         </button>
                       </div>
+  
+                      {/* Attendance History */}
+                      {mockAttendance[student.id]?.[`mock_${selectedMockLevel}`]?.length > 0 && (
+                        <div className="mt-2 text-xs text-gray-500">
+                          <div className="font-medium mb-1">Attendance History:</div>
+                          <div className="space-y-1 max-h-20 overflow-y-auto">
+                            {mockAttendance[student.id][`mock_${selectedMockLevel}`]
+                              .sort((a, b) => new Date(b.date) - new Date(a.date))
+                              .map((record, index) => (
+                                <div key={index} className="flex items-center justify-between">
+                                  <span>{new Date(record.date).toLocaleDateString()}</span>
+                                  <span className={`px-2 py-0.5 rounded ${
+                                    record.status === 'present' 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {record.status}
+                                  </span>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
   
                       {/* Score Input */}
                       <div className="flex items-center space-x-2 w-full md:w-auto">

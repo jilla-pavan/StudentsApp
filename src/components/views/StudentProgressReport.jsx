@@ -13,6 +13,7 @@ const StudentProgressReport = ({ students, batches }) => {
     const [student, setStudent] = useState(null);
     const [activeTab, setActiveTab] = useState('overview');
     const [loading, setLoading] = useState(true);
+    const [selectedAttendanceType, setSelectedAttendanceType] = useState('regular');
     const [attendanceData, setAttendanceData] = useState([
         {
             date: new Date().toISOString(),
@@ -21,6 +22,22 @@ const StudentProgressReport = ({ students, batches }) => {
         }
     ]);
     const printRef = useRef();
+    const [mockTestFilters, setMockTestFilters] = useState({
+        level: 'all',
+        status: 'all',
+        date: ''
+    });
+    const [attendanceFilters, setAttendanceFilters] = useState({
+        startDate: '',
+        endDate: '',
+        status: 'all'
+    });
+    const [mockAttendanceFilters, setMockAttendanceFilters] = useState({
+        startDate: '',
+        endDate: '',
+        status: 'all',
+        level: 'all'
+    });
 
     useEffect(() => {
         const loadData = async () => {
@@ -31,20 +48,20 @@ const StudentProgressReport = ({ students, batches }) => {
                 if (foundStudent) {
                     setStudent(foundStudent);
                     // Transform attendance data from the student document with proper validation
-                    const attendance = foundStudent.attendance ? 
+                    const attendance = foundStudent.attendance ?
                         Object.entries(foundStudent.attendance)
                             .filter(([key]) => {
                                 // Ensure we only process valid date entries
-                                return key !== 'length' && 
-                                       key !== 'mockAttendance' && 
-                                       !isNaN(Date.parse(key));
+                                return key !== 'length' &&
+                                    key !== 'mockAttendance' &&
+                                    !isNaN(Date.parse(key));
                             })
                             .map(([date, data]) => ({
                                 date,
                                 present: Boolean(data.present),
                                 timestamp: data.timestamp || date
                             }))
-                            .sort((a, b) => new Date(b.date) - new Date(a.date)) 
+                            .sort((a, b) => new Date(b.date) - new Date(a.date))
                         : [{
                             date: new Date().toISOString(),
                             present: false,
@@ -408,6 +425,7 @@ const StudentProgressReport = ({ students, batches }) => {
                         </div>
 
                         <div class="container">
+                            <!-- Student Information -->
                             <div class="student-info">
                                 <div class="section-title">Student Information</div>
                                 <div class="info-grid">
@@ -444,66 +462,119 @@ const StudentProgressReport = ({ students, batches }) => {
                                 </div>
                             </div>
 
-                            <div class="section-title">Performance Summary</div>
-                            <div class="performance-grid">
-                                <div class="performance-card">
-                                    <div class="card-header">
-                                        <div class="icon-container">🏆</div>
-                                        <span class="grade-badge">Grade ${getGradeLetter(overallPerformance)}</span>
+                            <!-- Performance Summary -->
+                            <div class="performance-summary" style="margin-bottom: 32px;">
+                                <div class="grid grid-cols-3 gap-6">
+                                    <!-- Regular Class Attendance Card -->
+                                    <div style="background: white; border-radius: 16px; padding: 24px; border: 1px solid #e5e7eb; position: relative;">
+                                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                            <div style="background: #f0f7ff; padding: 8px; border-radius: 8px;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 style="font-size: 16px; font-weight: 600; color: #3b82f6;">Class Attendance</h3>
+                                                <p style="font-size: 14px; color: #6b7280;">Regular Class Attendance</p>
+                                            </div>
+                                        </div>
+                                        <div style="position: absolute; top: 24px; right: 24px;">
+                                            <span style="background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
+                                                Grade A+
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div style="display: flex; align-items: baseline; gap: 8px;">
+                                                <span style="font-size: 36px; font-weight: 700; color: #1f2937;">${attendancePercentage}%</span>
+                                                <span style="font-size: 14px; color: #6b7280;">attendance rate</span>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
+                                            <div style="width: ${attendancePercentage}%; height: 100%; background: #22c55e; border-radius: 9999px;"></div>
+                                        </div>
                                     </div>
-                                    <div class="score">${overallPerformance}%</div>
-                                    <div class="label">Overall Performance</div>
-                                </div>
 
-                                <div class="performance-card">
-                                    <div class="card-header">
-                                        <div class="icon-container">📅</div>
-                                        <span class="grade-badge">Grade ${getGradeLetter(attendancePercentage)}</span>
+                                    <!-- Mock Attendance Card -->
+                                    <div style="background: white; border-radius: 16px; padding: 24px; border: 1px solid #e5e7eb; position: relative;">
+                                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                            <div style="background: #faf5ff; padding: 8px; border-radius: 8px;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9333ea" stroke-width="2">
+                                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 style="font-size: 16px; font-weight: 600; color: #9333ea;">Mock Attendance</h3>
+                                                <p style="font-size: 14px; color: #6b7280;">Mock Tests</p>
+                                            </div>
+                                        </div>
+                                        <div style="position: absolute; top: 24px; right: 24px;">
+                                            <span style="background: #fef2f2; color: #dc2626; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
+                                                Grade F
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div style="display: flex; align-items: baseline; gap: 8px;">
+                                                <span style="font-size: 36px; font-weight: 700; color: #1f2937;">${mockAttendancePercentage}%</span>
+                                                <span style="font-size: 14px; color: #6b7280;">mock attendance</span>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
+                                            <div style="width: ${mockAttendancePercentage}%; height: 100%; background: #ef4444; border-radius: 9999px;"></div>
+                                        </div>
                                     </div>
-                                    <div class="score">${attendancePercentage}%</div>
-                                    <div class="label">Attendance Performance</div>
-                                </div>
 
-                                <div class="performance-card">
-                                    <div class="card-header">
-                                        <div class="icon-container">📚</div>
-                                        <span class="grade-badge">Grade ${getGradeLetter(mockPerformance.averageScore * 10)}</span>
+                                    <!-- Mock Test Score Card -->
+                                    <div style="background: white; border-radius: 16px; padding: 24px; border: 1px solid #e5e7eb; position: relative;">
+                                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                                            <div style="background: #f0fdf4; padding: 8px; border-radius: 8px;">
+                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2">
+                                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h3 style="font-size: 16px; font-weight: 600; color: #16a34a;">Mock Test Score</h3>
+                                                <p style="font-size: 14px; color: #6b7280;">Average Performance</p>
+                                            </div>
+                                        </div>
+                                        <div style="position: absolute; top: 24px; right: 24px;">
+                                            <span style="background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
+                                                Grade A
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 16px;">
+                                            <div style="display: flex; align-items: baseline; gap: 8px;">
+                                                <span style="font-size: 36px; font-weight: 700; color: #1f2937;">${mockTestPercentage}%</span>
+                                                <span style="font-size: 14px; color: #6b7280;">average score</span>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
+                                            <div style="width: ${mockTestPercentage}%; height: 100%; background: #22c55e; border-radius: 9999px;"></div>
+                                        </div>
                                     </div>
-                                    <div class="score">${(mockPerformance.averageScore * 10).toFixed(1)}%</div>
-                                    <div class="label">Mock Test Performance</div>
-                                </div>
-
-                                <div class="performance-card">
-                                    <div class="card-header">
-                                        <div class="icon-container">📝</div>
-                                        <span class="grade-badge">${mockPerformance.averageScore}/10</span>
-                                    </div>
-                                    <div class="score">${mockPerformance.passedTests}/${mockPerformance.totalTests}</div>
-                                    <div class="label">Mock Tests Passed</div>
                                 </div>
                             </div>
 
                             <!-- Attendance History Table -->
                             <div class="table-section">
-                                <div class="section-title">Recent Attendance History</div>
+                                <div class="section-title">Regular Attendance History</div>
                                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
                                     <thead>
                                         <tr style="background: #fff8f3;">
                                             <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Date</th>
                                             <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Status</th>
-                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Marked At</th>
+                                            <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">Time</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         ${attendanceData.slice(0, 10).map(record => `
                                             <tr>
                                                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
-                                                    ${new Date(record.date).toLocaleDateString('en-US', {
-                                                        weekday: 'long',
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })}
+                                                    ${new Date(record.date).toLocaleDateString()}
                                                 </td>
                                                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
                                                     <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; 
@@ -537,11 +608,7 @@ const StudentProgressReport = ({ students, batches }) => {
                                             <tr>
                                                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">${score.testId}</td>
                                                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
-                                                    ${score.createdAt ? new Date(score.createdAt).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    }) : 'N/A'}
+                                                    ${new Date(score.createdAt).toLocaleDateString()}
                                                 </td>
                                                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
                                                     <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; 
@@ -551,9 +618,9 @@ const StudentProgressReport = ({ students, batches }) => {
                                                 </td>
                                                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
                                                     <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;
-                                                        ${score.score >= 6 
-                                                            ? 'background: #fff5eb; color: #e65c00;' 
-                                                            : 'background: #fef2f2; color: #991b1b;'}">
+                                                        ${score.score >= 6
+                    ? 'background: #fff5eb; color: #e65c00;'
+                    : 'background: #fef2f2; color: #991b1b;'}">
                                                         ${score.score >= 6 ? '✓ Passed' : '✗ Failed'}
                                                     </span>
                                                 </td>
@@ -569,15 +636,8 @@ const StudentProgressReport = ({ students, batches }) => {
                                     Career Sure Academy - Pathway To Career Success
                                 </div>
                                 <div>
-                                    Generated on ${new Date().toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit'
-                                    })}
+                                    Generated on ${new Date().toLocaleDateString()}
                                 </div>
-                                <img src="/qr-code.png" alt="Report QR Code" class="qr-code">
                             </div>
                         </div>
                     </body>
@@ -595,12 +655,10 @@ const StudentProgressReport = ({ students, batches }) => {
                     printWindow.onafterprint = function () {
                         printWindow.close();
                     };
-                }, 1000); // Increased delay to ensure images are loaded
+                }, 1000);
             };
         }).catch(error => {
             console.error('Error loading logo:', error);
-            // Fallback to print without logo if image loading fails
-            // ... implement fallback print logic here if needed
         });
     };
 
@@ -622,7 +680,7 @@ const StudentProgressReport = ({ students, batches }) => {
 
         // Header with darker orange
         doc.setFillColor(230, 92, 0); // #e65c00 - darker orange
-        
+
         doc.setTextColor(255, 255, 255);
         doc.setFont("helvetica", "bold");
         doc.setFontSize(16);
@@ -724,23 +782,37 @@ const StudentProgressReport = ({ students, batches }) => {
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
             doc.text(label, x + 10, y + 35);
+
+            // Progress bar background
+            doc.setFillColor(243, 244, 246);
+            doc.roundedRect(x + 10, y + cardHeight - 15, cardWidth - 20, 2, 1, 1, 'F');
+
+            // Progress bar fill
+            const percentage = parseFloat(value);
+            if (!isNaN(percentage)) {
+                doc.setFillColor(230, 92, 0); // Darker orange for progress
+                const progressWidth = Math.min(percentage, 100) * (cardWidth - 20) / 100;
+                if (progressWidth > 0) {
+                    doc.roundedRect(x + 10, y + cardHeight - 15, progressWidth, 2, 1, 1, 'F');
+                }
+            }
         }
 
-        // Draw performance cards
+        // Draw the performance cards with correct positioning
         drawPerformanceCard({
             x: margin,
             y: cardStartY,
-            grade: `Grade ${getGradeLetter(overallPerformance)}`,
-            value: `${overallPerformance}%`,
-            label: 'Overall Performance'
+            grade: `Grade ${getGradeLetter(attendancePercentage)}`,
+            value: `${attendancePercentage}%`,
+            label: 'Regular Attendance'
         });
 
         drawPerformanceCard({
             x: margin + cardWidth + cardGap,
             y: cardStartY,
-            grade: `Grade ${getGradeLetter(attendancePercentage)}`,
-            value: `${attendancePercentage}%`,
-            label: 'Attendance Performance'
+            grade: `Grade ${getGradeLetter(mockAttendancePercentage)}`,
+            value: `${mockAttendancePercentage}%`,
+            label: 'Mock Attendance'
         });
 
         drawPerformanceCard({
@@ -748,7 +820,7 @@ const StudentProgressReport = ({ students, batches }) => {
             y: cardStartY + cardHeight + cardGap,
             grade: `Grade ${getGradeLetter(mockPerformance.averageScore * 10)}`,
             value: `${(mockPerformance.averageScore * 10).toFixed(1)}%`,
-            label: 'Mock Test Performance'
+            label: 'Mock Test Score'
         });
 
         drawPerformanceCard({
@@ -818,7 +890,6 @@ const StudentProgressReport = ({ students, batches }) => {
 
     const batch = batches.find(b => b.id === student.batchId);
 
-    // Calculate various metrics
     const calculateAttendancePercentage = () => {
         if (!attendanceData || attendanceData.length === 0) {
             return 0;
@@ -826,6 +897,42 @@ const StudentProgressReport = ({ students, batches }) => {
         const presentDays = attendanceData.filter(record => record.present).length;
         const totalDays = attendanceData.length;
         return totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+    };
+
+    const calculateMockAttendancePercentage = () => {
+        if (!student.mockAttendance) {
+            return 0;
+        }
+
+        let totalMockDays = 0;
+        let presentMockDays = 0;
+
+        // Iterate through all mock levels
+        Object.values(student.mockAttendance).forEach(levelAttendance => {
+            if (Array.isArray(levelAttendance)) {
+                levelAttendance.forEach(record => {
+                    totalMockDays++;
+                    if (record.status === 'present') {
+                        presentMockDays++;
+                    }
+                });
+            }
+        });
+
+        return totalMockDays > 0 ? Math.round((presentMockDays / totalMockDays) * 100) : 0;
+    };
+
+    const calculateMockTestPercentage = () => {
+        if (!student.mockScores || !Array.isArray(student.mockScores) || student.mockScores.length === 0) {
+            return 0;
+        }
+
+        const totalTests = student.mockScores.length;
+        const totalScore = student.mockScores.reduce((sum, score) => sum + score.score, 0);
+        const averageScore = totalScore / totalTests;
+
+        // Convert to percentage (since scores are out of 10)
+        return Math.round((averageScore / 10) * 100);
     };
 
     const calculateMockTestPerformance = () => {
@@ -843,8 +950,8 @@ const StudentProgressReport = ({ students, batches }) => {
         const totalTests = scores.length;
         const passedTests = scores.filter(score => score.score >= 6).length;
         const highestScore = Math.max(...scores.map(score => score.score));
-        const averageScore = totalTests > 0 ? 
-            scores.reduce((acc, curr) => acc + curr.score, 0) / totalTests : 
+        const averageScore = totalTests > 0 ?
+            scores.reduce((acc, curr) => acc + curr.score, 0) / totalTests :
             0;
 
         // Prepare data for progress chart
@@ -870,23 +977,6 @@ const StudentProgressReport = ({ students, batches }) => {
         if (percentage >= 60) return 'text-yellow-600 bg-yellow-50';
         return 'text-red-600 bg-red-50';
     };
-
-    const attendancePercentage = calculateAttendancePercentage();
-    const mockPerformance = calculateMockTestPerformance();
-    const calculateOverallPerformance = () => {
-        // Convert mock test score to percentage (out of 100)
-        const mockTestPercentage = mockPerformance.averageScore * 10 || 0; // Add fallback to 0
-        
-        // Get attendance percentage with fallback to 0
-        const attendancePercent = attendancePercentage || 0;
-        
-        // Calculate cumulative average
-        const overall = (mockTestPercentage + attendancePercent) / 2;
-        
-        return Math.round(overall) || 0; // Add fallback to 0 if NaN
-    };
-
-    const overallPerformance = calculateOverallPerformance();
 
     const getGradeLetter = (percentage) => {
         if (percentage >= 90) return 'A+';
@@ -918,12 +1008,50 @@ const StudentProgressReport = ({ students, batches }) => {
         return Object.values(monthlyData);
     };
 
-    const calculateMockTestPercentage = () => {
-        if (!mockPerformance || typeof mockPerformance.averageScore !== 'number') {
-            return 0;
-        }
+    // Calculate all metrics
+    const mockPerformance = calculateMockTestPerformance();
+    const attendancePercentage = calculateAttendancePercentage();
+    const mockAttendancePercentage = calculateMockAttendancePercentage();
+    const mockTestPercentage = calculateMockTestPercentage();
+
+    const calculateOverallPerformance = () => {
         // Convert mock test score to percentage (out of 100)
-        return Math.round(mockPerformance.averageScore * 10);
+        const mockTestPercentage = mockPerformance.averageScore * 10 || 0;
+
+        // Get attendance percentage with fallback to 0
+        const attendancePercent = attendancePercentage || 0;
+
+        // Calculate cumulative average
+        const overall = (mockTestPercentage + attendancePercent) / 2;
+
+        return Math.round(overall) || 0;
+    };
+
+    const overallPerformance = calculateOverallPerformance();
+
+    const getStatusColor = (score) => {
+        if (score >= 8) return 'bg-green-100 text-green-800 ring-green-600/20';
+        if (score >= 6) return 'bg-blue-100 text-blue-800 ring-blue-600/20';
+        return 'bg-red-100 text-red-800 ring-red-600/20';
+    };
+
+    // Add these helper functions
+    const getScoreColor = (score) => {
+        if (score >= 8) return 'bg-green-100 text-green-800 ring-green-600/20';
+        if (score >= 6) return 'bg-blue-100 text-blue-800 ring-blue-600/20';
+        return 'bg-red-100 text-red-800 ring-red-600/20';
+    };
+
+    const getScoreLabel = (score) => {
+        if (score >= 8) return 'Excellent';
+        if (score >= 6) return 'Passed';
+        return 'Failed';
+    };
+
+    const getProgressColor = (percentage) => {
+        if (percentage >= 75) return 'bg-green-500';
+        if (percentage >= 50) return 'bg-blue-500';
+        return 'bg-red-500';
     };
 
     return (
@@ -971,64 +1099,114 @@ const StudentProgressReport = ({ students, batches }) => {
                 </div>
             </div>
 
-            {/* Quick Stats - Make cards stack on mobile */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-                {/* Overall Performance Card */}
-                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-3 sm:mb-4">
-                        <div className="p-1.5 sm:p-2 bg-green-50 rounded-lg">
-                            <FiAward className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
+            {/* Quick Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                {/* Class Attendance Card */}
+                <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md border border-blue-100 p-6 hover:shadow-lg transition-shadow duration-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                            <div className="p-3 bg-blue-100 rounded-xl">
+                                <FiCalendar className="w-6 h-6 text-blue-600" />
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-blue-600">Class Attendance</h3>
+                                <p className="text-xs text-blue-500">Regular Class Attendance</p>
+                            </div>
                         </div>
-                        <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getGradeColor(overallPerformance)}`}>
-                            Grade {getGradeLetter(overallPerformance)}
-                        </span>
-                    </div>
-                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">{overallPerformance}%</h3>
-                    <p className="text-xs sm:text-sm text-gray-500">Overall Performance</p>
-                </div>
-
-                {/* Attendance Card */}
-                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-3 sm:mb-4">
-                        <div className="p-1.5 sm:p-2 bg-blue-50 rounded-lg">
-                            <FiCalendar className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
-                        </div>
-                        <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getGradeColor(attendancePercentage)}`}>
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${attendancePercentage >= 75 ? 'bg-green-100 text-green-700' :
+                            attendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                            }`}>
                             Grade {getGradeLetter(attendancePercentage)}
                         </span>
                     </div>
-                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">{attendancePercentage}%</h3>
-                    <p className="text-xs sm:text-sm text-gray-500">Attendance Rate</p>
+                    <div className="mt-2">
+                        <div className="flex items-baseline">
+                            <h2 className="text-4xl font-bold text-gray-900">{attendancePercentage}%</h2>
+                            <span className="ml-2 text-sm text-gray-500">attendance rate</span>
+                        </div>
+                        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                            <div
+                                className={`h-2 rounded-full ${attendancePercentage >= 75 ? 'bg-green-500' :
+                                    attendancePercentage >= 60 ? 'bg-yellow-500' :
+                                        'bg-red-500'
+                                    }`}
+                                style={{ width: `${attendancePercentage}%` }}
+                            />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Mock Test Performance Card */}
-                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-3 sm:mb-4">
-                        <div className="p-1.5 sm:p-2 bg-purple-50 rounded-lg">
-                            <FiBook className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
+                {/* Mock Attendance Card */}
+                <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-md border border-purple-100 p-6 hover:shadow-lg transition-shadow duration-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                            <div className="p-3 bg-purple-100 rounded-xl">
+                                <FiBook className="w-6 h-6 text-purple-600" />
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-purple-600">Mock Attendance</h3>
+                                <p className="text-xs text-purple-500">Mock Tests</p>
+                            </div>
                         </div>
-                        <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium ${getGradeColor(calculateMockTestPercentage())}`}>
-                            Grade {getGradeLetter(calculateMockTestPercentage())}
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockAttendancePercentage >= 75 ? 'bg-green-100 text-green-700' :
+                            mockAttendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                            }`}>
+                            Grade {getGradeLetter(mockAttendancePercentage)}
                         </span>
                     </div>
-                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">{(mockPerformance.averageScore * 10).toFixed(1)}%</h3>
-                    <p className="text-xs sm:text-sm text-gray-500">Mock Test Average</p>
+                    <div className="mt-2">
+                        <div className="flex items-baseline">
+                            <h2 className="text-4xl font-bold text-gray-900">{mockAttendancePercentage}%</h2>
+                            <span className="ml-2 text-sm text-gray-500">mock attendance</span>
+                        </div>
+                        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                            <div
+                                className={`h-2 rounded-full ${mockAttendancePercentage >= 75 ? 'bg-green-500' :
+                                    mockAttendancePercentage >= 60 ? 'bg-yellow-500' :
+                                        'bg-red-500'
+                                    }`}
+                                style={{ width: `${mockAttendancePercentage}%` }}
+                            />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Tests Passed Card */}
-                <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-3 sm:mb-4">
-                        <div className="p-1.5 sm:p-2 bg-yellow-50 rounded-lg">
-                            <FiCheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-yellow-600" />
+                {/* Mock Test Score Card */}
+                <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-md border border-green-100 p-6 hover:shadow-lg transition-shadow duration-200">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                            <div className="p-3 bg-green-100 rounded-xl">
+                                <FiCheckCircle className="w-6 h-6 text-green-600" />
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-green-600">Mock Test Score</h3>
+                                <p className="text-xs text-green-500">Average Performance</p>
+                            </div>
                         </div>
-                        <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium bg-yellow-50 text-yellow-600">
-                            {mockPerformance.averageScore.toFixed(1)}/10
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockTestPercentage >= 75 ? 'bg-green-100 text-green-700' :
+                            mockTestPercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-red-100 text-red-700'
+                            }`}>
+                            Grade {getGradeLetter(mockTestPercentage)}
                         </span>
                     </div>
-                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
-                        {mockPerformance.passedTests}/{mockPerformance.totalTests}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-500">Tests Passed</p>
+                    <div className="mt-2">
+                        <div className="flex items-baseline">
+                            <h2 className="text-4xl font-bold text-gray-900">{mockTestPercentage}%</h2>
+                            <span className="ml-2 text-sm text-gray-500">average score</span>
+                        </div>
+                        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                            <div
+                                className={`h-2 rounded-full ${mockTestPercentage >= 75 ? 'bg-green-500' :
+                                    mockTestPercentage >= 60 ? 'bg-yellow-500' :
+                                        'bg-red-500'
+                                    }`}
+                                style={{ width: `${mockTestPercentage}%` }}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1040,8 +1218,7 @@ const StudentProgressReport = ({ students, batches }) => {
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${
-                                    activeTab === tab
+                                className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${activeTab === tab
                                     ? 'border-purple-500 text-purple-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
@@ -1180,6 +1357,622 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'attendance' && (
+                        <div className="space-y-6">
+                            {/* Attendance Type Filter */}
+                            <div className="flex items-center justify-center space-x-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                                <button
+                                    onClick={() => setSelectedAttendanceType('regular')}
+                                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${selectedAttendanceType === 'regular'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    Regular Attendance
+                                </button>
+                                <button
+                                    onClick={() => setSelectedAttendanceType('mock')}
+                                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${selectedAttendanceType === 'mock'
+                                        ? 'bg-purple-600 text-white'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        }`}
+                                >
+                                    Mock Test Attendance
+                                </button>
+                            </div>
+
+                            {/* Single Attendance Summary Card */}
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                                <div className="flex items-center space-x-4 mb-6">
+                                    <div className="p-3 bg-blue-100 rounded-xl">
+                                        <FiCalendar className="w-8 h-8 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-gray-900">Attendance Overview</h3>
+                                        <p className="text-sm text-gray-500">Class & Mock attendance records</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    {/* Show only selected attendance type */}
+                                    {selectedAttendanceType === 'regular' ? (
+                                        /* Regular Class Attendance */
+                                        <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-6 border border-blue-100 lg:col-span-2">
+                                            <div className="mb-4">
+                                                <h4 className="text-lg font-semibold text-blue-800">Regular Classes</h4>
+                                                <div className="flex items-baseline mt-2">
+                                                    <div className="text-4xl font-bold text-gray-900">{attendancePercentage}%</div>
+                                                    <div className="ml-2 text-sm text-gray-500">attendance rate</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <span className="text-sm font-medium text-gray-500">Present/Total</span>
+                                                        <span className="text-lg font-bold text-blue-600">
+                                                            {attendanceData.filter(record => record.present).length}/{attendanceData.length}
+                                                        </span>
+                                                    </div>
+                                                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                        <div
+                                                            className="bg-blue-600 h-2.5 rounded-full"
+                                                            style={{ width: `${attendancePercentage}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="pt-2 border-t border-blue-100">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-sm font-medium text-gray-500">Absent Days</span>
+                                                        <span className="text-lg font-bold text-red-600">
+                                                            {attendanceData.length - attendanceData.filter(record => record.present).length}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* Mock Test Attendance */
+                                        <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl p-6 border border-purple-100 lg:col-span-2">
+                                            <div className="mb-4">
+                                                <h4 className="text-lg font-semibold text-purple-800">Mock Test Attendance</h4>
+                                                <div className="flex items-baseline mt-2">
+                                                    <div className="text-4xl font-bold text-gray-900">{mockAttendancePercentage}%</div>
+                                                    <div className="ml-2 text-sm text-gray-500">attendance rate</div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {(() => {
+                                                    let totalMockDays = 0;
+                                                    let presentMockDays = 0;
+
+                                                    if (student.mockAttendance) {
+                                                        Object.values(student.mockAttendance).forEach(levelAttendance => {
+                                                            if (Array.isArray(levelAttendance)) {
+                                                                levelAttendance.forEach(record => {
+                                                                    totalMockDays++;
+                                                                    if (record.status === 'present') {
+                                                                        presentMockDays++;
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+
+                                                    return (
+                                                        <>
+                                                            <div>
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <span className="text-sm font-medium text-gray-500">Present/Total</span>
+                                                                    <span className="text-lg font-bold text-purple-600">
+                                                                        {presentMockDays}/{totalMockDays}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                                    <div
+                                                                        className="bg-purple-600 h-2.5 rounded-full"
+                                                                        style={{ width: `${mockAttendancePercentage}%` }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="pt-2 border-t border-purple-100">
+                                                                <div className="flex justify-between items-center">
+                                                                    <span className="text-sm font-medium text-gray-500">Absent Days</span>
+                                                                    <span className="text-lg font-bold text-red-600">
+                                                                        {totalMockDays - presentMockDays}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    );
+                                                })()}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Show only the selected attendance history table */}
+                            {selectedAttendanceType === 'regular' ? (
+                                /* Regular Attendance History Table */
+                                <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                                    <div className="p-6 border-b border-gray-200">
+                                        <div className="flex flex-col space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-gray-900">Regular Attendance History</h3>
+                                                    <p className="mt-1 text-sm text-gray-500">Detailed record of daily attendance</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Filters Section */}
+                                            <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-lg">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-gray-500">From:</span>
+                                                    <input
+                                                        type="date"
+                                                        value={attendanceFilters.startDate}
+                                                        onChange={(e) => setAttendanceFilters(prev => ({
+                                                            ...prev,
+                                                            startDate: e.target.value
+                                                        }))}
+                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-gray-500">To:</span>
+                                                    <input
+                                                        type="date"
+                                                        value={attendanceFilters.endDate}
+                                                        onChange={(e) => setAttendanceFilters(prev => ({
+                                                            ...prev,
+                                                            endDate: e.target.value
+                                                        }))}
+                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                    />
+                                                </div>
+                                                <select
+                                                    value={attendanceFilters.status}
+                                                    onChange={(e) => setAttendanceFilters(prev => ({
+                                                        ...prev,
+                                                        status: e.target.value
+                                                    }))}
+                                                    className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                >
+                                                    <option value="all">All Status</option>
+                                                    <option value="present">Present</option>
+                                                    <option value="absent">Absent</option>
+                                                </select>
+                                                <button
+                                                    onClick={() => setAttendanceFilters({
+                                                        startDate: '',
+                                                        endDate: '',
+                                                        status: 'all'
+                                                    })}
+                                                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                                                >
+                                                    Clear Filters
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y divide-gray-200">
+                                            <thead className="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Date
+                                                    </th>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Day
+                                                    </th>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Status
+                                                    </th>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Time
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-gray-200">
+                                                {attendanceData
+                                                    .filter(record => {
+                                                        // Filter by date range
+                                                        const recordDate = new Date(record.date);
+                                                        const startDate = attendanceFilters.startDate ? new Date(attendanceFilters.startDate) : null;
+                                                        const endDate = attendanceFilters.endDate ? new Date(attendanceFilters.endDate) : null;
+
+                                                        const dateInRange = (!startDate || recordDate >= startDate) &&
+                                                            (!endDate || recordDate <= endDate);
+
+                                                        // Filter by status
+                                                        const statusMatch = attendanceFilters.status === 'all' ||
+                                                            (attendanceFilters.status === 'present' && record.present) ||
+                                                            (attendanceFilters.status === 'absent' && !record.present);
+
+                                                        return dateInRange && statusMatch;
+                                                    })
+                                                    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Always sort by date (newest first)
+                                                    .map((record, index) => (
+                                                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                {new Date(record.date).toLocaleDateString()}
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                {new Date(record.date).toLocaleDateString('en-US', { weekday: 'long' })}
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.present
+                                                                    ? 'bg-green-100 text-green-800'
+                                                                    : 'bg-red-100 text-red-800'
+                                                                    }`}>
+                                                                    {record.present ? 'Present' : 'Absent'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                {new Date(record.timestamp).toLocaleTimeString()}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ) : (
+                                /* Mock Test Attendance History Table */
+                                <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                                    <div className="p-6 border-b border-gray-200">
+                                        <div className="flex flex-col space-y-4">
+                                            <div>
+                                                <h3 className="text-lg font-semibold text-gray-900">Mock Test Attendance History</h3>
+                                                <p className="mt-1 text-sm text-gray-500">Detailed record of mock test attendance</p>
+                                            </div>
+
+                                            {/* Filters Section */}
+                                            <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-lg">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-gray-500">From:</span>
+                                                    <input
+                                                        type="date"
+                                                        value={mockAttendanceFilters.startDate}
+                                                        onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                            ...prev,
+                                                            startDate: e.target.value
+                                                        }))}
+                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm text-gray-500">To:</span>
+                                                    <input
+                                                        type="date"
+                                                        value={mockAttendanceFilters.endDate}
+                                                        onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                            ...prev,
+                                                            endDate: e.target.value
+                                                        }))}
+                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                    />
+                                                </div>
+                                                <select
+                                                    value={mockAttendanceFilters.status}
+                                                    onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                        ...prev,
+                                                        status: e.target.value
+                                                    }))}
+                                                    className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                >
+                                                    <option value="all">All Status</option>
+                                                    <option value="present">Present</option>
+                                                    <option value="absent">Absent</option>
+                                                </select>
+                                                <select
+                                                    value={mockAttendanceFilters.level}
+                                                    onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                        ...prev,
+                                                        level: e.target.value
+                                                    }))}
+                                                    className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                >
+                                                    <option value="all">All Levels</option>
+                                                    {student.mockAttendance &&
+                                                        Object.keys(student.mockAttendance)
+                                                            .filter(key => !isNaN(key))
+                                                            .sort((a, b) => Number(a) - Number(b))
+                                                            .map(level => (
+                                                                <option key={level} value={level}>Level {level}</option>
+                                                            ))
+                                                    }
+                                                </select>
+                                                <button
+                                                    onClick={() => setMockAttendanceFilters({
+                                                        startDate: '',
+                                                        endDate: '',
+                                                        status: 'all',
+                                                        level: 'all'
+                                                    })}
+                                                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                                                >
+                                                    Clear Filters
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y divide-gray-200">
+                                            <thead className="bg-gray-50">
+                                                <tr>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Date
+                                                    </th>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Mock Level
+                                                    </th>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Status
+                                                    </th>
+                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                        Time
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-gray-200">
+                                                {(() => {
+                                                    const mockAttendanceRecords = [];
+
+                                                    if (student.mockAttendance) {
+                                                        Object.entries(student.mockAttendance).forEach(([level, records]) => {
+                                                            if (Array.isArray(records)) {
+                                                                records.forEach(record => {
+                                                                    mockAttendanceRecords.push({
+                                                                        ...record,
+                                                                        level
+                                                                    });
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+
+                                                    return mockAttendanceRecords
+                                                        .filter(record => {
+                                                            // Filter by date range
+                                                            const recordDate = new Date(record.date);
+                                                            const startDate = mockAttendanceFilters.startDate ? new Date(mockAttendanceFilters.startDate) : null;
+                                                            const endDate = mockAttendanceFilters.endDate ? new Date(mockAttendanceFilters.endDate) : null;
+
+                                                            const dateInRange = (!startDate || recordDate >= startDate) &&
+                                                                (!endDate || recordDate <= endDate);
+
+                                                            // Filter by status
+                                                            const statusMatch = mockAttendanceFilters.status === 'all' ||
+                                                                (mockAttendanceFilters.status === 'present' && record.status === 'present') ||
+                                                                (mockAttendanceFilters.status === 'absent' && record.status === 'absent');
+
+                                                            // Filter by level
+                                                            const levelMatch = mockAttendanceFilters.level === 'all' ||
+                                                                record.level === mockAttendanceFilters.level;
+
+                                                            return dateInRange && statusMatch && levelMatch;
+                                                        })
+                                                        .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                                        .map((record, index) => (
+                                                            <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                    {new Date(record.date).toLocaleDateString()}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                                        Level {record.level}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.status === 'present'
+                                                                        ? 'bg-green-100 text-green-800'
+                                                                        : 'bg-red-100 text-red-800'
+                                                                        }`}>
+                                                                        {record.status === 'present' ? 'Present' : 'Absent'}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {record.timestamp ? new Date(record.timestamp).toLocaleTimeString() : 'N/A'}
+                                                                </td>
+                                                            </tr>
+                                                        ));
+                                                })()}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {activeTab === 'mock-tests' && (
+                        <div className="space-y-6">
+                            {/* Performance Overview Card */}
+                            <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-lg border border-purple-100 p-6 hover:shadow-xl transition-all duration-300">
+                                <div className="flex items-center justify-between mb-6">
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-gray-900">Mock Test Performance</h3>
+                                        <p className="text-sm text-gray-500">Overall performance across all mock tests</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getGradeColor(mockTestPercentage)}`}>
+                                            Grade {getGradeLetter(mockTestPercentage)}
+                                        </span>
+                                        <span className="text-2xl font-bold text-gray-900">{mockTestPercentage}%</span>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-purple-100 rounded-lg">
+                                                <FiBook className="w-5 h-5 text-purple-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-500">Total Tests</p>
+                                                <p className="text-xl font-semibold text-gray-900">{student.mockScores?.length || 0}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-green-100 rounded-lg">
+                                                <FiCheckCircle className="w-5 h-5 text-green-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-500">Tests Cleared</p>
+                                                <p className="text-xl font-semibold text-gray-900">
+                                                    {student.mockScores?.filter(score => score.score >= 6).length || 0}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-green-100 rounded-lg">
+                                                <FiCheckCircle className="w-5 h-5 text-green-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-500">Current Mock</p>
+                                                <p className="text-xl font-semibold text-gray-900">
+                                                    {student.mockScores?.filter(score => score.score >= 6).length || 0}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            {/* Mock Test History with Enhanced Filters */}
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
+                                <div className="p-6 border-b border-gray-200">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-gray-900">Test History</h3>
+                                            <p className="mt-1 text-sm text-gray-500">Detailed record of all mock tests attempted</p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-3">
+                                            <select
+                                                value={mockTestFilters.level}
+                                                onChange={(e) => setMockTestFilters(prev => ({ ...prev, level: e.target.value }))}
+                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
+                                            >
+                                                <option value="all">All Levels</option>
+                                                {Array.from(new Set(student.mockScores?.map(s => s.testId))).sort().map(level => (
+                                                    <option key={level} value={level}>Level {level}</option>
+                                                ))}
+                                            </select>
+                                            <select
+                                                value={mockTestFilters.status}
+                                                onChange={(e) => setMockTestFilters(prev => ({ ...prev, status: e.target.value }))}
+                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
+                                            >
+                                                <option value="all">All Status</option>
+                                                <option value="cleared">Cleared</option>
+                                                <option value="not_cleared">Not Cleared</option>
+                                            </select>
+                                            <input
+                                                type="date"
+                                                value={mockTestFilters.date}
+                                                onChange={(e) => setMockTestFilters(prev => ({ ...prev, date: e.target.value }))}
+                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
+                                            />
+                                            <button
+                                                onClick={() => setMockTestFilters({ level: 'all', status: 'all', date: '' })}
+                                                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                                            >
+                                                Clear Filters
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Level
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Date
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Score
+                                                </th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                    Status
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {student.mockScores
+                                                ?.filter(score => {
+                                                    const levelMatch = mockTestFilters.level === 'all' || score.testId.toString() === mockTestFilters.level;
+                                                    const statusMatch = mockTestFilters.status === 'all' ||
+                                                        (mockTestFilters.status === 'cleared' && score.score >= 6) ||
+                                                        (mockTestFilters.status === 'not_cleared' && score.score < 6);
+                                                    const dateMatch = !mockTestFilters.date ||
+                                                        new Date(score.date).toLocaleDateString() === new Date(mockTestFilters.date).toLocaleDateString();
+                                                    return levelMatch && statusMatch && dateMatch;
+                                                })
+                                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                                .map((score, index) => (
+                                                    <tr key={index}
+                                                        className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition-colors`}>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 ring-1 ring-purple-600/20">
+                                                                Level {score.testId}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            {new Date(score.createdAt).toLocaleDateString()}
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getScoreColor(score.score)} ring-1`}
+                                                                    title={`${getScoreLabel(score.score)} - ${score.score}/10`}>
+                                                                    {score.score}/10
+                                                                </span>
+                                                                {score.score === Math.max(...student.mockScores.map(s => s.score)) && (
+                                                                    <span className="text-amber-500" title="Highest Score">
+                                                                        <FiAward className="w-4 h-4" />
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${score.score >= 6
+                                                                ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20'
+                                                                : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
+                                                                }`}>
+                                                                {score.score >= 6 ? (
+                                                                    <>
+                                                                        <FiCheckCircle className="w-3.5 h-3.5" />
+                                                                        Cleared
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <FiXCircle className="w-3.5 h-3.5" />
+                                                                        Not Cleared
+                                                                    </>
+                                                                )}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
