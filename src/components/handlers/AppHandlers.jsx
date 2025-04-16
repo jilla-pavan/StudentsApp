@@ -251,12 +251,10 @@ const AppHandlers = ({
         return student;
       });
 
-      console.log('📊 HANDLER: Updating mock scores for students...');
       await Promise.all(
         updatedStudents
           .filter(student => scores[student.id] !== undefined)
           .map(student => {
-            console.log(`📊 HANDLER: Updating mock scores for student ${student.id}`);
             return updateStudent(student.id, {
               mockScores: student.mockScores
             });
