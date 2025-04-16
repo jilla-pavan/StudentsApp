@@ -4,7 +4,7 @@
  */
 
 // API URL for our Node.js backend
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://studentsapp-pdee.onrender.com/api';
 
 // Custom notification messages for better UX
 export const EMAIL_NOTIFICATIONS = {
