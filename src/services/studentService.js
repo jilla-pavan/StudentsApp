@@ -62,9 +62,39 @@ export const addStudent = async (studentData) => {
     delete student.id;
 
     const docRef = await addDoc(collection(db, COLLECTION_NAME), student);
-    return {
+    const newStudent = {
       id: docRef.id,
       ...student
+    };
+
+    // Send registration confirmation email if student has an email
+    let emailResult = null;
+    if (isValidEmail(newStudent.email)) {
+      console.log(`📧 STUDENT SERVICE: Student created by admin with email: ${newStudent.email}`);
+      try {
+        // Show sending notification
+        console.log(`📱 UX NOTIFICATION: ${EMAIL_NOTIFICATIONS.REGISTRATION.SENDING}`);
+        
+        // Send registration confirmation email
+        emailResult = await sendRegistrationConfirmationEmail(
+          newStudent,
+          'New Registration'
+        );
+        
+        console.log(`✅ STUDENT SERVICE: Registration email sent successfully:`, JSON.stringify(emailResult, null, 2));
+        console.log(`📱 UX NOTIFICATION: ${EMAIL_NOTIFICATIONS.REGISTRATION.SUCCESS}`);
+      } catch (emailError) {
+        console.error(`❌ STUDENT SERVICE EMAIL ERROR:`, emailError);
+        console.error(`❌ STUDENT SERVICE EMAIL ERROR DETAILS:`, emailError.stack);
+        console.log(`📱 UX NOTIFICATION: ${EMAIL_NOTIFICATIONS.REGISTRATION.ERROR}`);
+        // We still continue even if email fails
+      }
+    }
+
+    return {
+      ...newStudent,
+      emailSent: !!emailResult,
+      emailDetails: emailResult
     };
   } catch (error) {
     console.error('Error adding student:', error);
