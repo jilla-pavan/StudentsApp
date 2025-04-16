@@ -51,6 +51,7 @@ export default function Login() {
         }
 
         // Attempt login
+        console.log(`Attempting student login with email: ${studentEmail}`);
         const result = await studentLoginWithEmail(studentEmail, studentPassword);
 
         if (result.success) {
@@ -71,6 +72,7 @@ export default function Login() {
         }
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast.error('Failed to log in. Please try again.');
     }
 

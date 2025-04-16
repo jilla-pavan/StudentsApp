@@ -44,6 +44,7 @@ const StudentProgressReport = ({ students, batches }) => {
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
+            console.log(studentId);
             try {
                 const foundStudent = students.find(s => s.id === studentId);
                 if (foundStudent) {
@@ -71,6 +72,7 @@ const StudentProgressReport = ({ students, batches }) => {
                     setAttendanceData(attendance);
                 }
             } catch (error) {
+                console.error('Error loading student data:', error);
                 // Set default attendance data in case of error
                 setAttendanceData([{
                     date: new Date().toISOString(),

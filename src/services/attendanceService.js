@@ -52,7 +52,10 @@ const migrateStudentAttendance = async (studentId, studentData) => {
     await updateDoc(studentRef, {
       attendance: deleteField()
     });
+
+    console.log(`Successfully migrated ${validRecords.length} attendance records for student ${studentId}`);
   } catch (error) {
+    console.error('Error migrating attendance:', error);
     throw error;
   }
 };
@@ -126,6 +129,7 @@ export const markAttendance = async (studentId, date, present) => {
       updatedAt: attendanceData.updatedAt
     };
   } catch (error) {
+    console.error('Error marking attendance:', error);
     if (error.code === 'not-found') {
       throw new Error('Student not found. They may have been deleted.');
     } else if (error.code === 'permission-denied') {
@@ -150,6 +154,7 @@ export const getAttendanceForDate = async (studentId, date) => {
       ...doc.data()
     }));
   } catch (error) {
+    console.error('Error getting attendance:', error);
     throw error;
   }
 };
@@ -169,6 +174,7 @@ export const getAttendanceForDateRange = async (studentId, startDate, endDate) =
       ...doc.data()
     }));
   } catch (error) {
+    console.error('Error getting attendance range:', error);
     throw error;
   }
 };
@@ -187,6 +193,7 @@ export const getBatchAttendance = async (batchId, date) => {
       ...doc.data()
     }));
   } catch (error) {
+    console.error('Error getting batch attendance:', error);
     throw error;
   }
 };
@@ -200,6 +207,7 @@ export const calculateAttendancePercentage = async (studentId, startDate, endDat
     const present = attendance.filter(record => record.present).length;
     return (present / attendance.length) * 100;
   } catch (error) {
+    console.error('Error calculating attendance percentage:', error);
     throw error;
   }
 };
@@ -226,6 +234,7 @@ export const calculateBatchAttendance = async (batchId, date) => {
       percentage: (present / attendance.length) * 100
     };
   } catch (error) {
+    console.error('Error calculating batch attendance:', error);
     throw error;
   }
 };
@@ -269,6 +278,7 @@ export const getStudentAttendanceHistory = async (studentId) => {
       ...doc.data()
     }));
   } catch (error) {
+    console.error('Error getting student attendance history:', error);
     throw error;
   }
 };
@@ -293,6 +303,7 @@ export const calculateAverageAttendance = async (students) => {
 
     return percentages.reduce((sum, percentage) => sum + percentage, 0) / students.length;
   } catch (error) {
+    console.error('Error calculating average attendance:', error);
     return 0;
   }
 };
@@ -303,6 +314,7 @@ export const getStudentAttendance = async (studentId) => {
     const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
     return getAttendanceForDateRange(studentId, lastMonth.toISOString().split('T')[0], today.toISOString().split('T')[0]);
   } catch (error) {
+    console.error('Error getting student attendance:', error);
     throw error;
   }
 };

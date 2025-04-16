@@ -1,36 +1,32 @@
-// Test script for direct call to batch assignment email service
-require('dotenv').config();
 const emailService = require('./services/emailService');
 
-const testDirectBatchEmail = async () => {
+async function testBatchAssignmentEmailDirect() {
   try {
-    // Define test student data
+    console.log('Testing batch assignment email directly via service...');
+    
     const studentData = {
-      id: "test-student-123",
-      name: "Test Student",
-      email: "test@example.com",
-      rollNumber: "TEST001"
+      id: 'STUDENT_22001',        // Student ID used as password
+      email: 'jillakanna22001@gmail.com',
+      name: 'PAVAN JILLA',
+      rollNumber: 'RQZKMP'
     };
     
-    const batchName = "Advanced Java Batch";
+    const batchName = 'Foundation Batch 2024';
     
-    // Call the service directly
-    const result = await emailService.sendBatchAssignmentEmail(studentData, batchName);
+    const result = await emailService.sendRegistrationConfirmationEmail(studentData, batchName);
+    console.log('Batch assignment email sent successfully!');
+    console.log('Message ID:', result.messageId);
     
     return result;
   } catch (error) {
-    return {
-      success: false,
-      error: error.message
-    };
+    console.error('Error sending email:', error);
+    throw error;
   }
-};
+}
 
-// Execute the test
-testDirectBatchEmail()
-  .then(result => {
-    process.exit(0);
-  })
-  .catch(error => {
-    process.exit(1);
-  }); 
+// Run the test
+testBatchAssignmentEmailDirect().then(() => {
+  console.log('✅ Direct test completed successfully!');
+}).catch(error => {
+  console.error('❌ Direct test failed:', error);
+}); 
