@@ -51,7 +51,6 @@ export default function Login() {
         }
 
         // Attempt login
-        console.log(`Attempting student login with email: ${studentEmail}`);
         const result = await studentLoginWithEmail(studentEmail, studentPassword);
 
         if (result.success) {

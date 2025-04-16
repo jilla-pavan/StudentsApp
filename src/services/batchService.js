@@ -67,7 +67,6 @@ export const deleteBatch = async (id) => {
     }
 
     await deleteDoc(batchRef);
-    console.log(`Successfully deleted batch with ID: ${id}`);
     return id;
   } catch (error) {
     console.error('Error deleting batch:', error);

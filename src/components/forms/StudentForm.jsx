@@ -16,12 +16,6 @@ const StudentForm = ({ student, batches, onSubmit, onCancel }) => {
     ...student
   });
 
-  useEffect(() => {
-    if (student) {
-      console.log('📝 FORM: Editing student with ID:', student.id);
-    }
-  }, [student]);
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -38,10 +32,7 @@ const StudentForm = ({ student, batches, onSubmit, onCancel }) => {
     };
     
     if (student) {
-      console.log('📝 FORM: Submitting edit for student ID:', formData.id);
       formattedData.editingStudent = student;
-    } else {
-      console.log('📝 FORM: Creating new student');
     }
     
     onSubmit(formattedData);
@@ -49,21 +40,6 @@ const StudentForm = ({ student, batches, onSubmit, onCancel }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Form Header - Hidden since it's redundant with modal title */}
-      {/* <div className="flex items-center pb-4 mb-2 border-b border-gray-200">
-        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-          <FiUser className="text-purple-600 h-5 w-5" />
-        </div>
-        <div>
-          <h3 className="text-lg font-medium text-gray-900">
-            {student ? 'Edit Student Details' : 'Add New Student'}
-          </h3>
-          <p className="text-sm text-gray-500">
-            {student ? 'Update the information below for the existing student' : 'Fill in the information to create a new student'}
-          </p>
-        </div>
-      </div> */}
-      
       {/* Profile Image Upload */}
       <div className="flex justify-center mb-4">
         <div className="w-28 h-28 relative rounded-full bg-gray-50 flex items-center justify-center border-2 border-dashed border-gray-300 transition-all hover:border-purple-300 group">
@@ -292,23 +268,8 @@ const StudentForm = ({ student, batches, onSubmit, onCancel }) => {
 };
 
 StudentForm.propTypes = {
-  student: PropTypes.shape({
-    id: PropTypes.string,
-    firstName: PropTypes.string,
-    lastName: PropTypes.string,
-    email: PropTypes.string,
-    contactNumber: PropTypes.string,
-    batchId: PropTypes.string,
-    rollNumber: PropTypes.string,
-    gender: PropTypes.string,
-    feePaid: PropTypes.bool
-  }),
-  batches: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired
-    })
-  ).isRequired,
+  student: PropTypes.object,
+  batches: PropTypes.array.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired
 };
