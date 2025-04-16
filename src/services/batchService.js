@@ -19,7 +19,6 @@ export const getBatches = async () => {
       ...doc.data()
     }));
   } catch (error) {
-    console.error('Error getting batches:', error);
     throw new Error('Failed to fetch batches');
   }
 };
@@ -32,7 +31,6 @@ export const addBatch = async (batchData) => {
       ...batchData
     };
   } catch (error) {
-    console.error('Error adding batch:', error);
     throw new Error('Failed to add batch');
   }
 };
@@ -52,7 +50,6 @@ export const updateBatch = async (id, batchData) => {
       ...batchData
     };
   } catch (error) {
-    console.error('Error updating batch:', error);
     throw new Error(`Failed to update batch: ${error.message}`);
   }
 };
@@ -67,10 +64,8 @@ export const deleteBatch = async (id) => {
     }
 
     await deleteDoc(batchRef);
-    console.log(`Successfully deleted batch with ID: ${id}`);
     return id;
   } catch (error) {
-    console.error('Error deleting batch:', error);
     throw new Error(`Failed to delete batch: ${error.message}`);
   }
 }; 

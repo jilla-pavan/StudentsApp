@@ -1,39 +1,50 @@
+// Test script for batch assignment email API
 const axios = require('axios');
 
-async function testBatchAssignmentEmail() {
+const testBatchAssignmentEmail = async () => {
   try {
-    console.log('Testing batch assignment email API...');
-    
-    const studentData = {
-      id: 'STUDENT_22001',        // Student ID used as password
-      email: 'jillakanna22001@gmail.com',
-      name: 'PAVAN JILLA',
-      rollNumber: 'RQZKMP'
+    // Define test student data
+    const testData = {
+      studentData: {
+        id: "test-student-123",
+        name: "Test Student",
+        email: "test@example.com",
+        rollNumber: "TEST001"
+      },
+      batchName: "Advanced Java Batch"
     };
-    
-    const batchName = 'Foundation Batch 2024';
-    
-    const response = await axios.post('http://localhost:5000/api/email/send-batch-assignment', {
-      studentData,
-      batchName
-    });
-    
-    console.log('API Response:', response.data);
-    console.log('Batch assignment email sent successfully!');
+
+    // Call the API
+    const response = await axios.post(
+      'http://localhost:5000/api/email/send-batch-assignment',
+      testData,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
     return response.data;
   } catch (error) {
-    console.error('Error calling API:', error.message);
     if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response data:', error.response.data);
+      return {
+        success: false,
+        error: error.response.data
+      };
     }
-    throw error;
+    return {
+      success: false,
+      error: error.message
+    };
   }
-}
+};
 
-// Run the test
-testBatchAssignmentEmail().then(() => {
-  console.log('✅ Test completed successfully!');
-}).catch(error => {
-  console.error('❌ Test failed:', error);
-}); 
+// Execute the test
+testBatchAssignmentEmail()
+  .then(result => {
+    process.exit(0);
+  })
+  .catch(error => {
+    process.exit(1);
+  }); 
