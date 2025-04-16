@@ -24,13 +24,6 @@ async function sendRegistrationConfirmationEmail(studentData, batchName) {
     throw new Error("Invalid batch name provided");
   }
 
-  console.log(
-    "📧 EMAIL SERVICE: Preparing to send registration confirmation email"
-  );
-  console.log("📧 EMAIL SERVICE: Recipient:", studentData.email);
-  console.log("📧 EMAIL SERVICE: Student Name:", studentData.name);
-  console.log("📧 EMAIL SERVICE: Batch:", batchName);
-
   // For registration confirmation, we always use the new registration template
   const emailSubject =
     "Welcome To Career Sure Academy! Your Registration is Pending Review";
@@ -98,10 +91,7 @@ async function sendRegistrationConfirmationEmail(studentData, batchName) {
   };
 
   try {
-    console.log("📧 EMAIL SERVICE: Sending email...");
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ EMAIL SERVICE: Email sent successfully");
-    console.log("📧 EMAIL SERVICE: Message ID:", info.messageId);
     return info;
   } catch (error) {
     console.error(
@@ -161,13 +151,6 @@ async function sendBatchAssignmentEmail(studentData, batchName) {
   if (!batchName || typeof batchName !== "string") {
     throw new Error("Invalid batch name provided");
   }
-
-  console.log(
-    "📧 EMAIL SERVICE: Preparing to send batch assignment email with credentials"
-  );
-  console.log("📧 EMAIL SERVICE: Recipient:", studentData.email);
-  console.log("📧 EMAIL SERVICE: Student Name:", studentData.name);
-  console.log("📧 EMAIL SERVICE: Batch:", batchName);
 
   // For batch assignment, we always use the batch assignment template
   const emailSubject =
@@ -243,10 +226,7 @@ async function sendBatchAssignmentEmail(studentData, batchName) {
   };
 
   try {
-    console.log("📧 EMAIL SERVICE: Sending batch assignment email...");
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ EMAIL SERVICE: Batch assignment email sent successfully");
-    console.log("📧 EMAIL SERVICE: Message ID:", info.messageId);
     return info;
   } catch (error) {
     console.error(
@@ -274,9 +254,7 @@ async function sendBatchAssignmentEmail(studentData, batchName) {
       );
     }
 
-    throw new Error(
-      "Failed to send batch assignment email. Please try again later."
-    );
+    throw new Error("Failed to send batch assignment email. Please try again later.");
   }
 }
 

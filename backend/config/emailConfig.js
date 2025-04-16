@@ -1,7 +1,6 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 
-console.log('⚙️ EMAIL CONFIG: Loading environment variables...');
 dotenv.config();
 
 // Validate environment variables
@@ -15,8 +14,6 @@ if (!process.env.EMAIL_PASSWORD) {
   throw new Error('EMAIL_PASSWORD environment variable is required');
 }
 
-console.log('📧 EMAIL CONFIG: Initializing email configuration...');
-console.log('📧 EMAIL CONFIG: Using Gmail account:', process.env.EMAIL_USER);
 
 // Create reusable transporter object using Gmail SMTP
 const transporter = nodemailer.createTransport({
@@ -48,16 +45,11 @@ transporter.verify(function(error, success) {
     }
     
     // Create a dummy transporter for development
-    console.log('⚠️ EMAIL CONFIG: Creating dummy transporter for development');
     return nodemailer.createTransport({
       jsonTransport: true
     });
   }
   
-  console.log('✅ EMAIL CONFIG: Email configuration verified successfully');
-  console.log('📧 EMAIL CONFIG: SMTP connection established');
-  console.log('📧 EMAIL CONFIG: Maximum connections:', transporter.options.maxConnections || 'default');
-  console.log('📧 EMAIL CONFIG: Maximum messages:', transporter.options.maxMessages || 'default');
 });
 
 // Handle SMTP connection errors
@@ -68,5 +60,4 @@ transporter.on('error', (err) => {
   if (err.response) console.error('- Error Response:', err.response);
 });
 
-console.log('⚙️ EMAIL CONFIG: Email configuration complete');
 module.exports = transporter; 

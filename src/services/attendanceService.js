@@ -52,8 +52,6 @@ const migrateStudentAttendance = async (studentId, studentData) => {
     await updateDoc(studentRef, {
       attendance: deleteField()
     });
-
-    console.log(`Successfully migrated ${validRecords.length} attendance records for student ${studentId}`);
   } catch (error) {
     console.error('Error migrating attendance:', error);
     throw error;

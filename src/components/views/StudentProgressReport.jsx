@@ -44,7 +44,6 @@ const StudentProgressReport = ({ students, batches }) => {
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-            console.log(studentId);
             try {
                 const foundStudent = students.find(s => s.id === studentId);
                 if (foundStudent) {

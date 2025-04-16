@@ -51,22 +51,13 @@ const AppHandlers = ({
   };
 
   const handleStudentSubmit = async (formData) => {
-    console.log('👤 HANDLER: Student form submitted:', JSON.stringify(formData, null, 2));
     try {
       if (formData.editingStudent) {
-        console.log('👤 HANDLER: Editing existing student');
         const oldStudent = formData.editingStudent;
-        console.log('👤 HANDLER: Original student data:', JSON.stringify(oldStudent, null, 2));
         
         // Create a clean copy of the form data without the editingStudent property
         const updatedData = { ...formData };
         delete updatedData.editingStudent;
-        
-        // Preserve the student ID to ensure we're updating the existing record
-        // This ensures we're not creating a new document
-        console.log('👤 HANDLER: Student ID being updated:', oldStudent.id);
-        
-        console.log('👤 HANDLER: Updated student data:', JSON.stringify(updatedData, null, 2));
         
         // Check if this is a batch assignment
         const isBatchAssignment = 
@@ -74,43 +65,21 @@ const AppHandlers = ({
           updatedData.batchId && 
           updatedData.batchId !== 'unassigned';
         
-        console.log('👤 HANDLER: Is this a batch assignment?', isBatchAssignment);
-        console.log('👤 HANDLER: Old batch condition:', (oldStudent.batchId === 'unassigned' || !oldStudent.batchId));
-        console.log('👤 HANDLER: Old batch value:', oldStudent.batchId);
-        console.log('👤 HANDLER: New batch condition:', (updatedData.batchId && updatedData.batchId !== 'unassigned'));
-        console.log('👤 HANDLER: New batch value:', updatedData.batchId);
-        
-        if (isBatchAssignment) {
-          console.log('👤 HANDLER: Batch assignment detected. Old batch:', oldStudent.batchId, 'New batch:', updatedData.batchId);
-        }
-        
         // Display "processing" toast for batch assignments
         let toastId;
         if (isBatchAssignment) {
           const batch = batches.find(b => b.id === updatedData.batchId);
           const batchName = batch ? batch.name : 'selected batch';
-          console.log('👤 HANDLER: Found batch name for display:', batchName);
-          console.log('👤 HANDLER: Batches available:', JSON.stringify(batches.map(b => ({id: b.id, name: b.name})), null, 2));
           
           toastId = toast.loading(
             `Assigning ${updatedData.name} to ${batchName} and sending confirmation email...`,
             { duration: 10000 }
           );
-          console.log('👤 HANDLER: Displayed loading toast with ID:', toastId);
         }
         
         // Update the student
-        console.log('👤 HANDLER: Calling updateStudent service with ID:', oldStudent.id);
         try {
           const result = await updateStudent(oldStudent.id, updatedData);
-          console.log('👤 HANDLER: Update successful. Result:', JSON.stringify(result, null, 2));
-          console.log('👤 HANDLER: Email sent status:', result.emailSent);
-          
-          if (result.emailDetails) {
-            console.log('👤 HANDLER: Email details:', JSON.stringify(result.emailDetails, null, 2));
-          } else {
-            console.log('👤 HANDLER: No email details returned from update operation');
-          }
         } catch (updateError) {
           console.error('❌ HANDLER ERROR: Student update failed:', updateError);
           throw updateError;
@@ -119,30 +88,25 @@ const AppHandlers = ({
         // Handle toast based on batch assignment
         if (isBatchAssignment) {
           // Dismiss the loading toast if it's still visible
-          console.log('👤 HANDLER: Dismissing loading toast:', toastId);
           toast.dismiss(toastId);
           
           const batch = batches.find(b => b.id === updatedData.batchId);
           const batchName = batch ? batch.name : 'selected batch';
-          console.log('👤 HANDLER: Showing success toast for batch assignment to:', batchName);
           toast.success(
             `Student assigned to ${batchName}. A confirmation email has been sent to ${updatedData.email}`,
             { duration: 6000 }
           );
         } else {
-          console.log('👤 HANDLER: Showing generic success toast');
           toast.success('Student updated successfully');
         }
       } else {
         // This is a new student
-        console.log('👤 HANDLER: Adding new student');
         try {
           const newStudent = await addStudent({
             ...formData,
             attendance: { class: [] },
             mockScores: []
           });
-          console.log('👤 HANDLER: New student added successfully:', JSON.stringify(newStudent, null, 2));
           toast.success('Student added successfully');
         } catch (addError) {
           console.error('❌ HANDLER ERROR: Failed to add student:', addError);
@@ -151,7 +115,6 @@ const AppHandlers = ({
       }
       
       // Close the form
-      console.log('👤 HANDLER: Closing student form');
       setShowStudentForm(false);
       setEditingStudent(null);
     } catch (error) {
@@ -288,12 +251,10 @@ const AppHandlers = ({
         return student;
       });
 
-      console.log('📊 HANDLER: Updating mock scores for students...');
       await Promise.all(
         updatedStudents
           .filter(student => scores[student.id] !== undefined)
           .map(student => {
-            console.log(`📊 HANDLER: Updating mock scores for student ${student.id}`);
             return updateStudent(student.id, {
               mockScores: student.mockScores
             });
