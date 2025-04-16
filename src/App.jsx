@@ -27,6 +27,7 @@ import { AiOutlineClockCircle } from 'react-icons/ai';
 
 // Pages
 import Login from './pages/Login';
+import StudentRegister from './pages/StudentRegister';
 
 // Components - Common
 import Modal from './components/common/Modal';
@@ -299,7 +300,7 @@ function AppContent() {
             />
           ))}
         </div>
-      </div>
+      </div> 
     );
   };
 
@@ -415,7 +416,7 @@ function AppContent() {
               <div className="flex items-center pl-6 border-l border-gray-200">
                 <div className="mr-4">
                   <p className="text-sm font-medium text-gray-700">
-                    {userType === 'admin' ? 'Admin' : `Student ID: ${currentUser?.id}`}
+                    {userType === 'admin' ? 'Admin' : `Hi ${currentUser?.name}`}
                   </p>
                 </div>
                 <button
@@ -536,7 +537,7 @@ function AppContent() {
   };
 
   // Don't show navbar on login page
-  const showNavbar = location.pathname !== '/login';
+  const showNavbar = location.pathname !== '/login' && location.pathname !== '/register';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -551,10 +552,11 @@ function AppContent() {
           },
         }}
       />
-      <main className={`${showNavbar ? 'pt-20' : ''} max-w-7xl mx-auto px-6 py-8`}>
+      <main className={`${showNavbar ? 'pt-20' : ''} max-w-7xl mx-auto px-6 ${location.pathname !== '/register' && location.pathname !== '/login' ? 'py-8 bg-purple-50' : ''}`}>
         <div className="w-full">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<StudentRegister />} />
             
             {/* Protected Admin Routes */}
             <Route

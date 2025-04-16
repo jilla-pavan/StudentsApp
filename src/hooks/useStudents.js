@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import * as studentService from '../services/studentService';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { toast } from 'react-hot-toast';
 
 export const useStudents = () => {
   const [students, setStudents] = useState([]);
@@ -134,6 +135,26 @@ export const useStudents = () => {
     }
   };
 
+  const toggleFeeStatus = async (studentId, feePaid) => {
+    try {
+      const updatedStudent = await studentService.updateStudentFeeStatus(studentId, feePaid);
+      setStudents(prevStudents => 
+        prevStudents.map(student => 
+          student.id === studentId 
+            ? { ...student, feePaid: updatedStudent.feePaid } 
+            : student
+        )
+      );
+      
+      const message = feePaid ? 'Fee status updated to PAID' : 'Fee status updated to UNPAID';
+      toast.success(message);
+      return updatedStudent;
+    } catch (error) {
+      toast.error(`Failed to update fee status: ${error.message}`);
+      throw error;
+    }
+  };
+
   return {
     students,
     selectedStudents,
@@ -147,6 +168,7 @@ export const useStudents = () => {
     toggleStudentSelection,
     selectAllStudents,
     getFilteredStudents,
-    getStudentsByBatch
+    getStudentsByBatch,
+    toggleFeeStatus
   };
 }; 

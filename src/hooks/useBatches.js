@@ -1,115 +1,88 @@
 import { useState, useEffect } from 'react';
 import * as batchService from '../services/batchService';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 export const useBatches = () => {
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch batches on mount
   useEffect(() => {
-    fetchBatches();
-  }, []);
+    setLoading(true);
+    const unsubscribe = onSnapshot(
+      collection(db, 'batches'),
+      (snapshot) => {
+        const batchesData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().name || '',
+          ...doc.data()
+        }));
+        setBatches(batchesData);
+        setError(null);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching batches:', error);
+        setError('Failed to fetch batches');
+        setLoading(false);
+      }
+    );
 
-  const fetchBatches = async () => {
-    try {
-      setLoading(true);
-      const data = await batchService.getBatches();
-      setBatches(data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to fetch batches');
-      console.error('Error fetching batches:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => unsubscribe();
+  }, []);
 
   const addBatch = async (batchData) => {
     try {
       const newBatch = await batchService.addBatch(batchData);
-      setBatches(prev => [...prev, newBatch]);
+      // No need to update state manually since onSnapshot will catch the change
       return newBatch;
-    } catch (err) {
-      setError('Failed to add batch');
-      console.error('Error adding batch:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error adding batch:', error);
+      return null;
     }
   };
 
-  const updateBatch = async (id, batchData) => {
+  const updateBatch = async (batchId, batchData) => {
     try {
-      const updatedBatch = await batchService.updateBatch(id, batchData);
-      setBatches(prev => prev.map(batch => 
-        batch.id === id ? { ...batch, ...updatedBatch } : batch
-      ));
+      const updatedBatch = await batchService.updateBatch(batchId, batchData);
+      // No need to update state manually since onSnapshot will catch the change
       return updatedBatch;
-    } catch (err) {
-      setError('Failed to update batch');
-      console.error('Error updating batch:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error updating batch:', error);
+      return null;
     }
   };
 
-  const deleteBatch = async (id) => {
+  const deleteBatch = async (batchId) => {
     try {
-      setLoading(true);
-      await batchService.deleteBatch(id);
-      setBatches(prev => prev.filter(batch => batch.id !== id));
-      setError(null);
-    } catch (err) {
-      setError('Failed to delete batch');
-      console.error('Error deleting batch:', err);
-      throw err;
-    } finally {
-      setLoading(false);
+      await batchService.deleteBatch(batchId);
+      // No need to update state manually since onSnapshot will catch the change
+      return true;
+    } catch (error) {
+      console.error('Error deleting batch:', error);
+      return false;
     }
   };
 
-  const getBatchById = (id) => {
-    return batches.find(batch => batch.id === id);
-  };
+  const getBatchStatus = (batch) => {
+    const startDate = batch.startDate ? new Date(batch.startDate) : null;
+    const endDate = batch.endDate ? new Date(batch.endDate) : null;
+    const now = new Date();
 
-  const getBatchProgress = (batchId) => {
-    const batch = getBatchById(batchId);
-    if (!batch) return 0;
-    
-    const today = new Date();
-    const startDate = new Date(batch.startDate);
-    const endDate = new Date(batch.endDate);
-    
-    if (today < startDate) return 0;
-    if (today > endDate) return 100;
-    
-    const totalDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
-    const daysElapsed = (today - startDate) / (1000 * 60 * 60 * 24);
-    
-    return Math.round((daysElapsed / totalDays) * 100);
-  };
-
-  const getBatchStatus = (batchId) => {
-    const batch = getBatchById(batchId);
-    if (!batch) return 'unknown';
-
-    const today = new Date();
-    const startDate = new Date(batch.startDate);
-    const endDate = new Date(batch.endDate);
-
-    if (today < startDate) return 'upcoming';
-    if (today > endDate) return 'completed';
-    return 'ongoing';
+    if (!startDate) return 'Pending';
+    if (startDate > now) return 'Scheduled';
+    if (endDate && endDate < now) return 'Completed';
+    return 'Active';
   };
 
   const getBatchStatusColor = (status) => {
     switch (status) {
-      case 'upcoming':
-        return 'text-blue-600';
-      case 'ongoing':
-        return 'text-green-600';
-      case 'completed':
-        return 'text-gray-600';
-      default:
-        return 'text-gray-600';
+      case 'Scheduled': return 'blue';
+      case 'Active': return 'green';
+      case 'Completed': return 'gray';
+      case 'Pending':
+      default: return 'yellow';
     }
   };
 
@@ -120,10 +93,7 @@ export const useBatches = () => {
     addBatch,
     updateBatch,
     deleteBatch,
-    getBatchById,
-    getBatchProgress,
     getBatchStatus,
-    getBatchStatusColor,
-    refreshBatches: fetchBatches
+    getBatchStatusColor
   };
 }; 

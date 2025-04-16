@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useStudents } from '../hooks/useStudents';
 import { useBatches } from '../hooks/useBatches';
-import { FiArrowLeft, FiDownload, FiPrinter, FiCalendar, FiBook, FiAward, FiClock, FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiDownload, FiPrinter, FiCalendar, FiBook, FiAward, FiClock, FiCheckCircle, FiXCircle, FiDollarSign } from 'react-icons/fi';
 
 const StudentDetails = () => {
     const { studentId } = useParams();
@@ -163,13 +163,47 @@ const StudentDetails = () => {
                         <div className="flex-1">
                             <h2 className="text-xl font-semibold text-gray-900">{student.firstName} {student.lastName}</h2>
                             <p className="text-sm text-gray-500">{student.email}</p>
-                            <div className="mt-2 flex items-center">
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                                    {batch ? batch.name : 'No Batch'}
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                                    student.batchId === 'unassigned' 
+                                    ? 'bg-yellow-100 text-yellow-800' 
+                                    : 'bg-purple-100 text-purple-800'
+                                }`}>
+                                    {student.batchId === 'unassigned' 
+                                    ? 'Batch will be assigned soon' 
+                                    : (batch ? batch.name : 'No Batch')}
                                 </span>
-                                <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                                    student.rollNumber === 'unassigned' 
+                                    ? 'bg-blue-50 text-blue-600' 
+                                    : 'bg-blue-100 text-blue-800'
+                                }`}>
+                                    {student.rollNumber === 'unassigned' 
+                                    ? 'Roll Number will be assigned shortly' 
+                                    : `Roll Number: ${student.rollNumber}`}
+                                </span>
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                                     Grade: {grade}
                                 </span>
+                                {/* Fee Payment Status Badge */}
+                                <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                                    student.feePaid !== false 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                    <FiDollarSign className="h-4 w-4" />
+                                    {student.feePaid !== false ? 'Fees Paid' : 'Fees Due'}
+                                </span>
+                                {(batch?.startDate && student.batchId !== 'unassigned') && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                        Joined: {batch.startDate}
+                                    </span>
+                                )}
+                                {(!batch?.startDate || student.batchId === 'unassigned') && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-50 text-gray-600 italic">
+                                        Start date will be updated soon
+                                    </span>
+                                )}
                             </div>
                         </div>
                         <div className="mt-4 md:mt-0 md:ml-6">
@@ -201,6 +235,30 @@ const StudentDetails = () => {
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <span className="text-sm font-medium text-gray-900">{grade}</span>
                                     </div>
+                                </div>
+                            </div>
+                            
+                            {/* Fee Payment Toggle */}
+                            <div className="mt-4 flex items-center justify-end">
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-sm text-gray-700">Fee Status:</span>
+                                    <button
+                                        onClick={() => {
+                                            // This is a placeholder. In a real implementation, 
+                                            // you would call a function to update the student's fee status
+                                            alert(`This would toggle fee payment status for student ID: ${student.id}`);
+                                        }}
+                                        className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                                            student.feePaid !== false
+                                            ? 'bg-green-100 text-green-800 hover:bg-red-100 hover:text-red-800'
+                                            : 'bg-red-100 text-red-800 hover:bg-green-100 hover:text-green-800'
+                                        }`}
+                                    >
+                                        <FiDollarSign className="mr-1.5 h-4 w-4" />
+                                        {student.feePaid !== false 
+                                        ? 'Paid (Click to Mark as Unpaid)' 
+                                        : 'Unpaid (Click to Mark as Paid)'}
+                                    </button>
                                 </div>
                             </div>
                         </div>

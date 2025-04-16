@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiDownload, FiPrinter, FiCalendar, FiBook, FiAward, FiTrendingUp, FiCheckCircle, FiXCircle } from 'react-icons/fi';
+import { FiArrowLeft, FiDownload, FiPrinter, FiCalendar, FiBook, FiAward, FiTrendingUp, FiCheckCircle, FiXCircle, FiDollarSign } from 'react-icons/fi';
 import { BiTime } from 'react-icons/bi';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { jsPDF } from "jspdf";
 import autoTable from 'jspdf-autotable';
 import logo from '../../../public/images/CSA_Logo.png';
+import { useAuth } from '../../contexts/AuthContext';
 
 const StudentProgressReport = ({ students, batches }) => {
     const { studentId } = useParams();
     const navigate = useNavigate();
+    const { userType, logout } = useAuth();
     const [student, setStudent] = useState(null);
     const [activeTab, setActiveTab] = useState('overview');
     const [loading, setLoading] = useState(true);
@@ -1056,929 +1058,1009 @@ const StudentProgressReport = ({ students, batches }) => {
 
     return (
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
-            {/* Header */}
-            <div className="mb-4 sm:mb-6">
-                <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
-                    >
-                        <FiArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-                    </button>
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Student Progress Report</h1>
-                </div>
-
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-purple-100 flex items-center justify-center text-lg sm:text-xl font-bold text-purple-600">
-                            {student.firstName[0]}{student.lastName[0]}
-                        </div>
-                        <div>
-                            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
-                                {student.firstName} {student.lastName}
-                            </h2>
-                            <p className="text-sm sm:text-base text-gray-500">{student.email}</p>
-                        </div>
-                    </div>
-                    <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
-                        <button
-                            onClick={handlePrint}
-                            className="flex-1 sm:flex-none inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                            <FiPrinter className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                            Print Report
-                        </button>
-                        <button
-                            onClick={handleDownloadPDF}
-                            className="flex-1 sm:flex-none inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent rounded-lg text-xs sm:text-sm font-medium text-white bg-purple-600 hover:bg-purple-700"
-                        >
-                            <FiDownload className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                            Download PDF
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Quick Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-                {/* Class Attendance Card */}
-                <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md border border-blue-100 p-6 hover:shadow-lg transition-shadow duration-200">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                            <div className="p-3 bg-blue-100 rounded-xl">
-                                <FiCalendar className="w-6 h-6 text-blue-600" />
+            {/* Fee Payment Check */}
+            {student && !student.feePaid && userType === 'student' ? (
+                <div className="min-h-[80vh] flex flex-col items-center justify-center">
+                    <div className="max-w-xl w-full bg-white rounded-xl shadow-lg border-t-4 border-blue-500 p-8 sm:p-10">
+                        <div className="flex flex-col items-center">
+                            <div className="w-20 h-20 mb-6 flex items-center justify-center rounded-full bg-blue-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
                             </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-blue-600">Class Attendance</h3>
-                                <p className="text-xs text-blue-500">Regular Class Attendance</p>
-                            </div>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${attendancePercentage >= 75 ? 'bg-green-100 text-green-700' :
-                            attendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                            }`}>
-                            Grade {getGradeLetter(attendancePercentage)}
-                        </span>
-                    </div>
-                    <div className="mt-2">
-                        <div className="flex items-baseline">
-                            <h2 className="text-4xl font-bold text-gray-900">{attendancePercentage}%</h2>
-                            <span className="ml-2 text-sm text-gray-500">attendance rate</span>
-                        </div>
-                        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
-                            <div
-                                className={`h-2 rounded-full ${attendancePercentage >= 75 ? 'bg-green-500' :
-                                    attendancePercentage >= 60 ? 'bg-yellow-500' :
-                                        'bg-red-500'
-                                    }`}
-                                style={{ width: `${attendancePercentage}%` }}
-                            />
-                        </div>
-                    </div>
-                </div>
 
-                {/* Mock Attendance Card */}
-                <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-md border border-purple-100 p-6 hover:shadow-lg transition-shadow duration-200">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                            <div className="p-3 bg-purple-100 rounded-xl">
-                                <FiBook className="w-6 h-6 text-purple-600" />
-                            </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-purple-600">Mock Attendance</h3>
-                                <p className="text-xs text-purple-500">Mock Tests</p>
-                            </div>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockAttendancePercentage >= 75 ? 'bg-green-100 text-green-700' :
-                            mockAttendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                            }`}>
-                            Grade {getGradeLetter(mockAttendancePercentage)}
-                        </span>
-                    </div>
-                    <div className="mt-2">
-                        <div className="flex items-baseline">
-                            <h2 className="text-4xl font-bold text-gray-900">{mockAttendancePercentage}%</h2>
-                            <span className="ml-2 text-sm text-gray-500">mock attendance</span>
-                        </div>
-                        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
-                            <div
-                                className={`h-2 rounded-full ${mockAttendancePercentage >= 75 ? 'bg-green-500' :
-                                    mockAttendancePercentage >= 60 ? 'bg-yellow-500' :
-                                        'bg-red-500'
-                                    }`}
-                                style={{ width: `${mockAttendancePercentage}%` }}
-                            />
-                        </div>
-                    </div>
-                </div>
+                            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 text-center">Connect with our Sales Team</h2>
 
-                {/* Mock Test Score Card */}
-                <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-md border border-green-100 p-6 hover:shadow-lg transition-shadow duration-200">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center">
-                            <div className="p-3 bg-green-100 rounded-xl">
-                                <FiCheckCircle className="w-6 h-6 text-green-600" />
-                            </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-green-600">Mock Test Score</h3>
-                                <p className="text-xs text-green-500">Average Performance</p>
-                            </div>
-                        </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockTestPercentage >= 75 ? 'bg-green-100 text-green-700' :
-                            mockTestPercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-red-100 text-red-700'
-                            }`}>
-                            Grade {getGradeLetter(mockTestPercentage)}
-                        </span>
-                    </div>
-                    <div className="mt-2">
-                        <div className="flex items-baseline">
-                            <h2 className="text-4xl font-bold text-gray-900">{mockTestPercentage}%</h2>
-                            <span className="ml-2 text-sm text-gray-500">average score</span>
-                        </div>
-                        <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
-                            <div
-                                className={`h-2 rounded-full ${mockTestPercentage >= 75 ? 'bg-green-500' :
-                                    mockTestPercentage >= 60 ? 'bg-yellow-500' :
-                                        'bg-red-500'
-                                    }`}
-                                style={{ width: `${mockTestPercentage}%` }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            <div className="w-16 h-1 bg-blue-500 rounded mb-6"></div>
 
-            {/* Detailed Progress - Make tabs scrollable on mobile */}
-            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 sm:mb-8">
-                <div className="border-b border-gray-200 overflow-x-auto">
-                    <nav className="flex -mb-px min-w-full">
-                        {['overview', 'attendance', 'mock-tests', 'analytics'].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${activeTab === tab
-                                    ? 'border-purple-500 text-purple-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
-                            >
-                                {tab.charAt(0).toUpperCase() + tab.slice(1).replace('-', ' ')}
-                            </button>
-                        ))}
-                    </nav>
-                </div>
+                            <p className="text-lg text-gray-700 mb-6 text-center leading-relaxed">
+                                Our sales team is ready to assist you to ensure uninterrupted access.
+                            </p>
 
-                <div className="p-4 sm:p-6">
-                    {/* Update content sections */}
-                    {activeTab === 'overview' && (
-                        <div className="space-y-4 sm:space-y-6">
-                            <div className="grid grid-cols-1 gap-4 sm:gap-6">
-                                {/* Student Details */}
-                                <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
-                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Student Information</h3>
-                                    <div className="space-y-3 sm:space-y-4">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Batch</span>
-                                            <span className="text-gray-900 font-medium">{batch?.name || 'N/A'}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Roll Number</span>
-                                            <span className="text-gray-900 font-medium">{student.rollNumber}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Contact</span>
-                                            <span className="text-gray-900 font-medium">{student.contactNumber}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">Joined Date</span>
-                                            <span className="text-gray-900 font-medium">
-                                                {batch.startDate}
-                                            </span>
-                                        </div>
+                            <div className="w-full mb-6 bg-gray-50 rounded-lg p-4 max-w-md mx-auto">
+                                <div className="flex items-center mb-4 pl-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span className="font-medium text-gray-900 pl-1">Sales Team Contact</span>
+                                </div>
+
+                                <div className="space-y-3 pl-1">
+                                    <div className="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                        <span className="text-gray-700">+91 63010 46346
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                        <span className="text-gray-700">careersureacademypayment@gmail.com</span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
 
-                    {/* Update charts for better mobile responsiveness */}
-                    {activeTab === 'analytics' && (
-                        <div className="space-y-4 sm:space-y-6">
-                            {/* Make charts responsive */}
-                            <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Mock Test Progress</h3>
-                                <div className="h-60 sm:h-80">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart
-                                            data={mockPerformance.progressData}
-                                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis
-                                                dataKey="date"
-                                                tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                                            />
-                                            <YAxis domain={[0, 10]} />
-                                            <Tooltip
-                                                labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', {
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                })}
-                                            />
-                                            <Legend />
-                                            <Line
-                                                type="monotone"
-                                                dataKey="score"
-                                                name="Test Score"
-                                                stroke="#8b5cf6"
-                                                strokeWidth={2}
-                                                dot={{ r: 4 }}
-                                                activeDot={{ r: 6 }}
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-
-                            {/* Make grid layout stack on mobile */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                {/* Attendance Distribution */}
-                                <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Attendance Distribution</h3>
-                                    <div className="h-48 sm:h-64">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={[
-                                                        {
-                                                            name: 'Present',
-                                                            value: attendanceData.filter(record => record.present).length
-                                                        },
-                                                        {
-                                                            name: 'Absent',
-                                                            value: attendanceData.filter(record => !record.present).length
-                                                        }
-                                                    ]}
-                                                    cx="50%"
-                                                    cy="50%"
-                                                    innerRadius={60}
-                                                    outerRadius={80}
-                                                    paddingAngle={5}
-                                                    dataKey="value"
-                                                >
-                                                    <Cell fill="#22c55e" />
-                                                    <Cell fill="#ef4444" />
-                                                </Pie>
-                                                <Tooltip />
-                                                <Legend />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </div>
-
-                                {/* Monthly Attendance */}
-                                <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Monthly Attendance</h3>
-                                    <div className="h-48 sm:h-64">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart
-                                                data={getMonthlyAttendance(attendanceData)}
-                                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                            >
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis dataKey="month" />
-                                                <YAxis />
-                                                <Tooltip />
-                                                <Legend />
-                                                <Bar name="Present Days" dataKey="present" fill="#22c55e" />
-                                                <Bar name="Absent Days" dataKey="absent" fill="#ef4444" />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'attendance' && (
-                        <div className="space-y-6">
-                            {/* Attendance Type Filter */}
-                            <div className="flex items-center justify-center space-x-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-2 w-full max-w-md mx-auto">
                                 <button
-                                    onClick={() => setSelectedAttendanceType('regular')}
-                                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${selectedAttendanceType === 'regular'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
+                                    onClick={() => logout()}
+                                    className="flex-1 py-3 text-white font-medium bg-blue-600 hover:bg-blue-700 rounded-lg shadow transition-colors focus:outline-none"
                                 >
-                                    Regular Attendance
+                                    Return to Login
+                                </button>
+
+                                <a
+                                    href="mailto:sales@careersureacademy.com"
+                                    className="flex-1 py-3 text-blue-600 font-medium bg-white hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors focus:outline-none text-center"
+                                >
+                                    Contact Sales Team
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    {/* Header */}
+                    <div className="mb-4 sm:mb-6">
+                        <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+                            {userType === 'admin' && (
+                                <button
+                                    onClick={() => navigate(-1)}
+                                    className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                >
+                                    <FiArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                                </button>
+                            )}
+                            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Student Progress Report</h1>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div className="flex items-center gap-3 sm:gap-4">
+                                <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-purple-100 flex items-center justify-center text-lg sm:text-xl font-bold text-purple-600">
+                                    {student.firstName[0]}{student.lastName[0]}
+                                </div>
+                                <div>
+                                    <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900">
+                                        {student.firstName} {student.lastName}
+                                    </h2>
+                                    <p className="text-sm sm:text-base text-gray-500">{student.email}</p>
+                                    {batch && <p className="text-sm sm:text-base text-gray-500"> <span className="font-bold">Batch:</span> {batch?.name || 'N/A'}</p>}
+                                </div>
+                            </div>
+                            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                                <button
+                                    onClick={handlePrint}
+                                    className="flex-1 sm:flex-none inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                                >
+                                    <FiPrinter className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                                    Print Report
                                 </button>
                                 <button
-                                    onClick={() => setSelectedAttendanceType('mock')}
-                                    className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${selectedAttendanceType === 'mock'
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
+                                    onClick={handleDownloadPDF}
+                                    className="flex-1 sm:flex-none inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent rounded-lg text-xs sm:text-sm font-medium text-white bg-purple-600 hover:bg-purple-700"
                                 >
-                                    Mock Test Attendance
+                                    <FiDownload className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                                    Download PDF
                                 </button>
                             </div>
+                        </div>
+                    </div>
 
-                            {/* Single Attendance Summary Card */}
-                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-                                <div className="flex items-center space-x-4 mb-6">
+                    {/* Quick Stats Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                        {/* Class Attendance Card */}
+                        <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md border border-blue-100 p-6 hover:shadow-lg transition-shadow duration-200">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center">
                                     <div className="p-3 bg-blue-100 rounded-xl">
-                                        <FiCalendar className="w-8 h-8 text-blue-600" />
+                                        <FiCalendar className="w-6 h-6 text-blue-600" />
                                     </div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-gray-900">Attendance Overview</h3>
-                                        <p className="text-sm text-gray-500">Class & Mock attendance records</p>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-blue-600">Class Attendance</h3>
+                                        <p className="text-xs text-blue-500">Regular Class Attendance</p>
                                     </div>
                                 </div>
+                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${attendancePercentage >= 75 ? 'bg-green-100 text-green-700' :
+                                    attendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-red-100 text-red-700'
+                                    }`}>
+                                    Grade {getGradeLetter(attendancePercentage)}
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <div className="flex items-baseline">
+                                    <h2 className="text-4xl font-bold text-gray-900">{attendancePercentage}%</h2>
+                                    <span className="ml-2 text-sm text-gray-500">attendance rate</span>
+                                </div>
+                                <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                                    <div
+                                        className={`h-2 rounded-full ${attendancePercentage >= 75 ? 'bg-green-500' :
+                                            attendancePercentage >= 60 ? 'bg-yellow-500' :
+                                                'bg-red-500'
+                                            }`}
+                                        style={{ width: `${attendancePercentage}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    {/* Show only selected attendance type */}
-                                    {selectedAttendanceType === 'regular' ? (
-                                        /* Regular Class Attendance */
-                                        <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-6 border border-blue-100 lg:col-span-2">
-                                            <div className="mb-4">
-                                                <h4 className="text-lg font-semibold text-blue-800">Regular Classes</h4>
-                                                <div className="flex items-baseline mt-2">
-                                                    <div className="text-4xl font-bold text-gray-900">{attendancePercentage}%</div>
-                                                    <div className="ml-2 text-sm text-gray-500">attendance rate</div>
+                        {/* Mock Attendance Card */}
+                        <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-md border border-purple-100 p-6 hover:shadow-lg transition-shadow duration-200">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center">
+                                    <div className="p-3 bg-purple-100 rounded-xl">
+                                        <FiBook className="w-6 h-6 text-purple-600" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-purple-600">Mock Attendance</h3>
+                                        <p className="text-xs text-purple-500">Mock Tests</p>
+                                    </div>
+                                </div>
+                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockAttendancePercentage >= 75 ? 'bg-green-100 text-green-700' :
+                                    mockAttendancePercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-red-100 text-red-700'
+                                    }`}>
+                                    Grade {getGradeLetter(mockAttendancePercentage)}
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <div className="flex items-baseline">
+                                    <h2 className="text-4xl font-bold text-gray-900">{mockAttendancePercentage}%</h2>
+                                    <span className="ml-2 text-sm text-gray-500">mock attendance</span>
+                                </div>
+                                <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                                    <div
+                                        className={`h-2 rounded-full ${mockAttendancePercentage >= 75 ? 'bg-green-500' :
+                                            mockAttendancePercentage >= 60 ? 'bg-yellow-500' :
+                                                'bg-red-500'
+                                            }`}
+                                        style={{ width: `${mockAttendancePercentage}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Mock Test Score Card */}
+                        <div className="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-md border border-green-100 p-6 hover:shadow-lg transition-shadow duration-200">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center">
+                                    <div className="p-3 bg-green-100 rounded-xl">
+                                        <FiCheckCircle className="w-6 h-6 text-green-600" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-green-600">Mock Test Score</h3>
+                                        <p className="text-xs text-green-500">Average Performance</p>
+                                    </div>
+                                </div>
+                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockTestPercentage >= 75 ? 'bg-green-100 text-green-700' :
+                                    mockTestPercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-red-100 text-red-700'
+                                    }`}>
+                                    Grade {getGradeLetter(mockTestPercentage)}
+                                </span>
+                            </div>
+                            <div className="mt-2">
+                                <div className="flex items-baseline">
+                                    <h2 className="text-4xl font-bold text-gray-900">{mockTestPercentage}%</h2>
+                                    <span className="ml-2 text-sm text-gray-500">average score</span>
+                                </div>
+                                <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+                                    <div
+                                        className={`h-2 rounded-full ${mockTestPercentage >= 75 ? 'bg-green-500' :
+                                            mockTestPercentage >= 60 ? 'bg-yellow-500' :
+                                                'bg-red-500'
+                                            }`}
+                                        style={{ width: `${mockTestPercentage}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Detailed Progress - Make tabs scrollable on mobile */}
+                    <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6 sm:mb-8">
+                        <div className="border-b border-gray-200 overflow-x-auto">
+                            <nav className="flex -mb-px min-w-full">
+                                {['overview', 'attendance', 'mock-tests', 'analytics'].map((tab) => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => setActiveTab(tab)}
+                                        className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${activeTab === tab
+                                            ? 'border-purple-500 text-purple-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            }`}
+                                    >
+                                        {tab.charAt(0).toUpperCase() + tab.slice(1).replace('-', ' ')}
+                                    </button>
+                                ))}
+                            </nav>
+                        </div>
+
+                        <div className="p-4 sm:p-6">
+                            {/* Update content sections */}
+                            {activeTab === 'overview' && (
+                                <div className="space-y-4 sm:space-y-6">
+                                    <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                                        {/* Student Details */}
+                                        <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
+                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Student Information</h3>
+                                            <div className="space-y-3 sm:space-y-4">
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-500">Batch</span>
+                                                    <span className={`text-gray-900 font-medium ${student.batchId === 'unassigned' ? 'text-yellow-600' : ''}`}>
+                                                        {student.batchId === 'unassigned'
+                                                            ? 'Batch will be assigned soon'
+                                                            : (batch?.name || 'N/A')}
+                                                    </span>
                                                 </div>
-                                            </div>
-
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <div className="flex justify-between items-center mb-2">
-                                                        <span className="text-sm font-medium text-gray-500">Present/Total</span>
-                                                        <span className="text-lg font-bold text-blue-600">
-                                                            {attendanceData.filter(record => record.present).length}/{attendanceData.length}
-                                                        </span>
-                                                    </div>
-                                                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                                        <div
-                                                            className="bg-blue-600 h-2.5 rounded-full"
-                                                            style={{ width: `${attendancePercentage}%` }}
-                                                        />
-                                                    </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-500">Roll Number</span>
+                                                    <span className={`text-gray-900 font-medium ${student.rollNumber === 'unassigned' ? 'text-blue-600' : ''}`}>
+                                                        {student.rollNumber === 'unassigned'
+                                                            ? 'Roll Number will be assigned shortly'
+                                                            : student.rollNumber}
+                                                    </span>
                                                 </div>
-
-                                                <div className="pt-2 border-t border-blue-100">
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-sm font-medium text-gray-500">Absent Days</span>
-                                                        <span className="text-lg font-bold text-red-600">
-                                                            {attendanceData.length - attendanceData.filter(record => record.present).length}
-                                                        </span>
-                                                    </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-500">Contact</span>
+                                                    <span className="text-gray-900 font-medium">{student.contactNumber}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-gray-500">Joined Date</span>
+                                                    <span className={`text-gray-900 font-medium ${!batch?.startDate || student.batchId === 'unassigned' ? 'text-gray-500 italic' : ''}`}>
+                                                        {!batch?.startDate || student.batchId === 'unassigned'
+                                                            ? 'Start date will be updated soon'
+                                                            : batch.startDate}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                    ) : (
-                                        /* Mock Test Attendance */
-                                        <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl p-6 border border-purple-100 lg:col-span-2">
-                                            <div className="mb-4">
-                                                <h4 className="text-lg font-semibold text-purple-800">Mock Test Attendance</h4>
-                                                <div className="flex items-baseline mt-2">
-                                                    <div className="text-4xl font-bold text-gray-900">{mockAttendancePercentage}%</div>
-                                                    <div className="ml-2 text-sm text-gray-500">attendance rate</div>
-                                                </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Update charts for better mobile responsiveness */}
+                            {activeTab === 'analytics' && (
+                                <div className="space-y-4 sm:space-y-6">
+                                    {/* Make charts responsive */}
+                                    <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Mock Test Progress</h3>
+                                        <div className="h-60 sm:h-80">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <LineChart
+                                                    data={mockPerformance.progressData}
+                                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                                >
+                                                    <CartesianGrid strokeDasharray="3 3" />
+                                                    <XAxis
+                                                        dataKey="date"
+                                                        tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                    />
+                                                    <YAxis domain={[0, 10]} />
+                                                    <Tooltip
+                                                        labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', {
+                                                            year: 'numeric',
+                                                            month: 'long',
+                                                            day: 'numeric',
+                                                        })}
+                                                    />
+                                                    <Legend />
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="score"
+                                                        name="Test Score"
+                                                        stroke="#8b5cf6"
+                                                        strokeWidth={2}
+                                                        dot={{ r: 4 }}
+                                                        activeDot={{ r: 6 }}
+                                                    />
+                                                </LineChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    </div>
+
+                                    {/* Make grid layout stack on mobile */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                        {/* Attendance Distribution */}
+                                        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Attendance Distribution</h3>
+                                            <div className="h-48 sm:h-64">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <PieChart>
+                                                        <Pie
+                                                            data={[
+                                                                {
+                                                                    name: 'Present',
+                                                                    value: attendanceData.filter(record => record.present).length
+                                                                },
+                                                                {
+                                                                    name: 'Absent',
+                                                                    value: attendanceData.filter(record => !record.present).length
+                                                                }
+                                                            ]}
+                                                            cx="50%"
+                                                            cy="50%"
+                                                            innerRadius={60}
+                                                            outerRadius={80}
+                                                            paddingAngle={5}
+                                                            dataKey="value"
+                                                        >
+                                                            <Cell fill="#22c55e" />
+                                                            <Cell fill="#ef4444" />
+                                                        </Pie>
+                                                        <Tooltip />
+                                                        <Legend />
+                                                    </PieChart>
+                                                </ResponsiveContainer>
                                             </div>
+                                        </div>
 
-                                            <div className="space-y-4">
-                                                {(() => {
-                                                    let totalMockDays = 0;
-                                                    let presentMockDays = 0;
+                                        {/* Monthly Attendance */}
+                                        <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Monthly Attendance</h3>
+                                            <div className="h-48 sm:h-64">
+                                                <ResponsiveContainer width="100%" height="100%">
+                                                    <BarChart
+                                                        data={getMonthlyAttendance(attendanceData)}
+                                                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                                    >
+                                                        <CartesianGrid strokeDasharray="3 3" />
+                                                        <XAxis dataKey="month" />
+                                                        <YAxis />
+                                                        <Tooltip />
+                                                        <Legend />
+                                                        <Bar name="Present Days" dataKey="present" fill="#22c55e" />
+                                                        <Bar name="Absent Days" dataKey="absent" fill="#ef4444" />
+                                                    </BarChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
-                                                    if (student.mockAttendance) {
-                                                        Object.values(student.mockAttendance).forEach(levelAttendance => {
-                                                            if (Array.isArray(levelAttendance)) {
-                                                                levelAttendance.forEach(record => {
-                                                                    totalMockDays++;
-                                                                    if (record.status === 'present') {
-                                                                        presentMockDays++;
+                            {activeTab === 'attendance' && (
+                                <div className="space-y-6">
+                                    {/* Attendance Type Filter */}
+                                    <div className="flex items-center justify-center space-x-4 p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                                        <button
+                                            onClick={() => setSelectedAttendanceType('regular')}
+                                            className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${selectedAttendanceType === 'regular'
+                                                ? 'bg-blue-600 text-white'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            Regular Attendance
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectedAttendanceType('mock')}
+                                            className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors ${selectedAttendanceType === 'mock'
+                                                ? 'bg-purple-600 text-white'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            Mock Test Attendance
+                                        </button>
+                                    </div>
+
+                                    {/* Single Attendance Summary Card */}
+                                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                                        <div className="flex items-center space-x-4 mb-6">
+                                            <div className="p-3 bg-blue-100 rounded-xl">
+                                                <FiCalendar className="w-8 h-8 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-semibold text-gray-900">Attendance Overview</h3>
+                                                <p className="text-sm text-gray-500">Class & Mock attendance records</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            {/* Show only selected attendance type */}
+                                            {selectedAttendanceType === 'regular' ? (
+                                                /* Regular Class Attendance */
+                                                <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl p-6 border border-blue-100 lg:col-span-2">
+                                                    <div className="mb-4">
+                                                        <h4 className="text-lg font-semibold text-blue-800">Regular Classes</h4>
+                                                        <div className="flex items-baseline mt-2">
+                                                            <div className="text-4xl font-bold text-gray-900">{attendancePercentage}%</div>
+                                                            <div className="ml-2 text-sm text-gray-500">attendance rate</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        <div>
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <span className="text-sm font-medium text-gray-500">Present/Total</span>
+                                                                <span className="text-lg font-bold text-blue-600">
+                                                                    {attendanceData.filter(record => record.present).length}/{attendanceData.length}
+                                                                </span>
+                                                            </div>
+                                                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                                <div
+                                                                    className="bg-blue-600 h-2.5 rounded-full"
+                                                                    style={{ width: `${attendancePercentage}%` }}
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="pt-2 border-t border-blue-100">
+                                                            <div className="flex justify-between items-center">
+                                                                <span className="text-sm font-medium text-gray-500">Absent Days</span>
+                                                                <span className="text-lg font-bold text-red-600">
+                                                                    {attendanceData.length - attendanceData.filter(record => record.present).length}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                /* Mock Test Attendance */
+                                                <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl p-6 border border-purple-100 lg:col-span-2">
+                                                    <div className="mb-4">
+                                                        <h4 className="text-lg font-semibold text-purple-800">Mock Test Attendance</h4>
+                                                        <div className="flex items-baseline mt-2">
+                                                            <div className="text-4xl font-bold text-gray-900">{mockAttendancePercentage}%</div>
+                                                            <div className="ml-2 text-sm text-gray-500">attendance rate</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        {(() => {
+                                                            let totalMockDays = 0;
+                                                            let presentMockDays = 0;
+
+                                                            if (student.mockAttendance) {
+                                                                Object.values(student.mockAttendance).forEach(levelAttendance => {
+                                                                    if (Array.isArray(levelAttendance)) {
+                                                                        levelAttendance.forEach(record => {
+                                                                            totalMockDays++;
+                                                                            if (record.status === 'present') {
+                                                                                presentMockDays++;
+                                                                            }
+                                                                        });
                                                                     }
                                                                 });
                                                             }
-                                                        });
-                                                    }
 
-                                                    return (
-                                                        <>
-                                                            <div>
-                                                                <div className="flex justify-between items-center mb-2">
-                                                                    <span className="text-sm font-medium text-gray-500">Present/Total</span>
-                                                                    <span className="text-lg font-bold text-purple-600">
-                                                                        {presentMockDays}/{totalMockDays}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                                                    <div
-                                                                        className="bg-purple-600 h-2.5 rounded-full"
-                                                                        style={{ width: `${mockAttendancePercentage}%` }}
-                                                                    />
-                                                                </div>
-                                                            </div>
+                                                            return (
+                                                                <>
+                                                                    <div>
+                                                                        <div className="flex justify-between items-center mb-2">
+                                                                            <span className="text-sm font-medium text-gray-500">Present/Total</span>
+                                                                            <span className="text-lg font-bold text-purple-600">
+                                                                                {presentMockDays}/{totalMockDays}
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                                            <div
+                                                                                className="bg-purple-600 h-2.5 rounded-full"
+                                                                                style={{ width: `${mockAttendancePercentage}%` }}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
 
-                                                            <div className="pt-2 border-t border-purple-100">
-                                                                <div className="flex justify-between items-center">
-                                                                    <span className="text-sm font-medium text-gray-500">Absent Days</span>
-                                                                    <span className="text-lg font-bold text-red-600">
-                                                                        {totalMockDays - presentMockDays}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </>
-                                                    );
-                                                })()}
+                                                                    <div className="pt-2 border-t border-purple-100">
+                                                                        <div className="flex justify-between items-center">
+                                                                            <span className="text-sm font-medium text-gray-500">Absent Days</span>
+                                                                            <span className="text-lg font-bold text-red-600">
+                                                                                {totalMockDays - presentMockDays}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                            );
+                                                        })()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Show only the selected attendance history table */}
+                                    {selectedAttendanceType === 'regular' ? (
+                                        /* Regular Attendance History Table */
+                                        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                                            <div className="p-6 border-b border-gray-200">
+                                                <div className="flex flex-col space-y-4">
+                                                    <div className="flex items-center justify-between">
+                                                        <div>
+                                                            <h3 className="text-lg font-semibold text-gray-900">Regular Attendance History</h3>
+                                                            <p className="mt-1 text-sm text-gray-500">Detailed record of daily attendance</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Filters Section */}
+                                                    <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-lg">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm text-gray-500">From:</span>
+                                                            <input
+                                                                type="date"
+                                                                value={attendanceFilters.startDate}
+                                                                onChange={(e) => setAttendanceFilters(prev => ({
+                                                                    ...prev,
+                                                                    startDate: e.target.value
+                                                                }))}
+                                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm text-gray-500">To:</span>
+                                                            <input
+                                                                type="date"
+                                                                value={attendanceFilters.endDate}
+                                                                onChange={(e) => setAttendanceFilters(prev => ({
+                                                                    ...prev,
+                                                                    endDate: e.target.value
+                                                                }))}
+                                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                            />
+                                                        </div>
+                                                        <select
+                                                            value={attendanceFilters.status}
+                                                            onChange={(e) => setAttendanceFilters(prev => ({
+                                                                ...prev,
+                                                                status: e.target.value
+                                                            }))}
+                                                            className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                        >
+                                                            <option value="all">All Status</option>
+                                                            <option value="present">Present</option>
+                                                            <option value="absent">Absent</option>
+                                                        </select>
+                                                        <button
+                                                            onClick={() => setAttendanceFilters({
+                                                                startDate: '',
+                                                                endDate: '',
+                                                                status: 'all'
+                                                            })}
+                                                            className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                                                        >
+                                                            Clear Filters
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="overflow-x-auto">
+                                                <table className="min-w-full divide-y divide-gray-200">
+                                                    <thead className="bg-gray-50">
+                                                        <tr>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Date
+                                                            </th>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Day
+                                                            </th>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Status
+                                                            </th>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Time
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="bg-white divide-y divide-gray-200">
+                                                        {attendanceData
+                                                            .filter(record => {
+                                                                // Filter by date range
+                                                                const recordDate = new Date(record.date);
+                                                                const startDate = attendanceFilters.startDate ? new Date(attendanceFilters.startDate) : null;
+                                                                const endDate = attendanceFilters.endDate ? new Date(attendanceFilters.endDate) : null;
+
+                                                                const dateInRange = (!startDate || recordDate >= startDate) &&
+                                                                    (!endDate || recordDate <= endDate);
+
+                                                                // Filter by status
+                                                                const statusMatch = attendanceFilters.status === 'all' ||
+                                                                    (attendanceFilters.status === 'present' && record.present) ||
+                                                                    (attendanceFilters.status === 'absent' && !record.present);
+
+                                                                return dateInRange && statusMatch;
+                                                            })
+                                                            .sort((a, b) => new Date(b.date) - new Date(a.date)) // Always sort by date (newest first)
+                                                            .map((record, index) => (
+                                                                <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                        {new Date(record.date).toLocaleDateString()}
+                                                                    </td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                        {new Date(record.date).toLocaleDateString('en-US', { weekday: 'long' })}
+                                                                    </td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.present
+                                                                            ? 'bg-green-100 text-green-800'
+                                                                            : 'bg-red-100 text-red-800'
+                                                                            }`}>
+                                                                            {record.present ? 'Present' : 'Absent'}
+                                                                        </span>
+                                                                    </td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                        {new Date(record.timestamp).toLocaleTimeString()}
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        /* Mock Test Attendance History Table */
+                                        <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+                                            <div className="p-6 border-b border-gray-200">
+                                                <div className="flex flex-col space-y-4">
+                                                    <div>
+                                                        <h3 className="text-lg font-semibold text-gray-900">Mock Test Attendance History</h3>
+                                                        <p className="mt-1 text-sm text-gray-500">Detailed record of mock test attendance</p>
+                                                    </div>
+
+                                                    {/* Filters Section */}
+                                                    <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-lg">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm text-gray-500">From:</span>
+                                                            <input
+                                                                type="date"
+                                                                value={mockAttendanceFilters.startDate}
+                                                                onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                                    ...prev,
+                                                                    startDate: e.target.value
+                                                                }))}
+                                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-sm text-gray-500">To:</span>
+                                                            <input
+                                                                type="date"
+                                                                value={mockAttendanceFilters.endDate}
+                                                                onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                                    ...prev,
+                                                                    endDate: e.target.value
+                                                                }))}
+                                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                            />
+                                                        </div>
+                                                        <select
+                                                            value={mockAttendanceFilters.status}
+                                                            onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                                ...prev,
+                                                                status: e.target.value
+                                                            }))}
+                                                            className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                        >
+                                                            <option value="all">All Status</option>
+                                                            <option value="present">Present</option>
+                                                            <option value="absent">Absent</option>
+                                                        </select>
+                                                        <select
+                                                            value={mockAttendanceFilters.level}
+                                                            onChange={(e) => setMockAttendanceFilters(prev => ({
+                                                                ...prev,
+                                                                level: e.target.value
+                                                            }))}
+                                                            className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
+                                                        >
+                                                            <option value="all">All Levels</option>
+                                                            {student.mockAttendance &&
+                                                                Object.keys(student.mockAttendance)
+                                                                    .filter(key => !isNaN(key))
+                                                                    .sort((a, b) => Number(a) - Number(b))
+                                                                    .map(level => (
+                                                                        <option key={level} value={level}>Level {level}</option>
+                                                                    ))
+                                                            }
+                                                        </select>
+                                                        <button
+                                                            onClick={() => setMockAttendanceFilters({
+                                                                startDate: '',
+                                                                endDate: '',
+                                                                status: 'all',
+                                                                level: 'all'
+                                                            })}
+                                                            className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                                                        >
+                                                            Clear Filters
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="overflow-x-auto">
+                                                <table className="min-w-full divide-y divide-gray-200">
+                                                    <thead className="bg-gray-50">
+                                                        <tr>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Date
+                                                            </th>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Mock Level
+                                                            </th>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Status
+                                                            </th>
+                                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                Time
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="bg-white divide-y divide-gray-200">
+                                                        {(() => {
+                                                            const mockAttendanceRecords = [];
+
+                                                            if (student.mockAttendance) {
+                                                                Object.entries(student.mockAttendance).forEach(([level, records]) => {
+                                                                    if (Array.isArray(records)) {
+                                                                        records.forEach(record => {
+                                                                            mockAttendanceRecords.push({
+                                                                                ...record,
+                                                                                level
+                                                                            });
+                                                                        });
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            return mockAttendanceRecords
+                                                                .filter(record => {
+                                                                    // Filter by date range
+                                                                    const recordDate = new Date(record.date);
+                                                                    const startDate = mockAttendanceFilters.startDate ? new Date(mockAttendanceFilters.startDate) : null;
+                                                                    const endDate = mockAttendanceFilters.endDate ? new Date(mockAttendanceFilters.endDate) : null;
+
+                                                                    const dateInRange = (!startDate || recordDate >= startDate) &&
+                                                                        (!endDate || recordDate <= endDate);
+
+                                                                    // Filter by status
+                                                                    const statusMatch = mockAttendanceFilters.status === 'all' ||
+                                                                        (mockAttendanceFilters.status === 'present' && record.status === 'present') ||
+                                                                        (mockAttendanceFilters.status === 'absent' && record.status === 'absent');
+
+                                                                    // Filter by level
+                                                                    const levelMatch = mockAttendanceFilters.level === 'all' ||
+                                                                        record.level === mockAttendanceFilters.level;
+
+                                                                    return dateInRange && statusMatch && levelMatch;
+                                                                })
+                                                                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                                                                .map((record, index) => (
+                                                                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                                            {new Date(record.date).toLocaleDateString()}
+                                                                        </td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                                                Level {record.level}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap">
+                                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.status === 'present'
+                                                                                ? 'bg-green-100 text-green-800'
+                                                                                : 'bg-red-100 text-red-800'
+                                                                                }`}>
+                                                                                {record.status === 'present' ? 'Present' : 'Absent'}
+                                                                            </span>
+                                                                        </td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                            {record.timestamp ? new Date(record.timestamp).toLocaleTimeString() : 'N/A'}
+                                                                        </td>
+                                                                    </tr>
+                                                                ));
+                                                        })()}
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            )}
 
-                            {/* Show only the selected attendance history table */}
-                            {selectedAttendanceType === 'regular' ? (
-                                /* Regular Attendance History Table */
-                                <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-                                    <div className="p-6 border-b border-gray-200">
-                                        <div className="flex flex-col space-y-4">
-                                            <div className="flex items-center justify-between">
-                                                <div>
-                                                    <h3 className="text-lg font-semibold text-gray-900">Regular Attendance History</h3>
-                                                    <p className="mt-1 text-sm text-gray-500">Detailed record of daily attendance</p>
-                                                </div>
-                                            </div>
-
-                                            {/* Filters Section */}
-                                            <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-lg">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-500">From:</span>
-                                                    <input
-                                                        type="date"
-                                                        value={attendanceFilters.startDate}
-                                                        onChange={(e) => setAttendanceFilters(prev => ({
-                                                            ...prev,
-                                                            startDate: e.target.value
-                                                        }))}
-                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
-                                                    />
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-500">To:</span>
-                                                    <input
-                                                        type="date"
-                                                        value={attendanceFilters.endDate}
-                                                        onChange={(e) => setAttendanceFilters(prev => ({
-                                                            ...prev,
-                                                            endDate: e.target.value
-                                                        }))}
-                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
-                                                    />
-                                                </div>
-                                                <select
-                                                    value={attendanceFilters.status}
-                                                    onChange={(e) => setAttendanceFilters(prev => ({
-                                                        ...prev,
-                                                        status: e.target.value
-                                                    }))}
-                                                    className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
-                                                >
-                                                    <option value="all">All Status</option>
-                                                    <option value="present">Present</option>
-                                                    <option value="absent">Absent</option>
-                                                </select>
-                                                <button
-                                                    onClick={() => setAttendanceFilters({
-                                                        startDate: '',
-                                                        endDate: '',
-                                                        status: 'all'
-                                                    })}
-                                                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                                                >
-                                                    Clear Filters
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Date
-                                                    </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Day
-                                                    </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Status
-                                                    </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Time
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {attendanceData
-                                                    .filter(record => {
-                                                        // Filter by date range
-                                                        const recordDate = new Date(record.date);
-                                                        const startDate = attendanceFilters.startDate ? new Date(attendanceFilters.startDate) : null;
-                                                        const endDate = attendanceFilters.endDate ? new Date(attendanceFilters.endDate) : null;
-
-                                                        const dateInRange = (!startDate || recordDate >= startDate) &&
-                                                            (!endDate || recordDate <= endDate);
-
-                                                        // Filter by status
-                                                        const statusMatch = attendanceFilters.status === 'all' ||
-                                                            (attendanceFilters.status === 'present' && record.present) ||
-                                                            (attendanceFilters.status === 'absent' && !record.present);
-
-                                                        return dateInRange && statusMatch;
-                                                    })
-                                                    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Always sort by date (newest first)
-                                                    .map((record, index) => (
-                                                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                                {new Date(record.date).toLocaleDateString()}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                {new Date(record.date).toLocaleDateString('en-US', { weekday: 'long' })}
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.present
-                                                                    ? 'bg-green-100 text-green-800'
-                                                                    : 'bg-red-100 text-red-800'
-                                                                    }`}>
-                                                                    {record.present ? 'Present' : 'Absent'}
-                                                                </span>
-                                                            </td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                {new Date(record.timestamp).toLocaleTimeString()}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            ) : (
-                                /* Mock Test Attendance History Table */
-                                <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-                                    <div className="p-6 border-b border-gray-200">
-                                        <div className="flex flex-col space-y-4">
+                            {activeTab === 'mock-tests' && (
+                                <div className="space-y-6">
+                                    {/* Performance Overview Card */}
+                                    <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-lg border border-purple-100 p-6 hover:shadow-xl transition-all duration-300">
+                                        <div className="flex items-center justify-between mb-6">
                                             <div>
-                                                <h3 className="text-lg font-semibold text-gray-900">Mock Test Attendance History</h3>
-                                                <p className="mt-1 text-sm text-gray-500">Detailed record of mock test attendance</p>
+                                                <h3 className="text-xl font-semibold text-gray-900">Mock Test Performance</h3>
+                                                <p className="text-sm text-gray-500">Overall performance across all mock tests</p>
                                             </div>
+                                            <div className="flex items-center gap-3">
+                                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getGradeColor(mockTestPercentage)}`}>
+                                                    Grade {getGradeLetter(mockTestPercentage)}
+                                                </span>
+                                                <span className="text-2xl font-bold text-gray-900">{mockTestPercentage}%</span>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-purple-100 rounded-lg">
+                                                        <FiBook className="w-5 h-5 text-purple-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">Total Tests</p>
+                                                        <p className="text-xl font-semibold text-gray-900">{student.mockScores?.length || 0}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-green-100 rounded-lg">
+                                                        <FiCheckCircle className="w-5 h-5 text-green-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">Tests Cleared</p>
+                                                        <p className="text-xl font-semibold text-gray-900">
+                                                            {student.mockScores?.filter(score => score.score >= 6).length || 0}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-green-100 rounded-lg">
+                                                        <FiCheckCircle className="w-5 h-5 text-green-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">Current Mock</p>
+                                                        <p className="text-xl font-semibold text-gray-900">
+                                                            {student.mockScores?.filter(score => score.score >= 6).length || 0}
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                            {/* Filters Section */}
-                                            <div className="flex flex-wrap gap-3 p-4 bg-gray-50 rounded-lg">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-500">From:</span>
-                                                    <input
-                                                        type="date"
-                                                        value={mockAttendanceFilters.startDate}
-                                                        onChange={(e) => setMockAttendanceFilters(prev => ({
-                                                            ...prev,
-                                                            startDate: e.target.value
-                                                        }))}
-                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
-                                                    />
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-500">To:</span>
-                                                    <input
-                                                        type="date"
-                                                        value={mockAttendanceFilters.endDate}
-                                                        onChange={(e) => setMockAttendanceFilters(prev => ({
-                                                            ...prev,
-                                                            endDate: e.target.value
-                                                        }))}
-                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
-                                                    />
-                                                </div>
-                                                <select
-                                                    value={mockAttendanceFilters.status}
-                                                    onChange={(e) => setMockAttendanceFilters(prev => ({
-                                                        ...prev,
-                                                        status: e.target.value
-                                                    }))}
-                                                    className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
-                                                >
-                                                    <option value="all">All Status</option>
-                                                    <option value="present">Present</option>
-                                                    <option value="absent">Absent</option>
-                                                </select>
-                                                <select
-                                                    value={mockAttendanceFilters.level}
-                                                    onChange={(e) => setMockAttendanceFilters(prev => ({
-                                                        ...prev,
-                                                        level: e.target.value
-                                                    }))}
-                                                    className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500"
-                                                >
-                                                    <option value="all">All Levels</option>
-                                                    {student.mockAttendance &&
-                                                        Object.keys(student.mockAttendance)
-                                                            .filter(key => !isNaN(key))
-                                                            .sort((a, b) => Number(a) - Number(b))
-                                                            .map(level => (
-                                                                <option key={level} value={level}>Level {level}</option>
-                                                            ))
-                                                    }
-                                                </select>
-                                                <button
-                                                    onClick={() => setMockAttendanceFilters({
-                                                        startDate: '',
-                                                        endDate: '',
-                                                        status: 'all',
-                                                        level: 'all'
-                                                    })}
-                                                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                                                >
-                                                    Clear Filters
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y divide-gray-200">
-                                            <thead className="bg-gray-50">
-                                                <tr>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Date
-                                                    </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Mock Level
-                                                    </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Status
-                                                    </th>
-                                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                        Time
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="bg-white divide-y divide-gray-200">
-                                                {(() => {
-                                                    const mockAttendanceRecords = [];
 
-                                                    if (student.mockAttendance) {
-                                                        Object.entries(student.mockAttendance).forEach(([level, records]) => {
-                                                            if (Array.isArray(records)) {
-                                                                records.forEach(record => {
-                                                                    mockAttendanceRecords.push({
-                                                                        ...record,
-                                                                        level
-                                                                    });
-                                                                });
-                                                            }
-                                                        });
-                                                    }
 
-                                                    return mockAttendanceRecords
-                                                        .filter(record => {
-                                                            // Filter by date range
-                                                            const recordDate = new Date(record.date);
-                                                            const startDate = mockAttendanceFilters.startDate ? new Date(mockAttendanceFilters.startDate) : null;
-                                                            const endDate = mockAttendanceFilters.endDate ? new Date(mockAttendanceFilters.endDate) : null;
-
-                                                            const dateInRange = (!startDate || recordDate >= startDate) &&
-                                                                (!endDate || recordDate <= endDate);
-
-                                                            // Filter by status
-                                                            const statusMatch = mockAttendanceFilters.status === 'all' ||
-                                                                (mockAttendanceFilters.status === 'present' && record.status === 'present') ||
-                                                                (mockAttendanceFilters.status === 'absent' && record.status === 'absent');
-
-                                                            // Filter by level
-                                                            const levelMatch = mockAttendanceFilters.level === 'all' ||
-                                                                record.level === mockAttendanceFilters.level;
-
-                                                            return dateInRange && statusMatch && levelMatch;
+                                    {/* Mock Test History with Enhanced Filters */}
+                                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
+                                        <div className="p-6 border-b border-gray-200">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                                <div>
+                                                    <h3 className="text-xl font-semibold text-gray-900">Test History</h3>
+                                                    <p className="mt-1 text-sm text-gray-500">Detailed record of all mock tests attempted</p>
+                                                </div>
+                                                <div className="flex flex-wrap gap-3">
+                                                    <select
+                                                        value={mockTestFilters.level}
+                                                        onChange={(e) => setMockTestFilters(prev => ({ ...prev, level: e.target.value }))}
+                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
+                                                    >
+                                                        <option value="all">All Levels</option>
+                                                        {Array.from(new Set(student.mockScores?.map(s => s.testId))).sort().map(level => (
+                                                            <option key={level} value={level}>Level {level}</option>
+                                                        ))}
+                                                    </select>
+                                                    <select
+                                                        value={mockTestFilters.status}
+                                                        onChange={(e) => setMockTestFilters(prev => ({ ...prev, status: e.target.value }))}
+                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
+                                                    >
+                                                        <option value="all">All Status</option>
+                                                        <option value="cleared">Cleared</option>
+                                                        <option value="not_cleared">Not Cleared</option>
+                                                    </select>
+                                                    <input
+                                                        type="date"
+                                                        value={mockTestFilters.date}
+                                                        onChange={(e) => setMockTestFilters(prev => ({ ...prev, date: e.target.value }))}
+                                                        className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
+                                                    />
+                                                    <button
+                                                        onClick={() => setMockTestFilters({ level: 'all', status: 'all', date: '' })}
+                                                        className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                                                    >
+                                                        Clear Filters
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Level
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Date
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Score
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Status
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {student.mockScores
+                                                        ?.filter(score => {
+                                                            const levelMatch = mockTestFilters.level === 'all' || score.testId.toString() === mockTestFilters.level;
+                                                            const statusMatch = mockTestFilters.status === 'all' ||
+                                                                (mockTestFilters.status === 'cleared' && score.score >= 6) ||
+                                                                (mockTestFilters.status === 'not_cleared' && score.score < 6);
+                                                            const dateMatch = !mockTestFilters.date ||
+                                                                new Date(score.date).toLocaleDateString() === new Date(mockTestFilters.date).toLocaleDateString();
+                                                            return levelMatch && statusMatch && dateMatch;
                                                         })
                                                         .sort((a, b) => new Date(b.date) - new Date(a.date))
-                                                        .map((record, index) => (
-                                                            <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                                                    {new Date(record.date).toLocaleDateString()}
-                                                                </td>
+                                                        .map((score, index) => (
+                                                            <tr key={index}
+                                                                className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition-colors`}>
                                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                                                        Level {record.level}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.status === 'present'
-                                                                        ? 'bg-green-100 text-green-800'
-                                                                        : 'bg-red-100 text-red-800'
-                                                                        }`}>
-                                                                        {record.status === 'present' ? 'Present' : 'Absent'}
+                                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 ring-1 ring-purple-600/20">
+                                                                        Level {score.testId}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                    {record.timestamp ? new Date(record.timestamp).toLocaleTimeString() : 'N/A'}
+                                                                    {new Date(score.createdAt).toLocaleDateString()}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getScoreColor(score.score)} ring-1`}
+                                                                            title={`${getScoreLabel(score.score)} - ${score.score}/10`}>
+                                                                            {score.score}/10
+                                                                        </span>
+                                                                        {score.score === Math.max(...student.mockScores.map(s => s.score)) && (
+                                                                            <span className="text-amber-500" title="Highest Score">
+                                                                                <FiAward className="w-4 h-4" />
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${score.score >= 6
+                                                                        ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20'
+                                                                        : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
+                                                                        }`}>
+                                                                        {score.score >= 6 ? (
+                                                                            <>
+                                                                                <FiCheckCircle className="w-3.5 h-3.5" />
+                                                                                Cleared
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <FiXCircle className="w-3.5 h-3.5" />
+                                                                                Not Cleared
+                                                                            </>
+                                                                        )}
+                                                                    </span>
                                                                 </td>
                                                             </tr>
-                                                        ));
-                                                })()}
-                                            </tbody>
-                                        </table>
+                                                        ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             )}
                         </div>
-                    )}
-
-                    {activeTab === 'mock-tests' && (
-                        <div className="space-y-6">
-                            {/* Performance Overview Card */}
-                            <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-lg border border-purple-100 p-6 hover:shadow-xl transition-all duration-300">
-                                <div className="flex items-center justify-between mb-6">
-                                    <div>
-                                        <h3 className="text-xl font-semibold text-gray-900">Mock Test Performance</h3>
-                                        <p className="text-sm text-gray-500">Overall performance across all mock tests</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getGradeColor(mockTestPercentage)}`}>
-                                            Grade {getGradeLetter(mockTestPercentage)}
-                                        </span>
-                                        <span className="text-2xl font-bold text-gray-900">{mockTestPercentage}%</span>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-purple-100 rounded-lg">
-                                                <FiBook className="w-5 h-5 text-purple-600" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-500">Total Tests</p>
-                                                <p className="text-xl font-semibold text-gray-900">{student.mockScores?.length || 0}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-green-100 rounded-lg">
-                                                <FiCheckCircle className="w-5 h-5 text-green-600" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-500">Tests Cleared</p>
-                                                <p className="text-xl font-semibold text-gray-900">
-                                                    {student.mockScores?.filter(score => score.score >= 6).length || 0}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-green-100 rounded-lg">
-                                                <FiCheckCircle className="w-5 h-5 text-green-600" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-gray-500">Current Mock</p>
-                                                <p className="text-xl font-semibold text-gray-900">
-                                                    {student.mockScores?.filter(score => score.score >= 6).length || 0}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            {/* Mock Test History with Enhanced Filters */}
-                            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300">
-                                <div className="p-6 border-b border-gray-200">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                        <div>
-                                            <h3 className="text-xl font-semibold text-gray-900">Test History</h3>
-                                            <p className="mt-1 text-sm text-gray-500">Detailed record of all mock tests attempted</p>
-                                        </div>
-                                        <div className="flex flex-wrap gap-3">
-                                            <select
-                                                value={mockTestFilters.level}
-                                                onChange={(e) => setMockTestFilters(prev => ({ ...prev, level: e.target.value }))}
-                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
-                                            >
-                                                <option value="all">All Levels</option>
-                                                {Array.from(new Set(student.mockScores?.map(s => s.testId))).sort().map(level => (
-                                                    <option key={level} value={level}>Level {level}</option>
-                                                ))}
-                                            </select>
-                                            <select
-                                                value={mockTestFilters.status}
-                                                onChange={(e) => setMockTestFilters(prev => ({ ...prev, status: e.target.value }))}
-                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
-                                            >
-                                                <option value="all">All Status</option>
-                                                <option value="cleared">Cleared</option>
-                                                <option value="not_cleared">Not Cleared</option>
-                                            </select>
-                                            <input
-                                                type="date"
-                                                value={mockTestFilters.date}
-                                                onChange={(e) => setMockTestFilters(prev => ({ ...prev, date: e.target.value }))}
-                                                className="rounded-md border-gray-300 text-sm focus:ring-purple-500 focus:border-purple-500 hover:border-gray-400 transition-colors"
-                                            />
-                                            <button
-                                                onClick={() => setMockTestFilters({ level: 'all', status: 'all', date: '' })}
-                                                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
-                                            >
-                                                Clear Filters
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full divide-y divide-gray-200">
-                                        <thead className="bg-gray-50">
-                                            <tr>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Level
-                                                </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Date
-                                                </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Score
-                                                </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Status
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="bg-white divide-y divide-gray-200">
-                                            {student.mockScores
-                                                ?.filter(score => {
-                                                    const levelMatch = mockTestFilters.level === 'all' || score.testId.toString() === mockTestFilters.level;
-                                                    const statusMatch = mockTestFilters.status === 'all' ||
-                                                        (mockTestFilters.status === 'cleared' && score.score >= 6) ||
-                                                        (mockTestFilters.status === 'not_cleared' && score.score < 6);
-                                                    const dateMatch = !mockTestFilters.date ||
-                                                        new Date(score.date).toLocaleDateString() === new Date(mockTestFilters.date).toLocaleDateString();
-                                                    return levelMatch && statusMatch && dateMatch;
-                                                })
-                                                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                                                .map((score, index) => (
-                                                    <tr key={index}
-                                                        className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition-colors`}>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 ring-1 ring-purple-600/20">
-                                                                Level {score.testId}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                            {new Date(score.createdAt).toLocaleDateString()}
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getScoreColor(score.score)} ring-1`}
-                                                                    title={`${getScoreLabel(score.score)} - ${score.score}/10`}>
-                                                                    {score.score}/10
-                                                                </span>
-                                                                {score.score === Math.max(...student.mockScores.map(s => s.score)) && (
-                                                                    <span className="text-amber-500" title="Highest Score">
-                                                                        <FiAward className="w-4 h-4" />
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap">
-                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${score.score >= 6
-                                                                ? 'bg-green-100 text-green-800 ring-1 ring-green-600/20'
-                                                                : 'bg-red-100 text-red-800 ring-1 ring-red-600/20'
-                                                                }`}>
-                                                                {score.score >= 6 ? (
-                                                                    <>
-                                                                        <FiCheckCircle className="w-3.5 h-3.5" />
-                                                                        Cleared
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <FiXCircle className="w-3.5 h-3.5" />
-                                                                        Not Cleared
-                                                                    </>
-                                                                )}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

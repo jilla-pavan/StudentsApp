@@ -2,17 +2,19 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
-import { FiUser, FiUsers, FiLock } from 'react-icons/fi';
+import { FiUser, FiLock, FiMail, FiInfo } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState('student'); // 'student' or 'admin'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [studentId, setStudentId] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
+  const [studentPassword, setStudentPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showHelpInfo, setShowHelpInfo] = useState(false);
 
-  const { currentUser, userType, adminLogin, studentLogin } = useAuth();
+  const { currentUser, userType, adminLogin, studentLoginWithEmail } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -34,7 +36,6 @@ export default function Login() {
     try {
       if (activeTab === 'admin') {
         const result = await adminLogin(email, password);
-        console.log(result);
         if (result.success) {
           toast.success('Welcome back, admin!');
           navigate('/');
@@ -42,23 +43,44 @@ export default function Login() {
           toast.error(result.error);
         }
       } else {
-        const result = await studentLogin(studentId);
+        // Student login with email and student ID
+        if (!studentEmail.trim() || !studentPassword.trim()) {
+          toast.error("Please enter both email and Student ID");
+          setLoading(false);
+          return;
+        }
+
+        // Attempt login
+        console.log(`Attempting student login with email: ${studentEmail}`);
+        const result = await studentLoginWithEmail(studentEmail, studentPassword);
+
         if (result.success) {
           toast.success('Welcome back!');
-          navigate(`/student/${studentId}`);
+
+          // Check for fee status message
+          if (result.feeStatus && !result.feeStatus.feePaid && result.feeStatus.message) {
+            // Show warning for unpaid fees
+            toast.error(result.feeStatus.message, {
+              duration: 5000, // Show for longer
+              icon: '⚠️',
+            });
+          }
+
+          navigate(`/student/${result.studentId}`);
         } else {
-          toast.error(result.error);
+          toast.error(result.error || 'Invalid email or student ID');
         }
       }
     } catch (error) {
-      toast.error('Failed to log in');
+      console.error('Login error:', error);
+      toast.error('Failed to log in. Please try again.');
     }
 
     setLoading(false);
   }
 
   return (
-    <div className="h-full flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 overflow-hidden">
+    <div className="min-h-screen flex justify-center items-center py-12">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -72,8 +94,12 @@ export default function Login() {
             transition={{ duration: 0.5 }}
             className="flex justify-center mb-4"
           >
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
-              <FiUsers className="w-8 h-8 text-white" />
+            <div className="w-20 h-20 flex items-center justify-center">
+              <img 
+                src="/images/CSA_Logo_Round.png" 
+                alt="Career Sure Academy Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
           </motion.div>
           <motion.h1
@@ -181,46 +207,121 @@ export default function Login() {
                     </div>
                   </div>
                 ) : (
-                  <div>
-                    <label htmlFor="student-id" className="block text-sm font-medium text-gray-700 mb-1">
-                      Student ID
-                    </label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FiUser className="h-5 w-5 text-gray-400" />
+                  <div className="space-y-4">
+                    {/* Help icon for student login */}
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setShowHelpInfo(!showHelpInfo)}
+                        className="text-gray-400 hover:text-purple-600 flex items-center gap-1 text-xs"
+                      >
+                        <FiInfo className="h-4 w-4" />
+                        Need help signing in?
+                      </button>
+                    </div>
+
+                    {/* Help info panel */}
+                    <AnimatePresence>
+                      {showHelpInfo && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="bg-blue-50 p-3 rounded-lg border border-blue-100 text-sm text-blue-800 mb-4"
+                        >
+                          <p className="font-medium mb-1">How to sign in:</p>
+                          <ul className="list-disc pl-5 space-y-1 text-xs">
+                            <li>Use the email address you registered with</li>
+                            <li>If you've been assigned to a batch, check your email for login credentials</li>
+                            <li>Contact support if you can't access your account</li>
+                          </ul>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div>
+                      <label htmlFor="student-email" className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FiMail className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          id="student-email"
+                          name="studentEmail"
+                          type="email"
+                          autoComplete="email"
+                          required
+                          className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                          placeholder="Enter your registered email"
+                          value={studentEmail}
+                          onChange={(e) => setStudentEmail(e.target.value)}
+                        />
                       </div>
-                      <input
-                        id="student-id"
-                        name="studentId"
-                        type="text"
-                        required
-                        className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        placeholder="Enter your student ID"
-                        value={studentId}
-                        onChange={(e) => setStudentId(e.target.value)}
-                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between">
+                        <label htmlFor="student-password" className="block text-sm font-medium text-gray-700 mb-1">
+                          Password
+                        </label>
+                        <span className="text-xs text-gray-500">Sent to your email</span>
+                      </div>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <FiLock className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                          id="student-password"
+                          name="studentPassword"
+                          type="password"
+                          autoComplete="current-password"
+                          required
+                          className="appearance-none block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                          placeholder="Enter your Password"
+                          value={studentPassword}
+                          onChange={(e) => setStudentPassword(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      >
+                        {loading ? 'Signing in...' : 'Sign In'}
+                      </button>
+                    </div>
+
+                    <div className="pt-4 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/register')}
+                        className="text-sm font-medium text-purple-600 hover:text-purple-500 flex items-center"
+                      >
+                        New student? Register here
+                      </button>
                     </div>
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                ) : (
-                  'Sign in'
-                )}
-              </button>
-            </div>
+            {/* Only show submit button for admin login */}
+            {activeTab === 'admin' && (
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                >
+                  {loading ? 'Signing in...' : 'Sign In'}
+                </button>
+              </div>
+            )}
           </form>
         </motion.div>
       </motion.div>
