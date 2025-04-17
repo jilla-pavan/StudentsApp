@@ -33,12 +33,12 @@ async function sendRegistrationConfirmationEmail(studentData, batchName) {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 10px;">
       <div style="text-align: center; margin-bottom: 20px;">
         <h1 style="color: #f5c242; margin-bottom: 5px; font-size: 28px;">Welcome To Career Sure Academy!</h1>
-        <h2 style="color: #3498db; margin-top: 0; font-size: 20px;">Your Registration is Pending Review</h2>
+        <h2 style="color: #3498db; margin-top: 0; font-size: 20px;">Registration received – pending approval.</h2>
       </div>
       
       <p style="font-size: 16px;"><strong>Dear ${studentData.name},</strong></p>
       
-      <p style="font-size: 16px;">Thank you for registering with Career Sure Academy! 🎓 Your registration has been received and is pending review by our administrators.</p>
+      <p style="font-size: 16px;">Thank you for registering with Career Sure Academy! 🎓 Your registration has been received and is under review by our administrators.</p>
       
       <div style="background-color: #f0f7ff; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 5px solid #3498db;">
         <h3 style="color: #34495e; margin-top: 0; font-size: 18px;">Your Registration Information:</h3>
