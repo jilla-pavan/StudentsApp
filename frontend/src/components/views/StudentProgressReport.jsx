@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiDownload, FiPrinter, FiCalendar, FiBook, FiAward, FiTrendingUp, FiCheckCircle, FiXCircle, FiDollarSign } from 'react-icons/fi';
+import { FiArrowLeft, FiDownload, FiPrinter, FiCalendar, FiBook, FiAward, FiTrendingUp, FiCheckCircle, FiXCircle, FiDollarSign, FiClock } from 'react-icons/fi';
 import { BiTime } from 'react-icons/bi';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { jsPDF } from "jspdf";
@@ -1254,10 +1254,11 @@ const StudentProgressReport = ({ students, batches }) => {
                                         <p className="text-xs text-green-500">Average Performance</p>
                                     </div>
                                 </div>
-                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockTestPercentage >= 75 ? 'bg-green-100 text-green-700' :
+                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                                    mockTestPercentage >= 75 ? 'bg-green-100 text-green-700' :
                                     mockTestPercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-red-100 text-red-700'
-                                    }`}>
+                                    'bg-red-100 text-red-700'
+                                }`}>
                                     Grade {getGradeLetter(mockTestPercentage)}
                                 </span>
                             </div>
@@ -1268,10 +1269,11 @@ const StudentProgressReport = ({ students, batches }) => {
                                 </div>
                                 <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
                                     <div
-                                        className={`h-2 rounded-full ${mockTestPercentage >= 75 ? 'bg-green-500' :
+                                        className={`h-2 rounded-full ${
+                                            mockTestPercentage >= 75 ? 'bg-green-500' :
                                             mockTestPercentage >= 60 ? 'bg-yellow-500' :
-                                                'bg-red-500'
-                                            }`}
+                                            'bg-red-500'
+                                        }`}
                                         style={{ width: `${mockTestPercentage}%` }}
                                     />
                                 </div>
@@ -1287,10 +1289,11 @@ const StudentProgressReport = ({ students, batches }) => {
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
-                                        className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${activeTab === tab
+                                        className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${
+                                            activeTab === tab
                                             ? 'border-purple-500 text-purple-600'
                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                            }`}
+                                        }`}
                                     >
                                         {tab.charAt(0).toUpperCase() + tab.slice(1).replace('-', ' ')}
                                     </button>
@@ -1917,17 +1920,30 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                             <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-green-100 rounded-lg">
-                                                        <FiCheckCircle className="w-5 h-5 text-green-600" />
+                                                    <div className="p-2 bg-yellow-100 rounded-lg">
+                                                        <FiClock className="w-5 h-5 text-yellow-600" />
                                                     </div>
                                                     <div>
                                                         <p className="text-sm text-gray-500">Current Mock</p>
                                                         <p className="text-xl font-semibold text-gray-900">
-                                                            {student.mockScores?.filter(score => score.score >= 6).length || 0}
+                                                            {student.currentMockTest || 'N/A'}
                                                         </p>
                                                     </div>
                                                 </div>
-
+                                            </div>
+                                            <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                                        <FiTrendingUp className="w-5 h-5 text-blue-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm text-gray-500">Highest Score</p>
+                                                        <p className="text-xl font-semibold text-gray-900">
+                                                            {student.mockScores?.length ? 
+                                                                Math.max(...student.mockScores.map(score => score.score)) : 'N/A'}
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
