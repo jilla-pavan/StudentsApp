@@ -1089,7 +1089,13 @@ const StudentProgressReport = ({ students, batches }) => {
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                         </svg>
-                                        <span className="text-gray-700 break-all">+91 63010 46346</span>
+                                        <span className="text-gray-700 break-all">+91 6301046346</span>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                        </svg>
+                                        <span className="text-gray-700 break-all">+91 8919734391</span>
                                     </div>
 
                                     <div className="flex items-center">
@@ -1110,7 +1116,7 @@ const StudentProgressReport = ({ students, batches }) => {
                                 </button>
 
                                 <a
-                                    href="mailto:sales@careersureacademy.com"
+                                    href="mailto:careersure.info@gmail.com"
                                     className="flex-1 py-3 text-blue-600 font-medium bg-white hover:bg-blue-50 rounded-lg border border-blue-200 transition-colors focus:outline-none text-center"
                                 >
                                     Contact Sales Team
@@ -1253,11 +1259,10 @@ const StudentProgressReport = ({ students, batches }) => {
                                         <p className="text-xs text-green-500">Average Performance</p>
                                     </div>
                                 </div>
-                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                    mockTestPercentage >= 75 ? 'bg-green-100 text-green-700' :
+                                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${mockTestPercentage >= 75 ? 'bg-green-100 text-green-700' :
                                     mockTestPercentage >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                                    'bg-red-100 text-red-700'
-                                }`}>
+                                        'bg-red-100 text-red-700'
+                                    }`}>
                                     Grade {getGradeLetter(mockTestPercentage)}
                                 </span>
                             </div>
@@ -1268,11 +1273,10 @@ const StudentProgressReport = ({ students, batches }) => {
                                 </div>
                                 <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
                                     <div
-                                        className={`h-2 rounded-full ${
-                                            mockTestPercentage >= 75 ? 'bg-green-500' :
+                                        className={`h-2 rounded-full ${mockTestPercentage >= 75 ? 'bg-green-500' :
                                             mockTestPercentage >= 60 ? 'bg-yellow-500' :
-                                            'bg-red-500'
-                                        }`}
+                                                'bg-red-500'
+                                            }`}
                                         style={{ width: `${mockTestPercentage}%` }}
                                     />
                                 </div>
@@ -1288,11 +1292,10 @@ const StudentProgressReport = ({ students, batches }) => {
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
-                                        className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${
-                                            activeTab === tab
+                                        className={`py-3 sm:py-4 px-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap border-b-2 ${activeTab === tab
                                             ? 'border-purple-500 text-purple-600'
                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                        }`}
+                                            }`}
                                     >
                                         {tab.charAt(0).toUpperCase() + tab.slice(1).replace('-', ' ')}
                                     </button>
@@ -1938,7 +1941,7 @@ const StudentProgressReport = ({ students, batches }) => {
                                                     <div>
                                                         <p className="text-sm text-gray-500">Highest Score</p>
                                                         <p className="text-xl font-semibold text-gray-900">
-                                                            {student.mockScores?.length ? 
+                                                            {student.mockScores?.length ?
                                                                 Math.max(...student.mockScores.map(score => score.score)) : 'N/A'}
                                                         </p>
                                                     </div>
