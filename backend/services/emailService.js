@@ -74,7 +74,7 @@ async function sendRegistrationConfirmationEmail(studentData, batchName) {
         </p>
       </div>
       
-      <p style="font-size: 16px;">If you have any urgent questions or concerns, please feel free to contact our support team at <a href="mailto:careersureacademypayment@gmail.com" style="color: #3498db; text-decoration: none;">careersureacademypayment@gmail.com</a>.</p>
+      <p style="font-size: 16px;">If you have any urgent questions or concerns, please feel free to contact our support team at <a href="mailto:careersure.info@gmail.com" style="color: #3498db; text-decoration: none;">careersure.info@gmail.com</a>.</p>
       <p> Contact us at +91 63010 46346 </p> 
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #777; font-size: 14px;">
         <p style="margin-bottom: 5px;">Best regards,</p>
@@ -209,7 +209,7 @@ async function sendBatchAssignmentEmail(studentData, batchName) {
 
       <p style="font-size: 16px;">After logging in, you will have access to your dashboard</p>
       
-      <p style="font-size: 16px;">If you have any questions or need assistance, please don't hesitate to contact our support team at <a href="mailto:careersureacademypayment@gmail.com" style="color: #3498db; text-decoration: none;">careersureacademypayment@gmail.com</a>.</p>
+      <p style="font-size: 16px;">If you have any questions or need assistance, please don't hesitatecareersureacademypayment@gmail.com to contact our support team at <a href="mailto:" style="color: #3498db; text-decoration: none;">careersure.info@gmail.com</a>.</p>
       
       <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #777; font-size: 14px;">
         <p style="margin-bottom: 5px;">Best regards,</p>
