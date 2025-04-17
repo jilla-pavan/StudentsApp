@@ -956,11 +956,21 @@ const StudentProgressReport = ({ students, batches }) => {
             0;
 
         // Prepare data for progress chart
-        const progressData = scores.map(score => ({
-            testId: score.testId,
-            score: score.score,
-            date: score.date
-        })).sort((a, b) => new Date(a.date) - new Date(b.date));
+        const progressData = scores.map(score => {
+            // Validate and format date properly
+            let validDate = score.date;
+            
+            // If date is invalid or not provided, use current date
+            if (!score.date || isNaN(new Date(score.date).getTime())) {
+                validDate = new Date().toISOString().split('T')[0]; // Use today's date in YYYY-MM-DD format
+            }
+            
+            return {
+                testId: score.testId,
+                score: score.score,
+                date: validDate
+            };
+        }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
         return {
             averageScore,
@@ -1361,15 +1371,33 @@ const StudentProgressReport = ({ students, batches }) => {
                                                     <CartesianGrid strokeDasharray="3 3" />
                                                     <XAxis
                                                         dataKey="date"
-                                                        tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                                        tickFormatter={(date) => {
+                                                            try {
+                                                                const dateObj = new Date(date);
+                                                                return !isNaN(dateObj) 
+                                                                    ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) 
+                                                                    : 'N/A';
+                                                            } catch (e) {
+                                                                return 'N/A';
+                                                            }
+                                                        }}
                                                     />
                                                     <YAxis domain={[0, 10]} />
                                                     <Tooltip
-                                                        labelFormatter={(date) => new Date(date).toLocaleDateString('en-US', {
-                                                            year: 'numeric',
-                                                            month: 'long',
-                                                            day: 'numeric',
-                                                        })}
+                                                        labelFormatter={(date) => {
+                                                            try {
+                                                                const dateObj = new Date(date);
+                                                                return !isNaN(dateObj) 
+                                                                    ? dateObj.toLocaleDateString('en-US', {
+                                                                        year: 'numeric',
+                                                                        month: 'long',
+                                                                        day: 'numeric',
+                                                                    }) 
+                                                                    : 'N/A';
+                                                            } catch (e) {
+                                                                return 'N/A';
+                                                            }
+                                                        }}
                                                     />
                                                     <Legend />
                                                     <Line
