@@ -103,21 +103,35 @@ export const sendRegistrationConfirmationEmail = async (student, batchName) => {
 
 /**
  * Checks if a student's batch has been changed from 'unassigned' to a real batch
+ * or from one batch to another
  * 
  * @param {Object} oldStudent - Previous student data
  * @param {Object} newStudent - Updated student data
- * @returns {Boolean} - True if batch was just assigned
+ * @returns {Boolean} - True if batch was just assigned or changed
  */
 export const isBatchAssigned = (oldStudent, newStudent) => {
-  const result = (
-    oldStudent && 
-    newStudent && 
+  // Ensure we have both student objects
+  if (!oldStudent || !newStudent) {
+    return false;
+  }
+  
+  // Case 1: Student is being assigned a batch for the first time
+  const isFirstBatchAssignment = (
     (oldStudent.batchId === 'unassigned' || !oldStudent.batchId) && 
     newStudent.batchId && 
     newStudent.batchId !== 'unassigned'
   );
   
-  return result;
+  // Case 2: Student is being transferred from one batch to another
+  const isBatchTransfer = (
+    oldStudent.batchId && 
+    oldStudent.batchId !== 'unassigned' &&
+    newStudent.batchId && 
+    newStudent.batchId !== 'unassigned' &&
+    oldStudent.batchId !== newStudent.batchId
+  );
+  
+  return isFirstBatchAssignment || isBatchTransfer;
 };
 
 /**

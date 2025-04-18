@@ -349,7 +349,7 @@ export default function StudentRegister() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-xl"
+              className="bg-white rounded-xl p-6 max-w-lg w-full mx-4 shadow-xl"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -360,6 +360,40 @@ export default function StudentRegister() {
                 <p className="text-sm text-gray-600 mb-4">
                   Your registration has been completed successfully. A confirmation email has been sent to <strong>{registrationResult?.email}</strong>.
                 </p>
+                
+                {/* Student Card Preview */}
+                <motion.div 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="w-full bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden mb-4"
+                >
+                  <div className="p-5 border-b border-gray-200">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 mr-4">
+                        <div className="h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center text-xl font-bold text-purple-600">
+                          {formData.name.split(' ').map(n => n.charAt(0)).join('')}
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-lg font-semibold text-gray-900 truncate">{formData.name}</h2>
+                        <p className="text-sm text-gray-500">{registrationResult?.email}</p>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            Batch will be assigned soon
+                          </span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            ID: {registrationResult?.studentId?.slice(-6).toUpperCase() || 'Processing...'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="px-5 py-3 bg-gray-50">
+                    <p className="text-xs text-gray-500">This is a preview of your student profile. You will see this card when you sign in.</p>
+                  </div>
+                </motion.div>
+                
                 <p className="text-sm text-gray-500 mb-4">
                   Redirecting to login page in <span className="font-medium">{countdown}</span> seconds...
                 </p>

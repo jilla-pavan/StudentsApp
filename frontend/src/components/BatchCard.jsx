@@ -3,6 +3,21 @@ import PropTypes from 'prop-types';
 import { FiEdit2, FiTrash2, FiUsers } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
+const formatTimeToAMPM = (timeString) => {
+  if (!timeString) return '';
+  
+  const parts = timeString.split('-').map(part => part.trim());
+  
+  return parts.map(time => {
+    const [hours, minutes] = time.split(':').map(num => parseInt(num, 10));
+    if (isNaN(hours) || isNaN(minutes)) return time;
+    
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  }).join(' - ');
+};
+
 const BatchCard = ({ batch, onEdit, onDelete, studentsCount = 0 }) => {
   const navigate = useNavigate();
 
@@ -49,7 +64,7 @@ const BatchCard = ({ batch, onEdit, onDelete, studentsCount = 0 }) => {
               <span className="text-sm font-medium">{studentsCount} Students</span>
             </div>
             <div className="text-sm text-gray-700 font-medium bg-purple-50 px-3 py-1.5 rounded-md text-purple-700 border border-purple-100">
-              {batch.timing || '09:00 - 11:00'}
+              {formatTimeToAMPM(batch.timing || '09:00 - 11:00')}
             </div>
           </div>
 

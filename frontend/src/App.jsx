@@ -515,7 +515,7 @@ function AppContent() {
               <div className="mt-8 pt-4 border-t border-gray-200">
                 <div className="px-4 mb-2">
                   <p className="text-sm font-medium text-gray-700">
-                    {userType === 'admin' ? 'Admin' : `Student ID: ${currentUser?.id}`}
+                    {userType === 'admin' ? 'Admin' : `Hi ${currentUser?.name}`}
                   </p>
                 </div>
                 <button

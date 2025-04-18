@@ -63,11 +63,26 @@ const StudentCard = ({ student, onEdit, onDelete, onToggleFeeStatus }) => {
 
   // Default to true if feePaid is undefined (for backward compatibility)
   const feePaid = student.feePaid !== undefined ? student.feePaid : true;
+  
+  // Check if student is self-registered
+  const isSelfRegistered = !!student.registeredAt;
+  
+  // Check if student has been assigned to a proper batch (no longer 'unassigned')
+  const hasBatchAssigned = student.batchId && student.batchId !== 'unassigned';
+  
+  // Only show self-registered styling if they registered themselves AND haven't been assigned a batch yet
+  const showSelfRegisteredStyling = isSelfRegistered && !hasBatchAssigned;
+  
+  // Determine the border style based on registration source and fee status
+  const getBorderStyle = () => {
+    if (!feePaid) return 'border-red-100 hover:border-red-200';
+    if (showSelfRegisteredStyling) return 'border-emerald-300 hover:border-emerald-400';
+    return 'border-gray-100 hover:border-purple-100';
+  };
 
   return (
     <div
-      className={`group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border-2 ${feePaid ? 'border-gray-100 hover:border-purple-100' : 'border-red-100 hover:border-red-200'
-        } cursor-pointer relative`}
+      className={`group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border-2 ${getBorderStyle()} cursor-pointer relative`}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -78,14 +93,24 @@ const StudentCard = ({ student, onEdit, onDelete, onToggleFeeStatus }) => {
         }
       }}
     >
-      {/* Fee Status Badge */}
-      <div className={`absolute top-0 right-0 mt-2 mr-2 px-2 py-1 text-xs font-semibold rounded-full z-10 flex items-center gap-1
-        ${feePaid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-        <FiDollarSign className="w-3 h-3" />
-        {feePaid ? 'Fees Paid' : 'Fees Due'}
+      {/* Badges Container */}
+      <div className="absolute top-0 left-0 right-0 flex justify-between p-2 z-10">
+        {/* Registration Source Badge */}
+        {showSelfRegisteredStyling && (
+          <div className="px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800 flex items-center">
+            Self-Registered
+          </div>
+        )}
+        
+        {/* Fee Status Badge */}
+        <div className={`px-2 py-1 text-xs font-medium rounded-full flex items-center gap-1 ml-auto
+          ${feePaid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <FiDollarSign className="w-3 h-3" />
+          {feePaid ? 'Fees Paid' : 'Fees Due'}
+        </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 pt-10 space-y-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center space-x-3">
@@ -219,7 +244,8 @@ StudentCard.propTypes = {
     attendance: PropTypes.object,
     mockAttendance: PropTypes.object,
     mockScores: PropTypes.array,
-    feePaid: PropTypes.bool
+    feePaid: PropTypes.bool,
+    registeredAt: PropTypes.string
   }).isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,

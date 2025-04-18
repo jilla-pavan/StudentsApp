@@ -67,9 +67,52 @@ export const addStudent = async (studentData) => {
       ...student
     };
 
-    // Send registration confirmation email if student has an email
+    // Variable to track email results
     let emailResult = null;
-    if (isValidEmail(newStudent.email)) {
+    
+    // Check if we need to send batch assignment email - when admin creates student with batch
+    if (newStudent.batchId && newStudent.batchId !== 'unassigned' && isValidEmail(newStudent.email)) {
+      try {
+        // First ensure the student has a valid roll number
+        if (!newStudent.rollNumber || newStudent.rollNumber === 'unassigned') {
+          // Generate a temporary roll number from the student ID
+          const tempRollNumber = newStudent.id.slice(-6).toUpperCase();
+          
+          // Update the student with the temporary roll number
+          await updateDoc(doc(db, COLLECTION_NAME, newStudent.id), {
+            rollNumber: tempRollNumber
+          });
+          
+          // Update our local copy too
+          newStudent.rollNumber = tempRollNumber;
+        }
+        
+        // Get the batch name
+        const batchRef = doc(db, 'batches', newStudent.batchId);
+        const batchSnapshot = await getDoc(batchRef);
+        
+        if (batchSnapshot.exists()) {
+          const batchName = batchSnapshot.data().name;
+          
+          // Send batch assignment email
+          try {
+            emailResult = await sendBatchAssignmentEmail(
+              newStudent,
+              batchName
+            );
+          } catch (emailError) {
+            console.error(`❌ STUDENT SERVICE EMAIL ERROR:`, emailError);
+            console.error(`❌ STUDENT SERVICE EMAIL ERROR DETAILS:`, emailError.stack);
+            // We still continue even if email fails
+          }
+        }
+      } catch (error) {
+        console.error(`❌ STUDENT SERVICE ERROR: Error in batch assignment email process:`, error);
+        // We don't throw here to avoid failing the student creation if email fails
+      }
+    }
+    // If not batch assignment, send regular registration confirmation email
+    else if (isValidEmail(newStudent.email)) {
       try {
         // Send registration confirmation email
         emailResult = await sendRegistrationConfirmationEmail(
@@ -97,7 +140,7 @@ export const addStudent = async (studentData) => {
 export const updateStudent = async (studentId, data) => {
   try {
     // First get the current student data to compare
-    const studentRef = doc(db, 'students', studentId);
+    const studentRef = doc(db, COLLECTION_NAME, studentId);
     const studentSnapshot = await getDoc(studentRef);
     
     if (!studentSnapshot.exists()) {
@@ -119,6 +162,7 @@ export const updateStudent = async (studentId, data) => {
     
     let emailResult = null;
     
+    // Check if batch has been assigned or changed
     if (data.batchId && isBatchAssigned(oldStudentData, updatedStudentData)) {
       try {
         // Get the batch name
@@ -138,10 +182,17 @@ export const updateStudent = async (studentId, data) => {
           throw new Error('Student has invalid email address');
         }
         
-        // Must have roll number and ID for batch assignment
+        // Ensure student has a valid roll number
         if (!updatedStudentData.rollNumber || updatedStudentData.rollNumber === 'unassigned') {
-          console.error(`❌ STUDENT SERVICE ERROR: Student ${studentId} missing valid roll number`);
-          throw new Error('Student must have a valid roll number for batch assignment');
+          const tempRollNumber = studentId.slice(-6).toUpperCase();
+          
+          // Update the roll number
+          await updateDoc(studentRef, { rollNumber: tempRollNumber });
+          
+          // Update our local copy
+          updatedStudentData.rollNumber = tempRollNumber;
+          
+          console.log(`🔄 STUDENT SERVICE: Generated roll number ${tempRollNumber} for student ${studentId}`);
         }
         
         try {
