@@ -1,26 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useStudents } from '../hooks/useStudents';
 import { useBatches } from '../hooks/useBatches';
 import { FiArrowLeft, FiDownload, FiPrinter, FiCalendar, FiBook, FiAward, FiClock, FiCheckCircle, FiXCircle, FiDollarSign } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const StudentDetails = () => {
     const { studentId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { students } = useStudents();
     const { batches } = useBatches();
     const [student, setStudent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
+    const [showWelcomeAnimation, setShowWelcomeAnimation] = useState(false);
 
     useEffect(() => {
         // Find the student by ID
         const foundStudent = students.find(s => s.id === studentId);
         if (foundStudent) {
             setStudent(foundStudent);
+            
+            // Check if this is a newly registered student
+            const isNewlyRegistered = location.state?.from === 'registration' || 
+                                     (foundStudent.registeredAt && 
+                                      new Date().getTime() - new Date(foundStudent.registeredAt).getTime() < 24 * 60 * 60 * 1000);
+            
+            if (isNewlyRegistered) {
+                setShowWelcomeAnimation(true);
+                // Hide welcome animation after 3 seconds
+                setTimeout(() => {
+                    setShowWelcomeAnimation(false);
+                }, 3000);
+            }
         }
         setLoading(false);
-    }, [studentId, students]);
+    }, [studentId, students, location.state]);
 
     // Calculate attendance percentage
     const calculateAttendancePercentage = (student) => {
@@ -119,6 +135,30 @@ const StudentDetails = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Welcome Animation for newly registered students */}
+            <AnimatePresence>
+                {showWelcomeAnimation && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -50 }}
+                        transition={{ duration: 0.5 }}
+                        className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+                    >
+                        <div className="bg-purple-600 bg-opacity-90 text-white px-8 py-6 rounded-xl shadow-2xl text-center">
+                            <motion.div 
+                                initial={{ scale: 0.8 }}
+                                animate={{ scale: 1 }}
+                                transition={{ duration: 0.5, delay: 0.2 }}
+                            >
+                                <h1 className="text-2xl font-bold mb-2">Welcome to Career Sure Academy!</h1>
+                                <p>Your student profile is ready. Here's all your information.</p>
+                            </motion.div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            
             {/* Header with back button and actions */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 print:hidden">
                 <div className="flex items-center mb-4 md:mb-0">
@@ -152,7 +192,12 @@ const StudentDetails = () => {
             </div>
 
             {/* Student Profile Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8"
+            >
                 <div className="p-6 border-b border-gray-200">
                     <div className="flex flex-col md:flex-row md:items-center">
                         <div className="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
@@ -300,7 +345,7 @@ const StudentDetails = () => {
                         </button>
                     </nav>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Content based on active tab */}
             {activeTab === 'overview' && (
