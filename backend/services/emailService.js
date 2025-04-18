@@ -26,7 +26,7 @@ async function sendRegistrationConfirmationEmail(studentData, batchName) {
 
   // For registration confirmation, we always use the new registration template
   const emailSubject =
-    "Welcome To Career Sure Academy! Your Registration is Pending Review";
+    "Welcome To Career Sure Academy! Your Registration is Under Review";
 
   // Email template for new registrations
   const emailContent = `
@@ -201,7 +201,7 @@ async function sendBatchAssignmentEmail(studentData, batchName) {
       </div>
       
       <div style="margin: 30px 0; text-align: center;">
-        <a href="${process.env.FRONTEND_URL || "http://localhost:3000"}/login" 
+        <a href="${process.env.FRONTEND_URL}" 
            style="background-color: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 16px; font-weight: bold; box-shadow: 0 3px 6px rgba(0,0,0,0.1);">
           Login to Your Account
         </a>

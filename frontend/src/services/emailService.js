@@ -4,7 +4,7 @@
  */
 
 // API URL for our Node.js backend
-const API_URL = 'https://studentsapp-pdee.onrender.com/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 // Custom notification messages for better UX
 export const EMAIL_NOTIFICATIONS = {
