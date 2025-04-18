@@ -26,7 +26,7 @@ async function sendRegistrationConfirmationEmail(studentData, batchName) {
 
   // For registration confirmation, we always use the new registration template
   const emailSubject =
-    "Welcome To Career Sure Academy! Your Registration is Pending Review";
+    "Welcome To Career Sure Academy! Your Registration is Under Review";
 
   // Email template for new registrations
   const emailContent = `
