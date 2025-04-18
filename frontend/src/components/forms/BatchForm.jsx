@@ -144,21 +144,44 @@ const BatchForm = ({ batch, onSubmit, onCancel }) => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Timing
             </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={formData.timing}
-                onChange={(e) => {
-                  setFormData({ ...formData, timing: e.target.value });
-                  if (errors.timing) setErrors(prev => ({ ...prev, timing: null }));
-                }}
-                placeholder="09:00 - 11:00"
-                className={`w-full pl-9 pr-3 py-2 border ${
-                  errors.timing ? 'border-red-500' : 'border-gray-200'
-                } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-                disabled={loading}
-              />
-              <FiClock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="time"
+                  value={formData.timing?.split('-')[0]?.trim() || ''}
+                  onChange={(e) => {
+                    const startTime = e.target.value;
+                    const endTime = formData.timing?.split('-')[1]?.trim() || '';
+                    const newTiming = startTime + ' - ' + endTime;
+                    setFormData({ ...formData, timing: newTiming });
+                    if (errors.timing) setErrors(prev => ({ ...prev, timing: null }));
+                  }}
+                  className={`w-full pl-9 pr-3 py-2 border ${
+                    errors.timing ? 'border-red-500' : 'border-gray-200'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  disabled={loading}
+                />
+                <FiClock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+              <span className="text-gray-500">to</span>
+              <div className="relative flex-1">
+                <input
+                  type="time"
+                  value={formData.timing?.split('-')[1]?.trim() || ''}
+                  onChange={(e) => {
+                    const startTime = formData.timing?.split('-')[0]?.trim() || '';
+                    const endTime = e.target.value;
+                    const newTiming = startTime + ' - ' + endTime;
+                    setFormData({ ...formData, timing: newTiming });
+                    if (errors.timing) setErrors(prev => ({ ...prev, timing: null }));
+                  }}
+                  className={`w-full pl-9 pr-3 py-2 border ${
+                    errors.timing ? 'border-red-500' : 'border-gray-200'
+                  } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  disabled={loading}
+                />
+                <FiClock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
             </div>
             {errors.timing && (
               <p className="mt-1 text-sm text-red-500">{errors.timing}</p>
