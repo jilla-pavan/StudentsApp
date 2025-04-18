@@ -483,16 +483,16 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="position: absolute; top: 24px; right: 24px;">
-                                            <span style="background: ${attendancePercentage >= 90 ? '#ecfdf5' : 
-                                                          attendancePercentage >= 80 ? '#f0f9ff' :
-                                                          attendancePercentage >= 70 ? '#faf5ff' : 
-                                                          attendancePercentage >= 60 ? '#fef3c7' : 
-                                                          '#fef2f2'}; 
-                                                   color: ${attendancePercentage >= 90 ? '#059669' : 
-                                                          attendancePercentage >= 80 ? '#0369a1' :
-                                                          attendancePercentage >= 70 ? '#7e22ce' : 
-                                                          attendancePercentage >= 60 ? '#d97706' : 
-                                                          '#dc2626'}; 
+                                            <span style="background: ${attendancePercentage >= 90 ? '#ecfdf5' :
+                    attendancePercentage >= 80 ? '#f0f9ff' :
+                        attendancePercentage >= 70 ? '#faf5ff' :
+                            attendancePercentage >= 60 ? '#fef3c7' :
+                                '#fef2f2'}; 
+                                                   color: ${attendancePercentage >= 90 ? '#059669' :
+                    attendancePercentage >= 80 ? '#0369a1' :
+                        attendancePercentage >= 70 ? '#7e22ce' :
+                            attendancePercentage >= 60 ? '#d97706' :
+                                '#dc2626'}; 
                                                    padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
                                                 Grade ${getGradeLetter(attendancePercentage)}
                                             </span>
@@ -505,9 +505,9 @@ const StudentProgressReport = ({ students, batches }) => {
                                         </div>
                                         <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
                                             <div style="width: ${attendancePercentage}%; height: 100%; 
-                                                       background: ${attendancePercentage >= 75 ? '#22c55e' : 
-                                                                   attendancePercentage >= 60 ? '#eab308' : 
-                                                                   '#ef4444'}; 
+                                                       background: ${attendancePercentage >= 75 ? '#22c55e' :
+                    attendancePercentage >= 60 ? '#eab308' :
+                        '#ef4444'}; 
                                                        border-radius: 9999px;"></div>
                                         </div>
                                     </div>
@@ -527,16 +527,16 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="position: absolute; top: 24px; right: 24px;">
-                                            <span style="background: ${mockAttendancePercentage >= 90 ? '#ecfdf5' : 
-                                                          mockAttendancePercentage >= 80 ? '#f0f9ff' :
-                                                          mockAttendancePercentage >= 70 ? '#faf5ff' : 
-                                                          mockAttendancePercentage >= 60 ? '#fef3c7' : 
-                                                          '#fef2f2'}; 
-                                                   color: ${mockAttendancePercentage >= 90 ? '#059669' : 
-                                                          mockAttendancePercentage >= 80 ? '#0369a1' :
-                                                          mockAttendancePercentage >= 70 ? '#7e22ce' : 
-                                                          mockAttendancePercentage >= 60 ? '#d97706' : 
-                                                          '#dc2626'}; 
+                                            <span style="background: ${mockAttendancePercentage >= 90 ? '#ecfdf5' :
+                    mockAttendancePercentage >= 80 ? '#f0f9ff' :
+                        mockAttendancePercentage >= 70 ? '#faf5ff' :
+                            mockAttendancePercentage >= 60 ? '#fef3c7' :
+                                '#fef2f2'}; 
+                                                   color: ${mockAttendancePercentage >= 90 ? '#059669' :
+                    mockAttendancePercentage >= 80 ? '#0369a1' :
+                        mockAttendancePercentage >= 70 ? '#7e22ce' :
+                            mockAttendancePercentage >= 60 ? '#d97706' :
+                                '#dc2626'}; 
                                                    padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
                                                 Grade ${getGradeLetter(mockAttendancePercentage)}
                                             </span>
@@ -549,9 +549,9 @@ const StudentProgressReport = ({ students, batches }) => {
                                         </div>
                                         <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
                                             <div style="width: ${mockAttendancePercentage}%; height: 100%; 
-                                                       background: ${mockAttendancePercentage >= 75 ? '#22c55e' : 
-                                                                   mockAttendancePercentage >= 60 ? '#eab308' : 
-                                                                   '#ef4444'}; 
+                                                       background: ${mockAttendancePercentage >= 75 ? '#22c55e' :
+                    mockAttendancePercentage >= 60 ? '#eab308' :
+                        '#ef4444'}; 
                                                        border-radius: 9999px;"></div>
                                         </div>
                                     </div>
@@ -571,16 +571,16 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="position: absolute; top: 24px; right: 24px;">
-                                            <span style="background: ${mockTestPercentage >= 90 ? '#ecfdf5' : 
-                                                          mockTestPercentage >= 80 ? '#f0f9ff' :
-                                                          mockTestPercentage >= 70 ? '#faf5ff' : 
-                                                          mockTestPercentage >= 60 ? '#fef3c7' : 
-                                                          '#fef2f2'}; 
-                                                   color: ${mockTestPercentage >= 90 ? '#059669' : 
-                                                          mockTestPercentage >= 80 ? '#0369a1' :
-                                                          mockTestPercentage >= 70 ? '#7e22ce' : 
-                                                          mockTestPercentage >= 60 ? '#d97706' : 
-                                                          '#dc2626'}; 
+                                            <span style="background: ${mockTestPercentage >= 90 ? '#ecfdf5' :
+                    mockTestPercentage >= 80 ? '#f0f9ff' :
+                        mockTestPercentage >= 70 ? '#faf5ff' :
+                            mockTestPercentage >= 60 ? '#fef3c7' :
+                                '#fef2f2'}; 
+                                                   color: ${mockTestPercentage >= 90 ? '#059669' :
+                    mockTestPercentage >= 80 ? '#0369a1' :
+                        mockTestPercentage >= 70 ? '#7e22ce' :
+                            mockTestPercentage >= 60 ? '#d97706' :
+                                '#dc2626'}; 
                                                    padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
                                                 Grade ${getGradeLetter(mockTestPercentage)}
                                             </span>
@@ -593,9 +593,9 @@ const StudentProgressReport = ({ students, batches }) => {
                                         </div>
                                         <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
                                             <div style="width: ${mockTestPercentage}%; height: 100%; 
-                                                      background: ${mockTestPercentage >= 75 ? '#22c55e' : 
-                                                                  mockTestPercentage >= 60 ? '#eab308' : 
-                                                                  '#ef4444'}; 
+                                                      background: ${mockTestPercentage >= 75 ? '#22c55e' :
+                    mockTestPercentage >= 60 ? '#eab308' :
+                        '#ef4444'}; 
                                                       border-radius: 9999px;"></div>
                                         </div>
                                     </div>
@@ -662,8 +662,8 @@ const StudentProgressReport = ({ students, batches }) => {
                                                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0;">
                                                     <span style="padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500;
                                                         ${score.score >= 6
-                    ? 'background: #fff5eb; color: #e65c00;'
-                    : 'background: #fef2f2; color: #991b1b;'}">
+                                ? 'background: #fff5eb; color: #e65c00;'
+                                : 'background: #fef2f2; color: #991b1b;'}">
                                                         ${score.score >= 6 ? '✓ Passed' : '✗ Failed'}
                                                     </span>
                                                 </td>
@@ -805,7 +805,7 @@ const StudentProgressReport = ({ students, batches }) => {
             // Determine colors based on percentage value
             const percentage = parseFloat(value);
             let fillColor, textColor;
-            
+
             // Set colors based on performance
             if (percentage >= 90) {
                 fillColor = [236, 253, 245]; // light green bg
@@ -823,7 +823,7 @@ const StudentProgressReport = ({ students, batches }) => {
                 fillColor = [254, 242, 242]; // light red bg
                 textColor = [220, 38, 38]; // red text
             }
-            
+
             // Card background
             doc.setFillColor(255, 245, 235); // Lighter orange background
             doc.setDrawColor(230, 92, 0); // Darker orange border
@@ -862,7 +862,7 @@ const StudentProgressReport = ({ students, batches }) => {
                 } else {
                     doc.setFillColor(239, 68, 68); // red
                 }
-                
+
                 const progressWidth = Math.min(percentage, 100) * (cardWidth - 20) / 100;
                 if (progressWidth > 0) {
                     doc.roundedRect(x + 10, y + cardHeight - 15, progressWidth, 2, 1, 1, 'F');
@@ -1030,12 +1030,12 @@ const StudentProgressReport = ({ students, batches }) => {
         const progressData = scores.map(score => {
             // Validate and format date properly
             let validDate = score.date;
-            
+
             // If date is invalid or not provided, use current date
             if (!score.date || isNaN(new Date(score.date).getTime())) {
                 validDate = new Date().toISOString().split('T')[0]; // Use today's date in YYYY-MM-DD format
             }
-            
+
             return {
                 testId: score.testId,
                 score: score.score,
@@ -1445,8 +1445,8 @@ const StudentProgressReport = ({ students, batches }) => {
                                                         tickFormatter={(date) => {
                                                             try {
                                                                 const dateObj = new Date(date);
-                                                                return !isNaN(dateObj) 
-                                                                    ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) 
+                                                                return !isNaN(dateObj)
+                                                                    ? dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
                                                                     : 'N/A';
                                                             } catch (e) {
                                                                 return 'N/A';
@@ -1458,12 +1458,12 @@ const StudentProgressReport = ({ students, batches }) => {
                                                         labelFormatter={(date) => {
                                                             try {
                                                                 const dateObj = new Date(date);
-                                                                return !isNaN(dateObj) 
+                                                                return !isNaN(dateObj)
                                                                     ? dateObj.toLocaleDateString('en-US', {
                                                                         year: 'numeric',
                                                                         month: 'long',
                                                                         day: 'numeric',
-                                                                    }) 
+                                                                    })
                                                                     : 'N/A';
                                                             } catch (e) {
                                                                 return 'N/A';
@@ -1576,8 +1576,10 @@ const StudentProgressReport = ({ students, batches }) => {
                                                 <FiCalendar className="w-8 h-8 text-blue-600" />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-semibold text-gray-900">Attendance Overview</h3>
-                                                <p className="text-sm text-gray-500">Class & Mock attendance records</p>
+                                                <h3 className="text-xl font-semibold text-gray-900">
+                                                    {selectedAttendanceType === 'regular' ? 'Regular Class Attendance' : 'Mock Test Attendance'}
+                                                </h3>
+
                                             </div>
                                         </div>
 
