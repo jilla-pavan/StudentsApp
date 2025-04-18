@@ -483,8 +483,18 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="position: absolute; top: 24px; right: 24px;">
-                                            <span style="background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
-                                                Grade A+
+                                            <span style="background: ${attendancePercentage >= 90 ? '#ecfdf5' : 
+                                                          attendancePercentage >= 80 ? '#f0f9ff' :
+                                                          attendancePercentage >= 70 ? '#faf5ff' : 
+                                                          attendancePercentage >= 60 ? '#fef3c7' : 
+                                                          '#fef2f2'}; 
+                                                   color: ${attendancePercentage >= 90 ? '#059669' : 
+                                                          attendancePercentage >= 80 ? '#0369a1' :
+                                                          attendancePercentage >= 70 ? '#7e22ce' : 
+                                                          attendancePercentage >= 60 ? '#d97706' : 
+                                                          '#dc2626'}; 
+                                                   padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
+                                                Grade ${getGradeLetter(attendancePercentage)}
                                             </span>
                                         </div>
                                         <div style="margin-bottom: 16px;">
@@ -494,7 +504,11 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
-                                            <div style="width: ${attendancePercentage}%; height: 100%; background: #22c55e; border-radius: 9999px;"></div>
+                                            <div style="width: ${attendancePercentage}%; height: 100%; 
+                                                       background: ${attendancePercentage >= 75 ? '#22c55e' : 
+                                                                   attendancePercentage >= 60 ? '#eab308' : 
+                                                                   '#ef4444'}; 
+                                                       border-radius: 9999px;"></div>
                                         </div>
                                     </div>
 
@@ -513,8 +527,18 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="position: absolute; top: 24px; right: 24px;">
-                                            <span style="background: #fef2f2; color: #dc2626; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
-                                                Grade F
+                                            <span style="background: ${mockAttendancePercentage >= 90 ? '#ecfdf5' : 
+                                                          mockAttendancePercentage >= 80 ? '#f0f9ff' :
+                                                          mockAttendancePercentage >= 70 ? '#faf5ff' : 
+                                                          mockAttendancePercentage >= 60 ? '#fef3c7' : 
+                                                          '#fef2f2'}; 
+                                                   color: ${mockAttendancePercentage >= 90 ? '#059669' : 
+                                                          mockAttendancePercentage >= 80 ? '#0369a1' :
+                                                          mockAttendancePercentage >= 70 ? '#7e22ce' : 
+                                                          mockAttendancePercentage >= 60 ? '#d97706' : 
+                                                          '#dc2626'}; 
+                                                   padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
+                                                Grade ${getGradeLetter(mockAttendancePercentage)}
                                             </span>
                                         </div>
                                         <div style="margin-bottom: 16px;">
@@ -524,7 +548,11 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
-                                            <div style="width: ${mockAttendancePercentage}%; height: 100%; background: #ef4444; border-radius: 9999px;"></div>
+                                            <div style="width: ${mockAttendancePercentage}%; height: 100%; 
+                                                       background: ${mockAttendancePercentage >= 75 ? '#22c55e' : 
+                                                                   mockAttendancePercentage >= 60 ? '#eab308' : 
+                                                                   '#ef4444'}; 
+                                                       border-radius: 9999px;"></div>
                                         </div>
                                     </div>
 
@@ -543,8 +571,18 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="position: absolute; top: 24px; right: 24px;">
-                                            <span style="background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
-                                                Grade A
+                                            <span style="background: ${mockTestPercentage >= 90 ? '#ecfdf5' : 
+                                                          mockTestPercentage >= 80 ? '#f0f9ff' :
+                                                          mockTestPercentage >= 70 ? '#faf5ff' : 
+                                                          mockTestPercentage >= 60 ? '#fef3c7' : 
+                                                          '#fef2f2'}; 
+                                                   color: ${mockTestPercentage >= 90 ? '#059669' : 
+                                                          mockTestPercentage >= 80 ? '#0369a1' :
+                                                          mockTestPercentage >= 70 ? '#7e22ce' : 
+                                                          mockTestPercentage >= 60 ? '#d97706' : 
+                                                          '#dc2626'}; 
+                                                   padding: 4px 12px; border-radius: 9999px; font-size: 14px; font-weight: 600;">
+                                                Grade ${getGradeLetter(mockTestPercentage)}
                                             </span>
                                         </div>
                                         <div style="margin-bottom: 16px;">
@@ -554,7 +592,11 @@ const StudentProgressReport = ({ students, batches }) => {
                                             </div>
                                         </div>
                                         <div style="width: 100%; height: 8px; background: #f3f4f6; border-radius: 9999px; overflow: hidden;">
-                                            <div style="width: ${mockTestPercentage}%; height: 100%; background: #22c55e; border-radius: 9999px;"></div>
+                                            <div style="width: ${mockTestPercentage}%; height: 100%; 
+                                                      background: ${mockTestPercentage >= 75 ? '#22c55e' : 
+                                                                  mockTestPercentage >= 60 ? '#eab308' : 
+                                                                  '#ef4444'}; 
+                                                      border-radius: 9999px;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -760,13 +802,35 @@ const StudentProgressReport = ({ students, batches }) => {
 
         // Helper function to draw performance cards
         function drawPerformanceCard({ x, y, grade, value, label }) {
+            // Determine colors based on percentage value
+            const percentage = parseFloat(value);
+            let fillColor, textColor;
+            
+            // Set colors based on performance
+            if (percentage >= 90) {
+                fillColor = [236, 253, 245]; // light green bg
+                textColor = [5, 150, 105]; // green text
+            } else if (percentage >= 80) {
+                fillColor = [239, 246, 255]; // light blue bg
+                textColor = [3, 105, 161]; // blue text
+            } else if (percentage >= 70) {
+                fillColor = [250, 245, 255]; // light purple bg
+                textColor = [126, 34, 206]; // purple text
+            } else if (percentage >= 60) {
+                fillColor = [254, 243, 199]; // light yellow bg
+                textColor = [217, 119, 6]; // yellow text
+            } else {
+                fillColor = [254, 242, 242]; // light red bg
+                textColor = [220, 38, 38]; // red text
+            }
+            
             // Card background
             doc.setFillColor(255, 245, 235); // Lighter orange background
             doc.setDrawColor(230, 92, 0); // Darker orange border
             doc.roundedRect(x, y, cardWidth, cardHeight, 3, 3, 'FD');
 
-            // Grade badge
-            doc.setFillColor(230, 92, 0); // Darker orange background for badge
+            // Grade badge with dynamic color
+            doc.setFillColor(...textColor); // Use the text color for badge background
             doc.setTextColor(255, 255, 255);
             doc.setFontSize(10);
             doc.roundedRect(x + cardWidth - 35, y + 5, 30, 7, 2, 2, 'F');
@@ -788,10 +852,17 @@ const StudentProgressReport = ({ students, batches }) => {
             doc.setFillColor(243, 244, 246);
             doc.roundedRect(x + 10, y + cardHeight - 15, cardWidth - 20, 2, 1, 1, 'F');
 
-            // Progress bar fill
-            const percentage = parseFloat(value);
+            // Progress bar fill with dynamic color
             if (!isNaN(percentage)) {
-                doc.setFillColor(230, 92, 0); // Darker orange for progress
+                // Set progress bar color based on performance
+                if (percentage >= 75) {
+                    doc.setFillColor(34, 197, 94); // green
+                } else if (percentage >= 60) {
+                    doc.setFillColor(234, 179, 8); // yellow
+                } else {
+                    doc.setFillColor(239, 68, 68); // red
+                }
+                
                 const progressWidth = Math.min(percentage, 100) * (cardWidth - 20) / 100;
                 if (progressWidth > 0) {
                     doc.roundedRect(x + 10, y + cardHeight - 15, progressWidth, 2, 1, 1, 'F');
@@ -819,8 +890,8 @@ const StudentProgressReport = ({ students, batches }) => {
         drawPerformanceCard({
             x: margin,
             y: cardStartY + cardHeight + cardGap,
-            grade: `Grade ${getGradeLetter(mockPerformance.averageScore * 10)}`,
-            value: `${(mockPerformance.averageScore * 10).toFixed(1)}%`,
+            grade: `Grade ${getGradeLetter(mockTestPercentage)}`,
+            value: `${mockTestPercentage}%`,
             label: 'Mock Test Score'
         });
 
