@@ -32,6 +32,8 @@ const BatchForm = ({ batch, onSubmit, onCancel }) => {
 
     if (!formData.startDate) {
       newErrors.startDate = 'Start date is required';
+    } else if (!formData.editingBatch && new Date(formData.startDate) < new Date().setHours(0, 0, 0, 0)) {
+      newErrors.startDate = 'Start date cannot be in the past for new batches';
     }
 
     if (!formData.timing?.trim()) {
@@ -127,7 +129,7 @@ const BatchForm = ({ batch, onSubmit, onCancel }) => {
                 setFormData({ ...formData, startDate: e.target.value });
                 if (errors.startDate) setErrors(prev => ({ ...prev, startDate: null }));
               }}
-              min={new Date().toISOString().split('T')[0]}
+              min={formData.editingBatch ? undefined : new Date().toISOString().split('T')[0]}
               className={`w-full px-3 py-2 border ${
                 errors.startDate ? 'border-red-500' : 'border-gray-200'
               } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
