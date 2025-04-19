@@ -6,6 +6,7 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
     const [scores, setScores] = useState({});
     const [studentMockLevels, setStudentMockLevels] = useState({});
     const [mockAttendance, setMockAttendance] = useState({});
+    const [showConfirmation, setShowConfirmation] = useState(null);
     const mockLevels = Array.from({ length: 10 }, (_, i) => ({ id: i + 1, name: `Level ${i + 1}` }));
   
     // Initialize student levels and attendance based on their highest passed level
@@ -75,13 +76,27 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
     };
   
     const handleAttendanceChange = async (studentId, mockLevel, isPresent) => {
+      // Show confirmation for both present and absent
+      setShowConfirmation({
+        studentId,
+        mockLevel,
+        name: students.find(s => s.id === studentId)?.firstName || 'Student',
+        action: isPresent ? 'present' : 'absent',
+        isPresent
+      });
+    };
+  
+    const markAttendance = async (studentId, mockLevel, isPresent) => {
       try {
+        // Clear any previous confirmation
+        setShowConfirmation(null);
+        
         const currentDate = new Date().toISOString();
         const newAttendanceRecord = {
           status: isPresent ? 'present' : 'absent',
           date: currentDate
         };
-
+  
         // Get existing attendance records for this mock level
         const existingAttendance = mockAttendance[studentId]?.[`mock_${mockLevel}`] || [];
         
@@ -90,18 +105,26 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
           ...mockAttendance[studentId],
           [`mock_${mockLevel}`]: [...existingAttendance, newAttendanceRecord]
         };
-
+  
         // Update local state
         setMockAttendance(prev => ({
           ...prev,
           [studentId]: updatedAttendance
         }));
-
+  
+        // If marking as absent, clear any score input for this student
+        if (!isPresent) {
+          setScores(prev => ({
+            ...prev,
+            [studentId]: ''
+          }));
+        }
+  
         // Update student in database
         await updateStudent(studentId, {
           mockAttendance: updatedAttendance
         });
-
+  
         toast.success(`Attendance marked as ${isPresent ? 'present' : 'absent'} for Level ${mockLevel}`);
       } catch (error) {
         console.error('Error marking attendance:', error);
@@ -126,8 +149,17 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
   
         // Check if attendance is marked
         const attendance = mockAttendance[studentId]?.[`mock_${mockLevel}`];
-        if (!attendance) {
+        if (!attendance || !Array.isArray(attendance) || attendance.length === 0) {
           toast.error('Please mark attendance before entering score');
+          return;
+        }
+  
+        // Get the most recent attendance record
+        const latestAttendance = attendance.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+        
+        // Prevent saving score if student is marked absent
+        if (latestAttendance.status === 'absent') {
+          toast.error('Cannot assign score to absent student');
           return;
         }
   
@@ -166,6 +198,32 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
   
     return (
       <div className="space-y-4">
+        {/* Confirmation Dialog */}
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+              <h3 className="text-lg font-bold text-gray-900 mb-3">Confirm Attendance</h3>
+              <p className="text-gray-700 mb-4">
+                Are you sure you want to mark <span className="font-semibold">{showConfirmation.name}</span> as <span className={showConfirmation.isPresent ? "text-green-600 font-medium" : "text-red-600 font-medium"}>{showConfirmation.action}</span> for Mock Test Level {showConfirmation.mockLevel}?
+              </p>
+              <div className="flex justify-end space-x-3">
+                <button 
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  onClick={() => setShowConfirmation(null)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className={`px-4 py-2 ${showConfirmation.isPresent ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} text-white rounded-lg`}
+                  onClick={() => markAttendance(showConfirmation.studentId, showConfirmation.mockLevel, showConfirmation.isPresent)}
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Mock Tests</h1>
@@ -236,6 +294,14 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
   
                 // Get attendance status for current level
                 const currentAttendance = mockAttendance[student.id]?.[`mock_${selectedMockLevel}`];
+                
+                // Get the most recent attendance record for the current level
+                const latestAttendance = currentAttendance && Array.isArray(currentAttendance) && currentAttendance.length > 0 
+                  ? currentAttendance.sort((a, b) => new Date(b.date) - new Date(a.date))[0] 
+                  : null;
+                
+                // Determine if the student is absent based on latest attendance record
+                const isAbsent = latestAttendance?.status === 'absent';
                 
                 return (
                   <div key={student.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-gray-50">
@@ -322,14 +388,14 @@ const MockTestsView = ({ renderMockTestList, students, filters, batches, onFilte
                           value={scores[student.id] || ''}
                           onChange={(e) => handleScoreChange(student.id, e.target.value)}
                           placeholder={mockScore ? `Current: ${mockScore.score}` : "Enter score"}
-                          className="w-16 px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                          disabled={!currentAttendance}
+                          className={`w-16 px-3 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${isAbsent ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                          disabled={!latestAttendance || isAbsent}
                         />
                         <span className="text-sm text-gray-500">/10</span>
                         
                         <button
                           onClick={() => handleSaveScore(student.id)}
-                          disabled={!scores[student.id] || !currentAttendance}
+                          disabled={!scores[student.id] || !latestAttendance || isAbsent}
                           className="px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                         >
                           Save
